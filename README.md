@@ -1,3 +1,3 @@
 проект проект проект
 я добавился
-in second
+in master|second merging
