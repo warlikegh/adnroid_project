@@ -1,4 +1,1 @@
-проект проект проект
-я добавился
-in master|second merging
-коля дурак1master
+Андроид клиент для следующего сервиса https://park.mail.ru/
