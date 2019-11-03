@@ -4,21 +4,21 @@
     android:id="@+id/activity_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    tools:context=".AuthActivity">
 
     <Button
         android:id="@+id/getBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="50dp"
         android:layout_centerHorizontal="true"
-        android:text="Get WebService"/>
+        android:layout_below="@id/password"
+        android:text="Войти" />
 
     <TextView
         android:id="@+id/result"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/password"
+        android:layout_below="@id/getBtn"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="8dp"
         android:text="Result ..."
@@ -30,7 +30,7 @@
         android:layout_height="wrap_content"
         android:gravity="top|left"
         android:inputType="textEmailAddress"
-        android:layout_below="@id/getBtn"
+        android:layout_marginTop="300dp"
         android:layout_centerHorizontal="true"
         android:hint="E-mail/Login"
         />

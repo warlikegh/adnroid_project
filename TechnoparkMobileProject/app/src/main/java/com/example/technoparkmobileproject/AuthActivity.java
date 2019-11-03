@@ -1,5 +1,7 @@
 package com.example.technoparkmobileproject;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -15,7 +17,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class MainActivity extends AppCompatActivity {
+public class AuthActivity extends AppCompatActivity {
 
     Button enter;
     TextView quq;
@@ -23,11 +25,13 @@ public class MainActivity extends AppCompatActivity {
     EditText mLogin;
     EditText mPassword;
     TechnoparkUser mUser;
+    public SharedPreferences prefs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        setTheme(R.style.AuthTheme);
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.auth_main);
 
         quq = findViewById(R.id.result);
         mLogin = findViewById(R.id.login);
@@ -38,6 +42,8 @@ public class MainActivity extends AppCompatActivity {
         mData = new UserAuth();
         mUser = new TechnoparkUser();
 
+        prefs = this.getSharedPreferences(
+                "com.example.technoparkmobileproject", Context.MODE_PRIVATE);
         enter.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -45,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
                 String pass = mPassword.getText().toString();
                 String req = login.substring(0,1)+pass.substring(2,3)+
                         login.substring(1,2)+pass.substring(1,2)+
-                        login.substring(2,3)+pass.substring(0,1);
+                        login.substring(2,3)+pass.substring(0,1);                       //need to rewrite req
                 String salt = "";
 
                 mData.setLogin(login);
@@ -84,6 +90,22 @@ public class MainActivity extends AppCompatActivity {
         });
 
     }
+
+    @Override
+    protected void onStop() {
+       // prefs.edit().putString("tag", mUser.getAuthToken()).apply(); was commented right version, while we don`t have salt. Second version will be delete
+        prefs.edit().putString("tag", mLogin.getText().toString()).apply();
+        super.onStop();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+      //  mUser.setAuthToken(prefs.getString("tag", "")); was commented right version, while we don`t have salt. Second version will be deleted
+        mLogin.setText(prefs.getString("tag", ""));
+
+    }
+
     public static String sha256(String base) {
         try{
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
