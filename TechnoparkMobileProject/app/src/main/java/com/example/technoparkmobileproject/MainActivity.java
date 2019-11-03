@@ -1,5 +1,9 @@
 package com.example.technoparkmobileproject;
+
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -13,41 +17,72 @@ import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity {
 
+    Button enter;
     TextView quq;
     UserAuth mData;
+    EditText mLogin;
+    EditText mPassword;
+    TechnoparkUser mUser;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         quq = findViewById(R.id.result);
+        mLogin = findViewById(R.id.login);
+        mPassword = findViewById(R.id.password);
+        enter = findViewById(R.id.getBtn);
+
+
         mData = new UserAuth();
+        mUser = new TechnoparkUser();
 
-        mData.setLogin("aa_tema@mail.ru");
-        mData.setPassword("qwerty3673ap");
-        mData.setReqId("1");
-        mData.setToken(sha256("12"));
+        enter.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String login = mLogin.getText().toString();
+                String pass = mPassword.getText().toString();
+                String req = login.substring(0,1)+pass.substring(2,3)+
+                        login.substring(1,2)+pass.substring(1,2)+
+                        login.substring(2,3)+pass.substring(0,1);
+                String salt = "";
 
-        NetworkService.getInstance()
-                .getJSONApi()
-                .getPostData(mData)
-                .enqueue(new Callback<TechnoparkUser>() {
-                    @Override
-                    public void onResponse(@NonNull Call<TechnoparkUser> call, @NonNull Response<TechnoparkUser> response) {
-                        TechnoparkUser post = response.body();
+                mData.setLogin(login);
+                mData.setPassword(pass);
+                mData.setReqId(req);
+                mData.setToken(sha256(req+salt));
 
-                        quq.append(post.getAuthToken() + "\n");
-                        quq.append(post.getUserId() + "\n");
-                        quq.append(post.getUsername() + "\n");
-                    }
+                quq.append(login+"\n"+pass+"\n"+req+"\n"+sha256(req+salt));
 
-                    @Override
-                    public void onFailure(@NonNull Call<TechnoparkUser> call, @NonNull Throwable t) {
 
-                        quq.append("Error occurred while getting request!");
-                        t.printStackTrace();
-                    }
-                });
+
+                Call<TechnoparkUser> u =NetworkService.getInstance()
+                        .getJSONApi()
+                        .getPostData(mData);
+                        u.enqueue(new Callback<TechnoparkUser>() {
+                            @Override
+                            public void onResponse(@NonNull Call<TechnoparkUser> call, @NonNull Response<TechnoparkUser> response) {
+                                TechnoparkUser post = response.body();
+                 /*
+                                if (post.getAuthToken()!=null)
+                                {
+                                quq.append(post.getAuthToken() + "\n");
+                                quq.append(post.getUserId() + "\n");
+                                quq.append(post.getUsername() + "\n");
+                                }*/
+                            }
+
+                            @Override
+                            public void onFailure(@NonNull Call<TechnoparkUser> call, @NonNull Throwable t) {
+
+                                quq.append("Error occurred while getting request!");
+                                t.printStackTrace();
+                            }
+                        });
+            }
+        });
+
     }
     public static String sha256(String base) {
         try{

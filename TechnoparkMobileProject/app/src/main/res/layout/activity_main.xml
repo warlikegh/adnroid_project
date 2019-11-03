@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity">
+
     <Button
         android:id="@+id/getBtn"
         android:layout_width="wrap_content"
@@ -12,13 +13,35 @@
         android:layout_marginTop="50dp"
         android:layout_centerHorizontal="true"
         android:text="Get WebService"/>
+
     <TextView
         android:id="@+id/result"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Result ..."
+        android:layout_below="@id/password"
         android:layout_centerHorizontal="true"
-        android:textSize="17sp"
+        android:layout_marginTop="8dp"
+        android:text="Result ..."
+        android:textSize="17sp" />
+
+    <EditText
+        android:id="@+id/login"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="top|left"
+        android:inputType="textEmailAddress"
         android:layout_below="@id/getBtn"
-        android:layout_marginTop="20dp"/>
+        android:layout_centerHorizontal="true"
+        android:hint="E-mail/Login"
+        />
+    <EditText
+        android:id="@+id/password"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="top|left"
+        android:inputType="textPassword"
+        android:layout_below="@id/login"
+        android:layout_centerHorizontal="true"
+        android:hint="Password"/>
+
 </RelativeLayout>
