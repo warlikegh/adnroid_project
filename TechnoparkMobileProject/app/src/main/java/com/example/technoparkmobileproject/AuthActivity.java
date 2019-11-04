@@ -70,6 +70,8 @@ public class AuthActivity extends AppCompatActivity {
                             @Override
                             public void onResponse(@NonNull Call<TechnoparkUser> call, @NonNull Response<TechnoparkUser> response) {
                                 if (response.isSuccessful()) {
+                                    prefs.edit().putString("login", mLogin.getText().toString()).apply();
+                                    prefs.edit().putString("pass", mLogin.getText().toString()).apply();
                                     TechnoparkUser post = response.body();
                                     Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                                     intent.putExtra(AUTH_TOKEN, response.body().getAuthToken());
@@ -89,20 +91,6 @@ public class AuthActivity extends AppCompatActivity {
 
     }
 
-    @Override
-    protected void onStop() {
-       // prefs.edit().putString("tag", mUser.getAuthToken()).apply(); was commented right version, while we don`t have salt. Second version will be delete
-        prefs.edit().putString("tag", mLogin.getText().toString()).apply();
-        super.onStop();
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-      //  mUser.setAuthToken(prefs.getString("tag", "")); was commented right version, while we don`t have salt. Second version will be deleted
-        mLogin.setText(prefs.getString("tag", ""));
-
-    }
 
     public static String sha256(String base) {
         try{
