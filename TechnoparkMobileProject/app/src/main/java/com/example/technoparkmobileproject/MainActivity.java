@@ -1,70 +1,30 @@
 package com.example.technoparkmobileproject;
+
 import android.os.Bundle;
-import android.widget.TextView;
 
-import androidx.annotation.NonNull;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+
 import androidx.appcompat.app.AppCompatActivity;
-
-import java.security.MessageDigest;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
+import androidx.navigation.ui.AppBarConfiguration;
+import androidx.navigation.ui.NavigationUI;
 
 public class MainActivity extends AppCompatActivity {
 
-    TextView quq;
-    UserAuth mData;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        quq = findViewById(R.id.result);
-        mData = new UserAuth();
-
-        mData.setLogin("aa_tema@mail.ru");
-        mData.setPassword("qwerty3673ap");
-        mData.setReqId("1");
-        mData.setToken(sha256("12"));
-
-        NetworkService.getInstance()
-                .getJSONApi()
-                .getPostData(mData)
-                .enqueue(new Callback<TechnoparkUser>() {
-                    @Override
-                    public void onResponse(@NonNull Call<TechnoparkUser> call, @NonNull Response<TechnoparkUser> response) {
-                        TechnoparkUser post = response.body();
-
-                        quq.append(post.getAuthToken() + "\n");
-                        quq.append(post.getUserId() + "\n");
-                        quq.append(post.getUsername() + "\n");
-                    }
-
-                    @Override
-                    public void onFailure(@NonNull Call<TechnoparkUser> call, @NonNull Throwable t) {
-
-                        quq.append("Error occurred while getting request!");
-                        t.printStackTrace();
-                    }
-                });
+        BottomNavigationView navView = findViewById(R.id.nav_view);
+        // Passing each menu ID as a set of Ids because each
+        // menu should be considered as top level destinations.
+        AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
+                R.id.navigation_home, R.id.navigation_dashboard, R.id.navigation_notifications)
+                .build();
+        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
+        NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
+        NavigationUI.setupWithNavController(navView, navController);
     }
-    public static String sha256(String base) {
-        try{
-            MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            byte[] hash = digest.digest(base.getBytes("UTF-8"));
-            StringBuffer hexString = new StringBuffer();
 
-            for (int i = 0; i < hash.length; i++) {
-                String hex = Integer.toHexString(0xff & hash[i]);
-                if(hex.length() == 1) hexString.append('0');
-                hexString.append(hex);
-            }
-
-            return hexString.toString();
-        } catch(Exception ex){
-            throw new RuntimeException(ex);
-        }
-    }
 }
-
