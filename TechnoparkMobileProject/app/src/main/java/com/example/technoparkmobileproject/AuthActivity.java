@@ -1,6 +1,7 @@
 package com.example.technoparkmobileproject;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
@@ -11,7 +12,9 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.math.BigInteger;
 import java.security.MessageDigest;
+import java.util.Random;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -25,7 +28,8 @@ public class AuthActivity extends AppCompatActivity {
     EditText mLogin;
     EditText mPassword;
     TechnoparkUser mUser;
-    public SharedPreferences prefs;
+    public static  SharedPreferences prefs;
+    public static final String AUTH_TOKEN = "auth_token";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,9 +53,7 @@ public class AuthActivity extends AppCompatActivity {
             public void onClick(View v) {
                 String login = mLogin.getText().toString();
                 String pass = mPassword.getText().toString();
-                String req = login.substring(0,1)+pass.substring(2,3)+
-                        login.substring(1,2)+pass.substring(1,2)+
-                        login.substring(2,3)+pass.substring(0,1);                       //need to rewrite req
+                String req = new BigInteger(16 * 4, new Random()).toString(16);                       //need to rewrite req
                 String salt = "";
 
                 mData.setLogin(login);
@@ -59,31 +61,27 @@ public class AuthActivity extends AppCompatActivity {
                 mData.setReqId(req);
                 mData.setToken(sha256(req+salt));
 
-                quq.append(login+"\n"+pass+"\n"+req+"\n"+sha256(req+salt));
+                //quq.append(login+"\n"+pass+"\n"+req+"\n"+sha256(req+salt));      //delete
 
-
-
-                Call<TechnoparkUser> u =NetworkService.getInstance()
+                NetworkService.getInstance()
                         .getJSONApi()
-                        .getPostData(mData);
-                        u.enqueue(new Callback<TechnoparkUser>() {
+                        .getPostData(mData)
+                        .enqueue(new Callback<TechnoparkUser>() {
                             @Override
                             public void onResponse(@NonNull Call<TechnoparkUser> call, @NonNull Response<TechnoparkUser> response) {
-                                TechnoparkUser post = response.body();
-                 /*
-                                if (post.getAuthToken()!=null)
-                                {
-                                quq.append(post.getAuthToken() + "\n");
-                                quq.append(post.getUserId() + "\n");
-                                quq.append(post.getUsername() + "\n");
-                                }*/
+                                if (response.isSuccessful()) {
+                                    TechnoparkUser post = response.body();
+                                    Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                                    intent.putExtra(AUTH_TOKEN, response.body().getAuthToken());
+                                    startActivity(intent);
+                                }
+                                else {
+                                    quq.append("Что-то не так! Вероятно, неправильно указаны данные");
+                                }
                             }
-
                             @Override
                             public void onFailure(@NonNull Call<TechnoparkUser> call, @NonNull Throwable t) {
-
-                                quq.append("Error occurred while getting request!");
-                                t.printStackTrace();
+                                quq.append("Нет соединения!");
                             }
                         });
             }
