@@ -1,4 +1,4 @@
-package com.example.technoparkmobileproject;
+package com.example.technoparkmobileproject.User;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;

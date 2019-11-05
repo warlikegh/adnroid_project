@@ -30,7 +30,7 @@
         android:layout_height="wrap_content"
         android:gravity="top|left"
         android:inputType="textEmailAddress"
-        android:layout_marginTop="300dp"
+        android:layout_marginTop="215dp"
         android:layout_centerHorizontal="true"
         android:hint="E-mail/Login"
         />
