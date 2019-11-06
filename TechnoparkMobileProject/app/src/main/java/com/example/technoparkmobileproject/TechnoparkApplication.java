@@ -16,27 +16,37 @@ import android.app.Application;
         import retrofit2.Callback;
         import retrofit2.Response;
 
-        import static com.example.technoparkmobileproject.AuthActivity.AUTH_TOKEN;
+        import static com.example.technoparkmobileproject.AuthActivity.AUTH_TOKEN_EXTRA;
 
 public class TechnoparkApplication extends Application {
 
     @Override
     public void onCreate() {
         super.onCreate();
-
 /*
+        String userLogin;
+        String userPassword;
+
         SharedPreferences sp = getSharedPreferences("my_settings",
                 Context.MODE_PRIVATE);
         boolean hasVisited = sp.getBoolean("hasVisited", false);
         if (!hasVisited) {
-            // выводим нужную активность
             SharedPreferences.Editor e = sp.edit();
             e.putBoolean("hasVisited", true);
-            e.commit(); // не забудьте подтвердить изменения
-            Intent intent = new Intent(getApplicationContext(), AuthActivity.class);
-            startActivity(intent);
+            e.commit();
+            startActivity(new Intent(getApplicationContext(), AuthActivity.class)
+                    .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
+                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
         } else
-            {
+            {/*
+                startActivity(new Intent(getApplicationContext(), AuthActivity.class)
+                        .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
+                        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+
+
+
+
+
         String login = AuthActivity.prefs.getString("login", "");
         String pass = AuthActivity.prefs.getString("password", "");
         String req = new BigInteger(16 * 4, new Random()).toString(16);
@@ -56,7 +66,7 @@ public class TechnoparkApplication extends Application {
                             if (response.isSuccessful()) {
                                 Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                                 intent.putExtra(AUTH_TOKEN, response.body().getAuthToken());
-                                startActivity(intent);
+                                startActivity(intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
                             } else {
                                 Intent intent = new Intent(getApplicationContext(), AuthActivity.class);
                                 startActivity(intent);
@@ -69,6 +79,7 @@ public class TechnoparkApplication extends Application {
                         }
                     });
         }
+
         }*/
     }
 }

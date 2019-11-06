@@ -4,16 +4,5 @@
     <item
         android:drawable="@color/black"/>
 
-    <item
-        android:width="250dp"
-        android:height="50dp"
-        android:top="230dp"
-        android:gravity="center_horizontal"
-        >
-        <bitmap
-            android:gravity="center"
-            android:src="@mipmap/tech"
-            />
-    </item>
 
 </layer-list>
