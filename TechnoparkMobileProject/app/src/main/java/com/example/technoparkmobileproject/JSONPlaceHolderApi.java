@@ -15,7 +15,7 @@ import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.POST;
 
-public interface JSONPlaceHolderApi {
+public interface JSONPlaceHolderApi { //interface for using API`s methods
     @POST("auth/")
     Call<TechnoparkUser> getPostData(@Body UserAuth data);
 
@@ -26,12 +26,12 @@ public interface JSONPlaceHolderApi {
     Call<UserNews> getUserNews(@Header("Authorization") String auth_token);
 
     @GET("schedule/9101/check/")
-    Call<UserCheck> check(@Header("Authorization") String auth_token);
+    Call<UserCheck> getUserCheck(@Header("Authorization") String auth_token);
 
     @POST("registerAPN/")
     Call<PushSuccess> registerAPN(@Header("Authorization") String auth_token, @Body UserPush data);
 
-    @GET("schedule/9101/check/")
+    @GET("schedule/")
     Call<UserSchedule> getUserSchedule(@Header("Authorization") String auth_token);
 
 }
