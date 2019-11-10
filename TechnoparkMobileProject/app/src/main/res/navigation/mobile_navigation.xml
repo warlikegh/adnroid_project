@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/navigation_home"
-        android:name="com.example.technoparkmobileproject.ui.home.HomeFragment"
+        android:name="com.example.technoparkmobileproject.ui.news.NewsFragment"
         android:label="@string/title_home"
         tools:layout="@layout/fragment_home" >
         <argument
@@ -18,15 +18,15 @@
 
     <fragment
         android:id="@+id/navigation_dashboard"
-        android:name="com.example.technoparkmobileproject.ui.dashboard.DashboardFragment"
+        android:name="com.example.technoparkmobileproject.ui.shedule.ScheduleFragment"
         android:label="@string/title_dashboard"
-        tools:layout="@layout/fragment_dashboard" />
+        tools:layout="@layout/fragment_schedule" />
 
     <fragment
         android:id="@+id/navigation_notifications"
-        android:name="com.example.technoparkmobileproject.ui.notifications.NotificationsFragment"
+        android:name="com.example.technoparkmobileproject.ui.profile.ProfileFragment"
         android:label="@string/title_notifications"
-        tools:layout="@layout/fragment_notifications" />
+        tools:layout="@layout/fragment_profile" />
     <argument
         android:name="authToken"
         android:defaultValue='"2"' />
