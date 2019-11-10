@@ -7,8 +7,8 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class NetworkService {
     private static NetworkService mInstance;
-    private static final String BASE_URL = "https://park.mail.ru/api/mobile/v1/";
-    private Retrofit mRetrofit;
+    private static final String BASE_URL = "https://park.mail.ru/api/mobile/v1/"; // in future it will be opportunity to get BASE_URL
+    private Retrofit mRetrofit;                                                   // in getInstance() and user can choose his Mail.ru Project
 
     private NetworkService() {
 
