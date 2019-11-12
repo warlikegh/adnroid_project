@@ -1,10 +1,23 @@
-package com.example.technoparkmobileproject.User;
+package com.example.technoparkmobileproject.ui.news;
 
-import java.util.List;
+import com.example.technoparkmobileproject.network.NewsApi;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class UserNews {
+import java.util.List;
+
+class UserNews {
+
+    public UserNews(Integer mLogin, String mPassword, String mReq/*, List<Result> mToken*/){
+        this.count = mLogin;
+        this.next = mPassword;
+        this.previous = mReq;
+        //this.results = mToken;
+    }
+
+
+
+
 
     @SerializedName("count")
     @Expose
