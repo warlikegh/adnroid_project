@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/text_news"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/blog"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="8dp"
+        android:text="Дорогие друзья,
+    Лето закончилось - пора думать о стажировке в Mail.ru Group.
+    Напоминаю, что стажировка - это возможность работать 20 часов в неделю
+    над реальными задачами, вместе с настоящими профессионалами и
+    применять свои знания на практике.На текущий момент открыто 5 позиций:"
+        android:textAlignment="center"
+        android:textSize="17sp" />
+</LinearLayout>

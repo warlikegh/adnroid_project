@@ -43,7 +43,7 @@ public class AuthRepo {
     private void login(final MutableLiveData<AuthProgress> progress, @NonNull final String login, @NonNull final String password) {
         AuthApi api = mApiRepo.getAuthApi();
         String req=new BigInteger(16 * 4, new Random()).toString(16);
-        api.getAuth(new AuthApi.ProfileAuth(login,password,req, sha256(req+"here must be salt")))
+        api.getAuth(new AuthApi.ProfileAuth(login,password,req, sha256(req+"")))
                 .enqueue(new Callback<AuthApi.UserAuth>() {
             @Override
             public void onResponse(Call<AuthApi.UserAuth> call,
