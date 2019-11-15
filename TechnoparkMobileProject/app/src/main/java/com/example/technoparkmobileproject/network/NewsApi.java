@@ -14,6 +14,9 @@ public interface NewsApi {
     @GET("topics/main/")
     Call<UserNewsPlain> getUserNews(@Header("Authorization") String auth_token);
 
+    @GET("topics/main/{url}")
+    Call<UserNewsPlain> getReUserNews(@Header("Authorization") String auth_token, String url);
+
     class UserNewsPlain {
 
         @SerializedName("count")
@@ -43,12 +46,15 @@ public interface NewsApi {
 
         public class Text {
 
-            @SerializedName("content")
+            @SerializedName(value = "content", alternate = {"src"})
             @Expose
             public String content;
+
             @SerializedName("type")
             @Expose
             public String type;
+
+
 
         }
         public class Result {

@@ -13,13 +13,13 @@ import java.util.List;
 public class NewsViewModel extends AndroidViewModel {
 
     private NewsRepo mRepo = new NewsRepo(getApplication());
-    private LiveData<List<UserNews.Result>> mNews = mRepo.getLessons();
+    private LiveData<UserNews> mNews = mRepo.getNews();
 
     public NewsViewModel(@NonNull Application application) {
         super(application);
     }
 
-    public LiveData<List<UserNews.Result>> getLessons() {
+    public LiveData<UserNews> getNews() {
         return mNews;
     }
 

@@ -26,29 +26,19 @@
         android:layout_marginTop="1dp"
         android:text="Blog"
         android:textSize="17sp" />
-    <TextView
-        android:id="@+id/next"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/content"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="0dp"
-        android:text=""
-        android:textSize="0sp" />
-    <TextView
+    <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/content"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/blog"
         android:layout_centerHorizontal="true"
+        android:layout_below="@id/blog"
         android:layout_marginTop="8dp"
-        android:text="Content"
-        android:textSize="17sp" />
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:context=".ArticleFragment"/>
     <TextView
         android:id="@+id/author"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/next"
+        android:layout_below="@id/content"
         android:layout_marginTop="8dp"
         android:text="Author"
         android:textSize="17sp" />
@@ -57,7 +47,7 @@
         android:id="@+id/rating_news_author"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/next"
+        android:layout_below="@id/content"
         android:layout_alignParentEnd="true"
         android:layout_marginStart="@dimen/cardview_compat_inset_shadow"
         android:layout_marginTop="8dp"
