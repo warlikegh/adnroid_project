@@ -10,6 +10,12 @@
         android:name="com.example.technoparkmobileproject.ui.news.NewsFragment"
         android:label="@string/title_home"
         tools:layout="@layout/fragment_home" >
+        <action
+            android:id="@+id/action_navigation_home_to_articleFragment2"
+            app:destination="@+id/articleFragment2"
+            app:launchSingleTop="false"
+            app:popUpTo="@+id/mobile_navigation"
+            app:popUpToInclusive="false" />
     </fragment>
 
     <fragment
@@ -23,4 +29,9 @@
         android:name="com.example.technoparkmobileproject.ui.profile.ProfileFragment"
         android:label="@string/title_notifications"
         tools:layout="@layout/fragment_profile" />
+    <fragment
+        android:id="@+id/articleFragment2"
+        android:name="com.example.technoparkmobileproject.ui.news.ArticleFragment"
+        android:label="news_article"
+        tools:layout="@layout/news_article" />
 </navigation>

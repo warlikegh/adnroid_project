@@ -10,7 +10,7 @@ import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
-public class MainActivity extends AppCompatActivity{
+public class MainActivity extends AppCompatActivity /*implements NewsFragment.OnItemSelectedListener*/{
 
 
     @Override
@@ -27,4 +27,12 @@ public class MainActivity extends AppCompatActivity{
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(navView, navController);
     }
+
+  /*  public void onItemSelected(UserNews.Result result){
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.nav_host_fragment,  ArticleFragment.newInstance(result))
+                .addToBackStack(null)
+                .commit();
+    }*/
 }

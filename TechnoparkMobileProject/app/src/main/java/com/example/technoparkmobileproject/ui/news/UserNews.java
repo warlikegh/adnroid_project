@@ -12,7 +12,16 @@ class UserNews {
         this.count=null;
         this.next=null;
         this.previous=null;
+        this.results=null;
     }
+
+    public UserNews(Integer mCount,String mNext,String mPrevious,List<Result> mResult){
+        this.count=mCount;
+        this.next=mNext;
+        this.previous=mPrevious;
+        this.results=mResult;
+    }
+
 
     @SerializedName("count")
     @Expose
@@ -91,10 +100,9 @@ class UserNews {
         public Text(String mType, String mContent){
             this.type=mType;
             this.content=mContent;
-
         }
 
-        @SerializedName("content")
+        @SerializedName(value = "content", alternate = "src")
         @Expose
         private String content;
 

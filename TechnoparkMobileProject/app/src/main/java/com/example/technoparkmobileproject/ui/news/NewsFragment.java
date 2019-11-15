@@ -5,6 +5,7 @@ import androidx.fragment.app.Fragment;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.Html;
+import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -15,6 +16,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -28,7 +30,9 @@ import java.util.List;
 
 public class NewsFragment extends Fragment {
 
+    private static NewsAdapter adapter;
     private NewsViewModel mNewsViewModel;
+    private static FragmentManager fragmentManager = null;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -39,8 +43,8 @@ public class NewsFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setHasOptionsMenu(true);
+        fragmentManager=getFragmentManager();
     }
 
     @Override
@@ -61,26 +65,33 @@ public class NewsFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
         RecyclerView recycler = view.findViewById(R.id.news);
-        final NewsAdapter adapter = new NewsAdapter();
+        adapter  = new NewsAdapter();
         recycler.setAdapter(adapter);
         recycler.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        Observer<List<UserNews.Result>> observer = new Observer<List<UserNews.Result>>() {
+        Observer<UserNews> observer = new Observer<UserNews>() {
             @Override
-            public void onChanged(List<UserNews.Result> news) {
+            public void onChanged(UserNews news) {
                 if (news != null) {
-                    adapter.setNews(news);
+                    adapter.setNews(news.getResults());
                 }
             }
         };
         mNewsViewModel = new ViewModelProvider(getActivity())
                 .get(NewsViewModel.class);
         mNewsViewModel
-                .getLessons()
+                .getNews()
                 .observe(getViewLifecycleOwner(), observer);
         mNewsViewModel.refresh();
+
     }
+    /*
+     public interface OnItemSelectedListener {
+   public void onItemSelected(UserNews.Result result);
+    }*/
+
 
     private class NewsAdapter extends RecyclerView.Adapter<NewsViewHolder> {
 
@@ -101,19 +112,29 @@ public class NewsFragment extends Fragment {
 
         @Override
         public void onBindViewHolder(@NonNull NewsViewHolder holder, int position) {
-            final UserNews.Result lesson = mNews.get(position);
-            holder.mTitle.setText(lesson.getTitle());
-            holder.mBlog.setText(lesson.getBlog());
-            holder.mAuthor.setText(lesson.getAuthor().getFullname());
-            holder.mDate.setText(lesson.getPublishDate());
-            holder.mRating.setText(lesson.getRating().toString());
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                holder.mContent1.setText(Html.fromHtml(lesson.getText().get(0).getContent(), Html.FROM_HTML_MODE_COMPACT));
-            } else {
-                holder.mContent1.setText(Html.fromHtml(lesson.getText().get(0).getContent()));
+            final UserNews.Result news = mNews.get(position);
+            holder.mTitle.setText(news.getTitle());
+            holder.mBlog.setText(news.getBlog());
+            holder.mAuthor.setText(news.getAuthor().getFullname());
+            holder.mDate.setText(news.getPublishDate());
+            holder.mRating.setText(news.getRating().toString());
+
+            if (news.getText().get(0).getType().equals("p")){
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    holder.mContent.setText(Html.fromHtml(news.getText().get(0).getContent(), Html.FROM_HTML_MODE_COMPACT));
+                } else {
+                    holder.mContent.setText(Html.fromHtml(news.getText().get(0).getContent()));
+                }
+                holder.mContent.setMovementMethod(LinkMovementMethod.getInstance());
             }
-            holder.mCommentsCount.setText(lesson.getCommentsCount().toString());
-            //content
+
+            holder.mCommentsCount.setText(news.getCommentsCount().toString());
+            if (news.getText().size()>1){
+            holder.mNext.setText("Читать дальше...");
+            holder.mNext.setTextColor(getResources().getColor(android.R.color.holo_blue_light));
+            holder.mNext.setTextSize(17);
+            }
+
         }
 
         @Override
@@ -122,97 +143,43 @@ public class NewsFragment extends Fragment {
         }
     }
 
-    static class NewsViewHolder extends RecyclerView.ViewHolder {
+        static class NewsViewHolder extends RecyclerView.ViewHolder {
 
-        protected TextView mTitle;
-        protected TextView mBlog;
-        protected RecyclerView mContent;
-        protected TextView mAuthor;
-        protected TextView mDate;
-        protected TextView mRating;
-        protected TextView mContent1;
-        protected TextView mCommentsCount;
-       
+            protected TextView mTitle;
+            protected TextView mBlog;
+            protected TextView mContent;
+            protected TextView mAuthor;
+            protected TextView mDate;
+            protected TextView mRating;
+            protected TextView mCommentsCount;
+            private final TextView mNext;
 
-        public NewsViewHolder(@NonNull View itemView) {
-            super(itemView);
-            mTitle = itemView.findViewById(R.id.title);
-            mBlog = itemView.findViewById(R.id.blog);
-            mContent = itemView.findViewById(R.id.content);
-            mContent1 = itemView.findViewById(R.id.content1);
-            mAuthor = itemView.findViewById(R.id.author);
-            mDate = itemView.findViewById(R.id.date_news_author);
-            mRating = itemView.findViewById(R.id.rating_news_author);
-            mCommentsCount = itemView.findViewById(R.id.comments_news);
-            //bindViews(itemView);
-        }
-/*
-        // This get called in PrimaryAdapter onBindViewHolder method
-        public void bindViews(@NonNull View itemView) {
-            RecyclerView recycler = itemView.findViewById(R.id.content);
-            final ContentAdapter adapter = new ContentAdapter();
-            recycler.setLayoutManager(new LinearLayoutManager(getContext()));
-            mContent.setAdapter(adapter);
-            Observer<List<UserNews.Result>> observer = new Observer<List<UserNews.Text>>() {
-                @Override
-                public void onChanged(List<UserNews.Text> text) {
-                    if (text != null) {
-                        adapter.setContent(text);
+            public NewsViewHolder(@NonNull View itemView) {
+                super(itemView);
+                mTitle = itemView.findViewById(R.id.title);
+                mBlog = itemView.findViewById(R.id.blog);
+                mContent = itemView.findViewById(R.id.content);
+                mAuthor = itemView.findViewById(R.id.author);
+                mDate = itemView.findViewById(R.id.date_news_author);
+                mRating = itemView.findViewById(R.id.rating_news_author);
+                mCommentsCount = itemView.findViewById(R.id.comments_news);
+                mNext = itemView.findViewById(R.id.next);
+
+                mNext.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        int pos = NewsViewHolder.this.getAdapterPosition();
+                        UserNews.Result myData = adapter.mNews.get(pos);
+
+                        //((OnItemSelectedListener)context).onItemSelected(myData);
+                                fragmentManager
+                                .beginTransaction()
+                                .replace(R.id.nav_host_fragment,  ArticleFragment.newInstance(myData))
+                                .addToBackStack(null)
+                                .commit();
                     }
-                }
-            };
-        }
-    }
-
-    private class ContentViewHolder extends RecyclerView.ViewHolder {
-
-        private TextView mTextView;
-
-        public ContentViewHolder(View view) {
-            super(view);
-            mTextView = (TextView) itemView.findViewById(R.id.text_news);
+                });
+            }
         }
 
-        public void bindView(UserNews.Text name) {
-            mTextView.setText(name.getContent());
-        }
-    }
-
-    private class ContentAdapter extends RecyclerView.Adapter<ContentViewHolder> {
-        private List<UserNews.Text> mText= new ArrayList<>();
-        public void setContent(List<UserNews.Result> news) {
-            mNews = news;
-            notifyDataSetChanged();
-        }
-
-
-
-        @Override
-        public ContentViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            LayoutInflater inflater = LayoutInflater.from(getActivity());
-            View view = inflater.inflate(R.layout.news_text_item, parent, false);
-            return new ContentViewHolder(view);
-        }
-
-        @Override
-        public void onBindViewHolder(ContentViewHolder holder, int position) {
-            final UserNews.Text lesson = mMovies.get(position);
-            holder.mTextView.setText(lesson.getContent());
-        }
-
-        @Override
-        public int getItemCount() {
-            return mMovies.size();
-        }
-
-
-    private ContentAdapter getContentAdapter(int position) {
-
-        ContentAdapter adapter;
-
-                return new ContentAdapter(mMovies);
-
-
-    }*/
-}
 }

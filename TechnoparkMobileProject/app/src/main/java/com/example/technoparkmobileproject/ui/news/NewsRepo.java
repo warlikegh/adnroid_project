@@ -13,7 +13,6 @@ import com.example.technoparkmobileproject.network.NewsApi;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
@@ -24,12 +23,7 @@ import retrofit2.Response;
 
 public class NewsRepo {
    // private static SimpleDateFormat sSimpleDateFormat = new SimpleDateFormat("dd.MM.yyyy", Locale.US);
-    private final static MutableLiveData<List<UserNews.Result>> mNews = new MutableLiveData<>();
-
-
-    static {
-        mNews.setValue(Collections.<UserNews.Result>emptyList());
-    }
+    private final static MutableLiveData<UserNews> mNews = new MutableLiveData<>();
 
     private final Context mContext;
     private NewsApi mNewsApi;
@@ -39,7 +33,7 @@ public class NewsRepo {
         mNewsApi = ApiRepo.from(mContext).getNewsApi();
     }
 
-    public LiveData<List<UserNews.Result>> getLessons() {
+    public LiveData<UserNews> getNews() {
         return mNews;
     }
 
@@ -49,7 +43,7 @@ public class NewsRepo {
             public void onResponse(Call<NewsApi.UserNewsPlain> call,
                                    Response<NewsApi.UserNewsPlain> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    List<NewsApi.UserNewsPlain.Result> result = response.body().results;
+                    NewsApi.UserNewsPlain result = response.body();
                     mNews.postValue(transform(result));
                 }
             }
@@ -61,9 +55,9 @@ public class NewsRepo {
         });
     }
 
-    private static List<UserNews.Result> transform(List<NewsApi.UserNewsPlain.Result> plains) {
+    private static UserNews transform(NewsApi.UserNewsPlain plains) {
         List<UserNews.Result> result = new ArrayList<>();
-        for (NewsApi.UserNewsPlain.Result newsPlain : plains) {
+        for (NewsApi.UserNewsPlain.Result newsPlain : plains.results) {
             try {
                 UserNews.Result news = map(newsPlain);
                 result.add(news);
@@ -71,7 +65,21 @@ public class NewsRepo {
                 e.printStackTrace();
             }
         }
-        return result;
+        return new UserNews(plains.count,plains.next,plains.previous,result);
+    }
+
+
+    private static List<UserNews.Text> transformText(List<NewsApi.UserNewsPlain.Text> plains) {
+        List<UserNews.Text> texts = new ArrayList<>();
+        for (NewsApi.UserNewsPlain.Text textPlain : plains) {
+            try {
+                UserNews.Text text = mapText(textPlain);
+                texts.add(text);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+        }
+        return texts;
     }
 
     private static UserNews.Author transformAuthor(NewsApi.UserNewsPlain.Author plains) {
@@ -85,18 +93,7 @@ public class NewsRepo {
 
         return author;
     }
-    private static List<UserNews.Text> transformText(List<NewsApi.UserNewsPlain.Text> plains) {
-        List<UserNews.Text> text = new ArrayList<>();
-        for (NewsApi.UserNewsPlain.Text textPlain : plains) {
-            try {
-                UserNews.Text lesson = mapText(textPlain);
-                text.add(lesson);
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-        }
-        return text;
-    }
+
 
     private static UserNews.Result map(NewsApi.UserNewsPlain.Result resultPlain) throws ParseException {
         UserNews temp = new UserNews();
