@@ -11,8 +11,8 @@ import retrofit2.http.Header;
 
 public interface NewsApi {
 
-    @GET("topics/subscribed/?limit=100&offset=15")
-    Call<List<UserNewsPlain>> getUserNews(@Header("Authorization") String auth_token);
+    @GET("topics/main/")
+    Call<UserNewsPlain> getUserNews(@Header("Authorization") String auth_token);
 
     class UserNewsPlain {
 

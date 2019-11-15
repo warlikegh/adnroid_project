@@ -8,16 +8,11 @@ import java.util.List;
 
 class UserNews {
 
-    public UserNews(Integer mLogin, String mPassword, String mReq/*, List<Result> mToken*/){
-        this.count = mLogin;
-        this.next = mPassword;
-        this.previous = mReq;
-        //this.results = mToken;
+    public UserNews(){
+        this.count=null;
+        this.next=null;
+        this.previous=null;
     }
-
-
-
-
 
     @SerializedName("count")
     @Expose
@@ -93,9 +88,16 @@ class UserNews {
 
     public class Text {
 
+        public Text(String mType, String mContent){
+            this.type=mType;
+            this.content=mContent;
+
+        }
+
         @SerializedName("content")
         @Expose
         private String content;
+
         @SerializedName("type")
         @Expose
         private String type;
@@ -118,6 +120,23 @@ class UserNews {
 
     }
     public class Result {
+
+        public Result(Author mAuthor, String mBlog, String mTitle, Double mRating, String mDate, List<Text> mText, int mCommentsCount){
+            this.id=null;
+            this.blog = mBlog;
+            this.author = mAuthor;
+            this.commentsCount=mCommentsCount;
+            this.favoritesCount=null;
+            this.publishDate=mDate;
+            this.title=mTitle;
+            this.rating=mRating;
+            this.text=mText;
+            this.textShort=null;
+            this.url=null;
+            this.userVote=null;
+            this.votesCount=null;
+            this.forbidComment=null;
+        }
 
         @SerializedName("id")
         @Expose
@@ -278,21 +297,35 @@ class UserNews {
 
     public class Author {
 
+        public Author(String mFullname, String mAvatarUrl, String mUsername, int mId){
+            this.fullname =mFullname;
+            this.avatarUrl=mAvatarUrl;
+            this.username=mUsername;
+            this.id=mId;
+            this.rating=null;
+            this.online=null;
+        }
+
         @SerializedName("id")
         @Expose
         private Integer id;
+
         @SerializedName("username")
         @Expose
         private String username;
+
         @SerializedName("fullname")
         @Expose
         private String fullname;
+
         @SerializedName("avatar_url")
         @Expose
         private String avatarUrl;
+
         @SerializedName("online")
         @Expose
         private Boolean online;
+
         @SerializedName("rating")
         @Expose
         private Double rating;
