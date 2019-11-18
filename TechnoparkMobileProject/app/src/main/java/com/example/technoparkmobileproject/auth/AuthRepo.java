@@ -1,16 +1,21 @@
 package com.example.technoparkmobileproject.auth;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
+import androidx.security.crypto.EncryptedSharedPreferences;
+import androidx.security.crypto.MasterKeys;
 
 import com.example.technoparkmobileproject.TechnoparkApplication;
 import com.example.technoparkmobileproject.network.ApiRepo;
 import com.example.technoparkmobileproject.network.AuthApi;
 
+import java.io.IOException;
 import java.math.BigInteger;
+import java.security.GeneralSecurityException;
 import java.security.MessageDigest;
 import java.util.Random;
 
@@ -22,6 +27,12 @@ import retrofit2.Response;
 public class AuthRepo {
 
     private final ApiRepo mApiRepo;
+    static SharedPreferences mSettings;
+    static SharedPreferences.Editor editor;
+    static String SALT="salt";
+    static String AUTH_TOKEN = "auth_token";
+    static String LOGIN = "login";
+    static String PASSWORD = "password";
 
     public AuthRepo(ApiRepo apiRepo) {
         mApiRepo = apiRepo;
@@ -29,7 +40,32 @@ public class AuthRepo {
 
     @NonNull
     public static AuthRepo getInstance(Context context) {
+        String masterKeyAlias = null;
+        try {
+            masterKeyAlias = MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC);
+        } catch (GeneralSecurityException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            mSettings = EncryptedSharedPreferences.create(
+                    "secret_shared_prefs",
+                    masterKeyAlias,
+                    context,
+                    EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+                    EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+            );
+        } catch (GeneralSecurityException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        editor = mSettings.edit();
+
         return TechnoparkApplication.from(context).getAuthRepo();
+
     }
 
     private MutableLiveData<AuthProgress> mAuthProgress;
@@ -43,15 +79,16 @@ public class AuthRepo {
     private void login(final MutableLiveData<AuthProgress> progress, @NonNull final String login, @NonNull final String password) {
         AuthApi api = mApiRepo.getAuthApi();
         String req=new BigInteger(16 * 4, new Random()).toString(16);
-        api.getAuth(new AuthApi.ProfileAuth(login,password,req, sha256(req+"")))
+        api.getAuth(new AuthApi.ProfileAuth(login,password,req, sha256(req+mSettings.getString(SALT,""))))
                 .enqueue(new Callback<AuthApi.UserAuth>() {
             @Override
             public void onResponse(Call<AuthApi.UserAuth> call,
                                    Response<AuthApi.UserAuth> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     AuthApi.UserAuth user = response.body();
-
-                   /*Here we are saving data */
+                    editor.putString(AUTH_TOKEN, user.getAuthToken()).apply();
+                    editor.putString(LOGIN, login).apply();
+                    editor.putString(PASSWORD, password).apply();
 
                     progress.postValue(AuthProgress.SUCCESS);
                 } else {
@@ -66,7 +103,7 @@ public class AuthRepo {
         });
     }
 
-    enum AuthProgress {
+    public enum AuthProgress {
         IN_PROGRESS,
         SUCCESS,
         FAILED,

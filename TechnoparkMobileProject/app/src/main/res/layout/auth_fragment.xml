@@ -1,48 +1,62 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout  xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/activity_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:gravity="center"
+    android:orientation="vertical"
     tools:context=".auth.AuthActivity">
+    <androidx.viewpager.widget.ViewPager
+        android:id="@+id/photos_viewpager"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"/>
 
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tab_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:tabBackground="@drawable/tab_selector"
+        app:tabGravity="center"
+        app:tabIndicatorHeight="0dp"/>
+
+
+    <EditText
+        android:id="@+id/login"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:inputType="textEmailAddress"
+        android:hint="E-mail/Login"
+        android:padding="5dp"
+        />
+    <EditText
+        android:id="@+id/password"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:inputType="textPassword"
+        android:hint="Password"
+        android:padding="5dp"/>
     <Button
         android:id="@+id/getBtn"
-        android:layout_width="wrap_content"
+        android:layout_width="300dp"
         android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_below="@id/password"
         android:text="Войти" />
-
+    <ProgressBar
+        android:id="@+id/progress"
+        android:visibility="gone"
+        android:indeterminate="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
     <TextView
         android:id="@+id/result"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/getBtn"
         android:textAlignment="center"
-        android:layout_centerHorizontal="true"
         android:layout_marginTop="8dp"
         android:text=""
         android:textSize="17sp" />
 
-    <EditText
-        android:id="@+id/login"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:gravity="top|left"
-        android:inputType="textEmailAddress"
-        android:layout_marginTop="215dp"
-        android:layout_centerHorizontal="true"
-        android:hint="E-mail/Login"
-        />
-    <EditText
-        android:id="@+id/password"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:gravity="top|left"
-        android:inputType="textPassword"
-        android:layout_below="@id/login"
-        android:layout_centerHorizontal="true"
-        android:hint="Password"/>
 
-</RelativeLayout>
+
+</LinearLayout>

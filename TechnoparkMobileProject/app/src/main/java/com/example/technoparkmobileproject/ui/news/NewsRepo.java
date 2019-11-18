@@ -2,14 +2,19 @@ package com.example.technoparkmobileproject.ui.news;
 
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.util.Log;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
+import androidx.security.crypto.EncryptedSharedPreferences;
+import androidx.security.crypto.MasterKeys;
 
 import com.example.technoparkmobileproject.network.ApiRepo;
 import com.example.technoparkmobileproject.network.NewsApi;
 
+import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -21,16 +26,21 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 
-public class NewsRepo {
+class NewsRepo {
    // private static SimpleDateFormat sSimpleDateFormat = new SimpleDateFormat("dd.MM.yyyy", Locale.US);
     private final static MutableLiveData<UserNews> mNews = new MutableLiveData<>();
-
+    private SharedPreferences mSettings;
+    //SharedPreferences.Editor editor;
     private final Context mContext;
     private NewsApi mNewsApi;
+    private static String AUTH_TOKEN = "auth_token";
+    static String LOGIN = "login";
+    static String PASSWORD = "password";
 
-    public NewsRepo(Context context) {
+    NewsRepo(Context context) {
         mContext = context;
         mNewsApi = ApiRepo.from(mContext).getNewsApi();
+
     }
 
     public LiveData<UserNews> getNews() {
@@ -38,16 +48,56 @@ public class NewsRepo {
     }
 
     public void refresh() {
-        mNewsApi.getUserNews(" Token ").enqueue(new Callback<NewsApi.UserNewsPlain>() {
+        String masterKeyAlias = null;
+        try {
+            masterKeyAlias = MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC);
+        } catch (GeneralSecurityException | IOException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            assert masterKeyAlias != null;
+            mSettings = EncryptedSharedPreferences.create(
+                    "secret_shared_prefs",
+                    masterKeyAlias,
+                    mContext,
+                    EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+                    EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+            );
+        } catch (GeneralSecurityException | IOException e) {
+            e.printStackTrace();
+        }
+        mNewsApi.getUserNews(" Token "+mSettings.getString(AUTH_TOKEN,"")).enqueue(new Callback<NewsApi.UserNewsPlain>() {
             @Override
             public void onResponse(Call<NewsApi.UserNewsPlain> call,
                                    Response<NewsApi.UserNewsPlain> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     NewsApi.UserNewsPlain result = response.body();
                     mNews.postValue(transform(result));
+                } else {
+                    if (response.code() == 401) {/*
+                        final MediatorLiveData<AuthViewModel.AuthState> mAuthState = new MediatorLiveData<>();
+
+                        final LiveData<AuthRepo.AuthProgress> progressLiveData = AuthRepo.getInstance(TechnoparkApplication.from(mContext))
+                                .login(mSettings.getString(LOGIN, ""), mSettings.getString(PASSWORD, ""));
+                        mAuthState.addSource(progressLiveData, new Observer<AuthRepo.AuthProgress>() {
+                            @Override
+                            public void onChanged(AuthRepo.AuthProgress authProgress) {
+                                if (authProgress == AuthRepo.AuthProgress.SUCCESS) {
+                                   refresh();
+                                   mAuthState.removeSource(progressLiveData);
+                                } else if (authProgress == AuthRepo.AuthProgress.FAILED) {
+
+                                    mAuthState.removeSource(progressLiveData);
+                                } else if (authProgress == AuthRepo.AuthProgress.FAILED_NET) {
+
+                                    mAuthState.removeSource(progressLiveData);
+                                }
+                            }
+                        });*/
+                    }
                 }
             }
-
             @Override
             public void onFailure(Call<NewsApi.UserNewsPlain> call, Throwable t) {
                 Log.e("NewsRepo", "Failed to load", t);
@@ -99,7 +149,8 @@ public class NewsRepo {
         UserNews temp = new UserNews();
         UserNews.Author author=transformAuthor(resultPlain.author);
         List<UserNews.Text> text=transformText(resultPlain.text);
-        UserNews.Result result = temp.new Result(
+        // sSimpleDateFormat.parse(lessonPlain.date)
+        return temp.new Result(
                 author,
                 resultPlain.blog,
                 resultPlain.title,
@@ -107,27 +158,23 @@ public class NewsRepo {
                 resultPlain.publishDate,
                 text,
                 resultPlain.commentsCount);
-        // sSimpleDateFormat.parse(lessonPlain.date)
-        return result;
     }
 
     private static UserNews.Author mapAuthor(NewsApi.UserNewsPlain.Author authorPlain) throws ParseException {
         UserNews temp = new UserNews();
-        UserNews.Author author = temp.new Author(
+        return temp.new Author(
                 authorPlain.fullname,
                 authorPlain.avatarUrl,
                 authorPlain.username,
                 authorPlain.id
         );
-        return author;
     }
 
     private static UserNews.Text mapText(NewsApi.UserNewsPlain.Text textPlain) throws ParseException {
         UserNews temp = new UserNews();
-        UserNews.Text text = temp.new Text(
+        return temp.new Text(
                 textPlain.type,
                 textPlain.content
         );
-        return text;
     }
 }

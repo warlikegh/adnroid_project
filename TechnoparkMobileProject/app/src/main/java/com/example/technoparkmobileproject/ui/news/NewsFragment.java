@@ -19,6 +19,8 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavController;
+import androidx.navigation.ui.NavigationUI;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -30,9 +32,11 @@ import java.util.List;
 
 public class NewsFragment extends Fragment {
 
+    private UserNews mNews;
     private static NewsAdapter adapter;
     private NewsViewModel mNewsViewModel;
     private static FragmentManager fragmentManager = null;
+    public static final String STATE = "change";
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -76,6 +80,7 @@ public class NewsFragment extends Fragment {
             public void onChanged(UserNews news) {
                 if (news != null) {
                     adapter.setNews(news.getResults());
+                    mNews = news;
                 }
             }
         };
@@ -177,9 +182,38 @@ public class NewsFragment extends Fragment {
                                 .replace(R.id.nav_host_fragment,  ArticleFragment.newInstance(myData))
                                 .addToBackStack(null)
                                 .commit();
+                       /* NavController a =new NavController()
+                        NavigationUI.setupActionBarWithNavController(action_articleFragment2_to_navigation_home);*/
                     }
                 });
             }
         }
+    private UserNews restoreState(Bundle savedInstanceState) {
+        UserNews news = new UserNews();
+        if (savedInstanceState != null) {
 
+        }
+        return news;
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+       /* outState.putStringArrayList("title",result.getTitle());
+        outState.putStringArrayList("author",result.getAuthor().getFullname());
+        outState.putIntegerArrayList("commentsCount",result.getCommentsCount());
+        outState.putStringArrayList("blog",result.getBlog());
+        outState.putStringArrayList("date",result.getPublishDate());
+        outState.putDoubleArray("rating",result.getRating());
+        ArrayList<String> text=new ArrayList<>();
+        for (int i = 0; i < result.getText().size(); i++){
+            text.add(result.getText().get(i).getContent());
+        }
+        ArrayList<String> type=new ArrayList<>();
+        for (int i = 0; i < result.getText().size(); i++){
+            type.add(result.getText().get(i).getType());
+        }
+        outState.put("content",text);
+        outState.putStringArrayList("type",type);*/
+    }
 }

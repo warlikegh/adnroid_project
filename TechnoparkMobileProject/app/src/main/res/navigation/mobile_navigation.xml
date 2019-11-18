@@ -13,9 +13,9 @@
         <action
             android:id="@+id/action_navigation_home_to_articleFragment2"
             app:destination="@+id/articleFragment2"
-            app:launchSingleTop="false"
-            app:popUpTo="@+id/mobile_navigation"
-            app:popUpToInclusive="false" />
+            app:launchSingleTop="true"
+            app:popUpTo="@+id/articleFragment2"
+            app:popUpToInclusive="true" />
     </fragment>
 
     <fragment
@@ -29,9 +29,21 @@
         android:name="com.example.technoparkmobileproject.ui.profile.ProfileFragment"
         android:label="@string/title_notifications"
         tools:layout="@layout/fragment_profile" />
+
     <fragment
         android:id="@+id/articleFragment2"
         android:name="com.example.technoparkmobileproject.ui.news.ArticleFragment"
         android:label="news_article"
-        tools:layout="@layout/news_article" />
+        tools:layout="@layout/news_article" >
+        <action
+            android:id="@+id/action_articleFragment2_to_navigation_home"
+            app:destination="@id/navigation_home"
+            app:enterAnim="@anim/fragment_fast_out_extra_slow_in"
+            app:exitAnim="@anim/fragment_close_exit"
+            app:launchSingleTop="true"
+            app:popEnterAnim="@anim/fragment_fade_enter"
+            app:popExitAnim="@anim/fragment_open_exit"
+            app:popUpTo="@+id/mobile_navigation"
+            app:popUpToInclusive="true" />
+    </fragment>
 </navigation>

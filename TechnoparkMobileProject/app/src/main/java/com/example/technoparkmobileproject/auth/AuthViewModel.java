@@ -52,7 +52,7 @@ public class AuthViewModel extends AndroidViewModel {
     }
 
 
-    enum AuthState {
+    public enum AuthState {
         NONE,
         IN_PROGRESS,
         SUCCESS,
