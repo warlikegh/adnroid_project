@@ -26,7 +26,8 @@
             android:label="@string/title_activity_main">
         </activity>
         <activity
-            android:name=".auth.AuthActivity">
+            android:name=".auth.AuthActivity"
+            android:windowSoftInputMode="adjustResize">
         </activity>
     </application>
 

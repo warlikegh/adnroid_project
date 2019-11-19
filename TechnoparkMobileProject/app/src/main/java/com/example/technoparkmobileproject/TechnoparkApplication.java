@@ -21,11 +21,13 @@ public class TechnoparkApplication extends Application {
     static SharedPreferences mSettings;
     static SharedPreferences.Editor editor;
     static String SALT = "salt";
+    private static Context mContext;
 
     @Override
     public void onCreate() {
         super.onCreate();
-        mApiRepo = new ApiRepo();
+        mContext = getApplicationContext();
+        mApiRepo = new ApiRepo(mContext);
         mAuthRepo = new AuthRepo(mApiRepo);
     }
 
@@ -60,7 +62,7 @@ public class TechnoparkApplication extends Application {
             e.printStackTrace();
         }
         editor = mSettings.edit();
-        editor.putString(SALT, "").apply();
+        editor.putString(SALT, "b3d0341e9c1b5b2b73fc84dc59de6ac9f81e2710154c780302915b8e9082b5ef").apply();
         return (TechnoparkApplication) context.getApplicationContext();
     }
 }
