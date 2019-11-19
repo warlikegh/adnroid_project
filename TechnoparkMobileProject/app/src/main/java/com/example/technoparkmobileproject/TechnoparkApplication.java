@@ -62,7 +62,7 @@ public class TechnoparkApplication extends Application {
             e.printStackTrace();
         }
         editor = mSettings.edit();
-        editor.putString(SALT, "b3d0341e9c1b5b2b73fc84dc59de6ac9f81e2710154c780302915b8e9082b5ef").apply();
+        editor.putString(SALT, "").apply();
         return (TechnoparkApplication) context.getApplicationContext();
     }
 }
