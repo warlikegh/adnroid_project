@@ -21,11 +21,13 @@ public class TechnoparkApplication extends Application {
     static SharedPreferences mSettings;
     static SharedPreferences.Editor editor;
     static String SALT = "salt";
+    private static Context mContext;
 
     @Override
     public void onCreate() {
         super.onCreate();
-        mApiRepo = new ApiRepo();
+        mContext = getApplicationContext();
+        mApiRepo = new ApiRepo(mContext);
         mAuthRepo = new AuthRepo(mApiRepo);
     }
 

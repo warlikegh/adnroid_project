@@ -19,8 +19,6 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.navigation.NavController;
-import androidx.navigation.ui.NavigationUI;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -37,6 +35,7 @@ public class NewsFragment extends Fragment {
     private NewsViewModel mNewsViewModel;
     private static FragmentManager fragmentManager = null;
     public static final String STATE = "change";
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -149,7 +148,6 @@ public class NewsFragment extends Fragment {
     }
 
         static class NewsViewHolder extends RecyclerView.ViewHolder {
-
             protected TextView mTitle;
             protected TextView mBlog;
             protected TextView mContent;
@@ -175,15 +173,12 @@ public class NewsFragment extends Fragment {
                     public void onClick(View view) {
                         int pos = NewsViewHolder.this.getAdapterPosition();
                         UserNews.Result myData = adapter.mNews.get(pos);
-
                         //((OnItemSelectedListener)context).onItemSelected(myData);
                                 fragmentManager
                                 .beginTransaction()
                                 .replace(R.id.nav_host_fragment,  ArticleFragment.newInstance(myData))
                                 .addToBackStack(null)
                                 .commit();
-                       /* NavController a =new NavController()
-                        NavigationUI.setupActionBarWithNavController(action_articleFragment2_to_navigation_home);*/
                     }
                 });
             }
