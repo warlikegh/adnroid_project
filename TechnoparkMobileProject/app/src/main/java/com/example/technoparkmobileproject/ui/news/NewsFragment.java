@@ -2,6 +2,8 @@ package com.example.technoparkmobileproject.ui.news;
 
 import androidx.fragment.app.Fragment;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.Html;
@@ -21,9 +23,13 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.security.crypto.EncryptedSharedPreferences;
+import androidx.security.crypto.MasterKeys;
 
 import com.example.technoparkmobileproject.R;
 
+import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,6 +41,14 @@ public class NewsFragment extends Fragment {
     private NewsViewModel mNewsViewModel;
     private static FragmentManager fragmentManager = null;
     public static final String STATE = "change";
+    public static Context context;
+
+    static SharedPreferences mSettings;
+    static SharedPreferences.Editor editor;
+    static String SALT="salt";
+    static String AUTH_TOKEN = "auth_token";
+    static String LOGIN = "login";
+    static String PASSWORD = "password";
 
 
     @Override
@@ -47,6 +61,7 @@ public class NewsFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+        context=getContext();
         fragmentManager=getFragmentManager();
     }
 
@@ -173,6 +188,35 @@ public class NewsFragment extends Fragment {
                     public void onClick(View view) {
                         int pos = NewsViewHolder.this.getAdapterPosition();
                         UserNews.Result myData = adapter.mNews.get(pos);
+/////////////////////////////////////  кодю фигню    отсюда
+                        String masterKeyAlias = null;
+                        try {
+                            masterKeyAlias = MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC);
+                        } catch (GeneralSecurityException e) {
+                            e.printStackTrace();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+
+                        try {
+                            mSettings = EncryptedSharedPreferences.create(
+                                    "secret_shared_prefs",
+                                    masterKeyAlias,
+                                    context,
+                                    EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+                                    EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+                            );
+                        } catch (GeneralSecurityException e) {
+                            e.printStackTrace();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        editor = mSettings.edit();
+                        editor.putString(AUTH_TOKEN,"2")
+                                .putString(LOGIN,"1")
+                                .apply();
+
+ ///////////////////////////////досюда
                         //((OnItemSelectedListener)context).onItemSelected(myData);
                                 fragmentManager
                                 .beginTransaction()
