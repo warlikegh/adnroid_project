@@ -15,6 +15,7 @@ import androidx.security.crypto.MasterKeys;
 
 import com.example.technoparkmobileproject.User.TechnoparkUser;
 import com.example.technoparkmobileproject.User.UserAuth;
+import com.example.technoparkmobileproject.fragments.LoopViewPagerFragment;
 
 
 import java.io.IOException;
@@ -43,6 +44,8 @@ public class AuthActivity extends AppCompatActivity {
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
 
+
+
         setTheme(R.style.AuthTheme);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.auth_main);
@@ -53,6 +56,12 @@ public class AuthActivity extends AppCompatActivity {
         enter = findViewById(R.id.getBtn);
 
         mData = new UserAuth();
+
+        getSupportFragmentManager()
+                .beginTransaction()
+                .add(R.id.fragment_container, new LoopViewPagerFragment())
+                .commit();
+
 
         /*  We`re planning to realize EncryptedSharedPreferences for save secret data such as
         salt, login, password, auth_token (maybe device_id, device_token, user_id, username)
@@ -149,6 +158,8 @@ public class AuthActivity extends AppCompatActivity {
             throw new RuntimeException(ex);
         }
     }
+
+
 
 
 }
