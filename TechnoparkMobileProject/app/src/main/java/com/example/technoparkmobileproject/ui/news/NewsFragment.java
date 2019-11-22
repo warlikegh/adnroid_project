@@ -2,8 +2,6 @@ package com.example.technoparkmobileproject.ui.news;
 
 import androidx.fragment.app.Fragment;
 
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.Html;
@@ -23,13 +21,9 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.security.crypto.EncryptedSharedPreferences;
-import androidx.security.crypto.MasterKeys;
 
 import com.example.technoparkmobileproject.R;
 
-import java.io.IOException;
-import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,6 +35,7 @@ public class NewsFragment extends Fragment {
     private NewsViewModel mNewsViewModel;
     private static FragmentManager fragmentManager = null;
     public static final String STATE = "change";
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -127,7 +122,7 @@ public class NewsFragment extends Fragment {
             holder.mDate.setText(news.getPublishDate());
             holder.mRating.setText(news.getRating().toString());
 
-            if (news.getText().get(0).getType().equals("p")){
+            if (news.getText().get(0).getType().equals("p")||news.getText().get(0).getType().equals("u1")){
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                     holder.mContent.setText(Html.fromHtml(news.getText().get(0).getContent(), Html.FROM_HTML_MODE_COMPACT));
                 } else {

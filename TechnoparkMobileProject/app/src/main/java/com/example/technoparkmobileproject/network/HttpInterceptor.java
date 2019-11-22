@@ -85,9 +85,6 @@ public class HttpInterceptor implements Interceptor {
                             if (response.isSuccessful() && response.body() != null) {
                                 AuthApi.UserAuth user = response.body();
                                 editor.putString(AUTH_TOKEN, user.getAuthToken()).apply();
-                                editor.putString(LOGIN, login).apply();
-                                editor.putString(PASSWORD, pass).apply();
-
                             } else {
                                 mContext.startActivity(new Intent(mContext, AuthActivity.class)
                                         .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)

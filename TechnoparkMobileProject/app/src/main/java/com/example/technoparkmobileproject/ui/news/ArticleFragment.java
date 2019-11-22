@@ -92,7 +92,7 @@ public class ArticleFragment extends Fragment {
         public void onBindViewHolder(@NonNull ContentViewHolder holder, int position) {
             final String text = mText.get(position);
             final String type = mType.get(position);
-            if (type.equals("p")){
+            if (type.equals("p")||type.equals("ul")){
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                     holder.mTextNews.setText(Html.fromHtml(text, Html.FROM_HTML_MODE_COMPACT));
                 } else {
