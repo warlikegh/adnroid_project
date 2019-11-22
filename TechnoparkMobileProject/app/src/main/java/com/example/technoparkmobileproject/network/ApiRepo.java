@@ -1,28 +1,10 @@
 package com.example.technoparkmobileproject.network;
 
 import android.content.Context;
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.util.Log;
-
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MediatorLiveData;
-import androidx.lifecycle.Observer;
-import androidx.security.crypto.EncryptedSharedPreferences;
-import androidx.security.crypto.MasterKeys;
 
 import com.example.technoparkmobileproject.TechnoparkApplication;
-import com.example.technoparkmobileproject.auth.AuthActivity;
-import com.example.technoparkmobileproject.auth.AuthRepo;
-import com.example.technoparkmobileproject.auth.AuthViewModel;
 
-import java.io.IOException;
-import java.security.GeneralSecurityException;
-
-import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -37,9 +19,6 @@ public class ApiRepo {
     private final PushApi mPushApi;
     private final OkHttpClient mOkHttpClient;
     private String BASE_URL="https://park.mail.ru/api/mobile/v1/";
-    static String LOGIN = "login";
-    static String PASSWORD = "password";
-    static SharedPreferences mSettings;
 
     public ApiRepo(Context context) {
 
@@ -100,73 +79,6 @@ public class ApiRepo {
     public static ApiRepo from(Context context) {
 
         return TechnoparkApplication.from(context).getApis();
-    }
-    private class HttpInterceptor implements Interceptor {
-
-        private Context mContext;
-
-        public HttpInterceptor(Context context){
-            mContext=context;
-        }
-
-        @Override
-        public Response intercept(Chain chain) throws IOException {
-            Request request = chain.request();
-            Request.Builder builder = request.newBuilder();
-            request = builder.build();
-            Response response = chain.proceed(request);
-
-            if (response.code() == 401) { //if unauthorized
-                String masterKeyAlias = null;
-                try {
-                    masterKeyAlias = MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC);
-                } catch (GeneralSecurityException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
-                try {
-                    mSettings = EncryptedSharedPreferences.create(
-                            "secret_shared_prefs",
-                            masterKeyAlias,
-                            mContext,
-                            EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-                            EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
-                    );
-                } catch (GeneralSecurityException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                final MediatorLiveData<AuthViewModel.AuthState> mAuthState = new MediatorLiveData<>();
-                final LiveData<AuthRepo.AuthProgress> progressLiveData = AuthRepo.getInstance(mContext)
-                        .login(mSettings.getString(LOGIN,""), mSettings.getString(PASSWORD,""));
-                /*mAuthState.addSource(progressLiveData, new Observer<AuthRepo.AuthProgress>() {
-                    @Override
-                    public void onChanged(AuthRepo.AuthProgress authProgress) {
-                        if (authProgress == AuthRepo.AuthProgress.SUCCESS) {
-
-                            mAuthState.removeSource(progressLiveData);
-                        } else if (authProgress == AuthRepo.AuthProgress.FAILED) {
-                            mContext.startActivity(new Intent(mContext, AuthActivity.class)
-                                    .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
-                                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
-                            mAuthState.removeSource(progressLiveData);
-                        }else if (authProgress == AuthRepo.AuthProgress.FAILED_NET) {
-
-                            mAuthState.removeSource(progressLiveData);
-                        }
-                    }
-                });*/
-            } else if (response.code()==400){
-                mContext.startActivity(new Intent(mContext, AuthActivity.class)
-                        .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
-                        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
-            }
-
-            return response;
-        }
     }
 }
 
