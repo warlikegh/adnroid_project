@@ -3,9 +3,11 @@ package com.example.technoparkmobileproject.network;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.util.Log;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MediatorLiveData;
+import androidx.lifecycle.Observer;
 import androidx.security.crypto.EncryptedSharedPreferences;
 import androidx.security.crypto.MasterKeys;
 
@@ -140,6 +142,23 @@ public class ApiRepo {
                 final MediatorLiveData<AuthViewModel.AuthState> mAuthState = new MediatorLiveData<>();
                 final LiveData<AuthRepo.AuthProgress> progressLiveData = AuthRepo.getInstance(mContext)
                         .login(mSettings.getString(LOGIN,""), mSettings.getString(PASSWORD,""));
+                /*mAuthState.addSource(progressLiveData, new Observer<AuthRepo.AuthProgress>() {
+                    @Override
+                    public void onChanged(AuthRepo.AuthProgress authProgress) {
+                        if (authProgress == AuthRepo.AuthProgress.SUCCESS) {
+
+                            mAuthState.removeSource(progressLiveData);
+                        } else if (authProgress == AuthRepo.AuthProgress.FAILED) {
+                            mContext.startActivity(new Intent(mContext, AuthActivity.class)
+                                    .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
+                                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+                            mAuthState.removeSource(progressLiveData);
+                        }else if (authProgress == AuthRepo.AuthProgress.FAILED_NET) {
+
+                            mAuthState.removeSource(progressLiveData);
+                        }
+                    }
+                });*/
             } else if (response.code()==400){
                 mContext.startActivity(new Intent(mContext, AuthActivity.class)
                         .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
