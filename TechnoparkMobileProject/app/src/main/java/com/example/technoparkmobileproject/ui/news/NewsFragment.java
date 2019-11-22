@@ -12,6 +12,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -22,6 +23,8 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.example.technoparkmobileproject.R;
 
 import java.util.ArrayList;
@@ -131,12 +134,18 @@ public class NewsFragment extends Fragment {
                 holder.mContent.setMovementMethod(LinkMovementMethod.getInstance());
             }
 
+
             holder.mCommentsCount.setText(news.getCommentsCount().toString());
             if (news.getText().size()>1){
             holder.mNext.setText("Читать дальше...");
             holder.mNext.setTextColor(getResources().getColor(android.R.color.holo_blue_light));
             holder.mNext.setTextSize(17);
             }
+            Glide.with(getContext())
+                    .load(news.getAuthor().getAvatarUrl())
+/*rewrite*/         .placeholder(R.drawable.ic_launcher_foreground)
+                    .apply(RequestOptions.circleCropTransform())
+                    .into(holder.mAvatar);
 
         }
 
@@ -155,6 +164,7 @@ public class NewsFragment extends Fragment {
             protected TextView mRating;
             protected TextView mCommentsCount;
             private final TextView mNext;
+            protected ImageView mAvatar;
 
             public NewsViewHolder(@NonNull View itemView) {
                 super(itemView);
@@ -165,6 +175,7 @@ public class NewsFragment extends Fragment {
                 mDate = itemView.findViewById(R.id.date_news_author);
                 mRating = itemView.findViewById(R.id.rating_news_author);
                 mCommentsCount = itemView.findViewById(R.id.comments_news);
+                mAvatar=itemView.findViewById(R.id.photo);
                 mNext = itemView.findViewById(R.id.next);
 
                 mNext.setOnClickListener(new View.OnClickListener() {
