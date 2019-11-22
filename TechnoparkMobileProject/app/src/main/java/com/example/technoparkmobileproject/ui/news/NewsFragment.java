@@ -41,16 +41,6 @@ public class NewsFragment extends Fragment {
     private NewsViewModel mNewsViewModel;
     private static FragmentManager fragmentManager = null;
     public static final String STATE = "change";
-    public static Context context;
-
-    static SharedPreferences mSettings;
-    static SharedPreferences.Editor editor;
-    static String SALT="salt";
-    static String AUTH_TOKEN = "auth_token";
-    static String LOGIN = "login";
-    static String PASSWORD = "password";
-
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -61,7 +51,6 @@ public class NewsFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-        context=getContext();
         fragmentManager=getFragmentManager();
     }
 
@@ -188,35 +177,6 @@ public class NewsFragment extends Fragment {
                     public void onClick(View view) {
                         int pos = NewsViewHolder.this.getAdapterPosition();
                         UserNews.Result myData = adapter.mNews.get(pos);
-/////////////////////////////////////  кодю фигню    отсюда
-                        String masterKeyAlias = null;
-                        try {
-                            masterKeyAlias = MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC);
-                        } catch (GeneralSecurityException e) {
-                            e.printStackTrace();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-
-                        try {
-                            mSettings = EncryptedSharedPreferences.create(
-                                    "secret_shared_prefs",
-                                    masterKeyAlias,
-                                    context,
-                                    EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-                                    EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
-                            );
-                        } catch (GeneralSecurityException e) {
-                            e.printStackTrace();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                        editor = mSettings.edit();
-                        editor.putString(AUTH_TOKEN,"2")
-                                .putString(LOGIN,"1")
-                                .apply();
-
- ///////////////////////////////досюда
                         //((OnItemSelectedListener)context).onItemSelected(myData);
                                 fragmentManager
                                 .beginTransaction()
