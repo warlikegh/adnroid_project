@@ -2,14 +2,15 @@ package com.example.technoparkmobileproject.ui.news;
 
 import androidx.fragment.app.Fragment;
 
+import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -17,6 +18,8 @@ import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.example.technoparkmobileproject.R;
 
 import java.util.ArrayList;
@@ -48,6 +51,7 @@ public class ArticleFragment extends Fragment {
         String blog="";
         String date="";
         String author="";
+        String authorAvatar="";
         Integer сommentsCount=0;
         Double rating=0.;
 
@@ -61,9 +65,10 @@ public class ArticleFragment extends Fragment {
             сommentsCount = arguments.getInt("commentsCount");
             text = arguments.getStringArrayList("content");
             type = arguments.getStringArrayList("type");
+            authorAvatar=arguments.getString("avatar");
         }
         final PageAdapter adapter = new PageAdapter();
-        adapter.setContent(text, type, title, blog, author, date, сommentsCount, rating);
+        adapter.setContent(text, type, title, blog, author, date, сommentsCount, rating, authorAvatar, getContext());
         mContent.setAdapter(adapter);
         mContent.setLayoutManager(new LinearLayoutManager(getContext()));
 
@@ -101,7 +106,11 @@ public class ArticleFragment extends Fragment {
                 holder.mTextNews.setMovementMethod(LinkMovementMethod.getInstance());
             } else
             if (type.equals("img")){
-                holder.mTextNews.setText(text);
+                Glide.with(getContext())
+                        .load(text)
+/*rewrite*/             .placeholder(R.drawable.ic_launcher_foreground)
+                        .into(holder.mImageNews);
+                holder.mTextNews.setEnabled(true);
             } else {
             }
         }
@@ -115,10 +124,12 @@ public class ArticleFragment extends Fragment {
     static class ContentViewHolder extends RecyclerView.ViewHolder {
 
         protected TextView mTextNews;
+        protected ImageView mImageNews;
 
         public ContentViewHolder(@NonNull View itemView) {
             super(itemView);
             mTextNews = itemView.findViewById(R.id.text_news);
+            mImageNews=itemView.findViewById(R.id.photo);
         }
     }
 
@@ -145,6 +156,7 @@ public class ArticleFragment extends Fragment {
         bundle.putStringArrayList("content",text);
         bundle.putStringArrayList("type",type);
         fragment.setArguments(bundle);
+        bundle.putString("avatar",result.getAuthor().getAvatarUrl());
         return fragment;
     }
 
@@ -158,9 +170,11 @@ public class ArticleFragment extends Fragment {
         private String mAuthor;
         private Integer mCommentsCount;
         private Double mRating;
+        private String mAvatar;
+        private Context mComtext;
 
         public void setContent(List<String> text, List<String> type, String title, String blog,
-                               String author, String date, Integer count, Double rating) {
+                               String author, String date, Integer count, Double rating, String avatar, Context context) {
             mText = text;
             mType = type;
             mTitle=title;
@@ -169,6 +183,8 @@ public class ArticleFragment extends Fragment {
             mDate=date;
             mCommentsCount=count;
             mRating=rating;
+            mAvatar=avatar;
+            mComtext=context;
             notifyDataSetChanged();
         }
 
@@ -187,6 +203,12 @@ public class ArticleFragment extends Fragment {
             holder.mDate.setText(mDate);
             holder.mRating.setText(mRating.toString());
             holder.mCommentsCount.setText(mCommentsCount.toString());
+
+            Glide.with(mComtext)
+                    .load(mAvatar)
+/*rewrite*/         .placeholder(R.drawable.ic_launcher_foreground)
+                    .apply(RequestOptions.circleCropTransform())
+                    .into(holder.mAvatar);
 
             final ContentAdapter adapter = new ContentAdapter();
             adapter.setContent(mText, mType);
@@ -210,6 +232,7 @@ public class ArticleFragment extends Fragment {
         protected TextView mDate;
         protected TextView mCommentsCount;
         protected TextView mRating;
+        protected ImageView mAvatar;
 
         public PageViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -220,6 +243,7 @@ public class ArticleFragment extends Fragment {
             mDate = itemView.findViewById(R.id.date_news_author);
             mRating = itemView.findViewById(R.id.rating_news_author);
             mCommentsCount = itemView.findViewById(R.id.comments_news);
+            mAvatar=itemView.findViewById(R.id.photo);
         }
     }
 
