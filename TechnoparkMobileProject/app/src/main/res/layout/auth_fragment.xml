@@ -8,10 +8,15 @@
     android:gravity="center"
     android:orientation="vertical"
     tools:context=".auth.AuthActivity">
-    <androidx.viewpager.widget.ViewPager
-        android:id="@+id/photos_viewpager"
+
+    <com.imbryk.viewPager.LoopViewPager
+        android:id="@+id/viewpager"
         android:layout_width="match_parent"
-        android:layout_height="200dp"/>
+        android:layout_height="256dp"
+        android:background="@color/black">
+
+
+    </com.imbryk.viewPager.LoopViewPager>
 
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tab_layout"

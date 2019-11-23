@@ -1,6 +1,7 @@
 package com.example.technoparkmobileproject.network;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.example.technoparkmobileproject.TechnoparkApplication;
 
@@ -11,6 +12,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 
 public class ApiRepo {
+    private static final String TAG ="URL_Find" ;
     private final AuthApi mAuthApi;
     private final NewsApi mNewsApi;
     private final ScheduleApi mScheduleApi;
@@ -50,6 +52,7 @@ public class ApiRepo {
 
     public void setUrl(String url) {
         BASE_URL = url;
+        Log.d(TAG,url);
     }
 
     public AuthApi getAuthApi() {
