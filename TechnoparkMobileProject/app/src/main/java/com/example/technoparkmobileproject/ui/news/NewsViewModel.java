@@ -1,6 +1,7 @@
 package com.example.technoparkmobileproject.ui.news;
 
 import android.app.Application;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 
@@ -22,7 +23,8 @@ public class NewsViewModel extends AndroidViewModel {
         return mNews;
     }
 
-    public void refresh() {
-        mRepo.refresh();
+    public void refresh(String url) {
+        mRepo.refresh(url);
+        Log.e("okhttp3",url);
     }
 }

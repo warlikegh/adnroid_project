@@ -41,9 +41,10 @@ class NewsRepo {
         return mNews;
     }
 
-    public void refresh() {
+    public void refresh(String url) {
+        Log.e("okhttp4",url);
         mSettings=new SecretData().getSecretData(mContext);
-        mNewsApi.getUserNews(" Token "+mSettings.getString(AUTH_TOKEN,"")).enqueue(new Callback<NewsApi.UserNewsPlain>() {
+        mNewsApi.getReUserNews(" Token "+mSettings.getString(AUTH_TOKEN,""), url).enqueue(new Callback<NewsApi.UserNewsPlain>() {
             @Override
             public void onResponse(Call<NewsApi.UserNewsPlain> call,
                                    Response<NewsApi.UserNewsPlain> response) {

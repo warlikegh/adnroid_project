@@ -6,6 +6,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -20,7 +21,6 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -39,6 +39,8 @@ public class NewsFragment extends Fragment {
     private NewsViewModel mNewsViewModel;
     private static FragmentManager fragmentManager = null;
     public static final String STATE = "change";
+
+    private EndlessRecyclerViewScrollListener scrollListener;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -62,7 +64,7 @@ public class NewsFragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.refresh) {
-            mNewsViewModel.refresh();
+            mNewsViewModel.refresh("topics/main/");
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -75,14 +77,39 @@ public class NewsFragment extends Fragment {
         RecyclerView recycler = view.findViewById(R.id.news);
         adapter = new NewsAdapter();
         recycler.setAdapter(adapter);
-        recycler.setLayoutManager(new LinearLayoutManager(getContext()));
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
+        recycler.setLayoutManager(linearLayoutManager);
+
+        scrollListener = new EndlessRecyclerViewScrollListener(linearLayoutManager) {
+            @Override
+            public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
+                // Triggered only when new data needs to be appended to the list
+                // Add whatever code is needed to append new items to the bottom of the list
+                if (mNews.getNext()!=null) {
+                    String url = "topics/main/?" + mNews.getNext().substring(mNews.getNext().indexOf("?") + 1);
+                    loadNextDataFromApi(url);
+                }
+
+            }
+        };
+        recycler.addOnScrollListener(scrollListener);
+
 
         Observer<UserNews> observer = new Observer<UserNews>() {
             @Override
             public void onChanged(UserNews news) {
                 if (news != null) {
-                    adapter.setNews(news.getResults());
-                    mNews = news;
+                    List<UserNews.Result> tempResult = new ArrayList<>();
+                    if (mNews!=null)
+                        tempResult.addAll(mNews.getResults());
+                    tempResult.addAll(news.getResults());
+                    if (mNews!=null){
+                        UserNews temp = new UserNews(news.getCount() + mNews.getCount(), news.getNext(), news.getPrevious(), tempResult);
+                        mNews=temp;
+                    }else{
+                        mNews=news;
+                    }
+                    adapter.setNews(mNews.getResults());
                 }
             }
         };
@@ -91,8 +118,18 @@ public class NewsFragment extends Fragment {
         mNewsViewModel
                 .getNews()
                 .observe(getViewLifecycleOwner(), observer);
-        mNewsViewModel.refresh();
+        mNewsViewModel.refresh("topics/main/");
 
+    }
+
+    public void loadNextDataFromApi(String url) {
+        // Send an API request to retrieve appropriate paginated data
+        //  --> Send the request including an offset value (i.e `page`) as a query parameter.
+        //  --> Deserialize and construct new model objects from the API response
+        //  --> Append the new data objects to the existing set of items inside the array of items
+        //  --> Notify the adapter of the new items made with `notifyItemRangeInserted()`
+        mNewsViewModel.refresh(url);
+        adapter.notifyItemInserted(mNews.getCount() - 1);
     }
     /*
      public interface OnItemSelectedListener {
@@ -144,7 +181,7 @@ public class NewsFragment extends Fragment {
             }
             Glide.with(getContext())
                     .load(news.getAuthor().getAvatarUrl())
-/*rewrite*/         .placeholder(R.drawable.ic_launcher_foreground)
+/*rewrite*/.placeholder(R.drawable.ic_launcher_foreground)
                     .apply(RequestOptions.circleCropTransform())
                     .into(holder.mAvatar);
 
@@ -223,7 +260,6 @@ public class NewsFragment extends Fragment {
         outState.put("content",text);
         outState.putStringArrayList("type",type);*/
     }
-
 
 
 }
