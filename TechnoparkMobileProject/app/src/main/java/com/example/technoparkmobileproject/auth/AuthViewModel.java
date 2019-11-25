@@ -12,7 +12,7 @@ import com.example.technoparkmobileproject.auth.AuthRepo;
 
 public class AuthViewModel extends AndroidViewModel {
 
-  private MediatorLiveData<AuthState> mAuthState = new MediatorLiveData<>();
+    private MediatorLiveData<AuthState> mAuthState = new MediatorLiveData<>();
 
     public AuthViewModel(@NonNull Application application) {
         super(application);
@@ -25,7 +25,7 @@ public class AuthViewModel extends AndroidViewModel {
 
     public void login(String login, String password, int page) {
         AuthData AuthData = new AuthData(login, password, page);
-       if (mAuthState.getValue() != AuthState.IN_PROGRESS) {
+        if (mAuthState.getValue() != AuthState.IN_PROGRESS) {
             requestAuth(AuthData);
         }
     }
@@ -33,7 +33,7 @@ public class AuthViewModel extends AndroidViewModel {
     private void requestAuth(final AuthData AuthData) {
         mAuthState.postValue(AuthState.IN_PROGRESS);
         final LiveData<AuthRepo.AuthProgress> progressLiveData = AuthRepo.getInstance(getApplication())
-                .login(AuthData.getAuth(), AuthData.getPassword(),AuthData.getUrl());
+                .login(AuthData.getAuth(), AuthData.getPassword(), AuthData.getIndex());
         mAuthState.addSource(progressLiveData, new Observer<AuthRepo.AuthProgress>() {
             @Override
             public void onChanged(AuthRepo.AuthProgress authProgress) {
@@ -43,7 +43,7 @@ public class AuthViewModel extends AndroidViewModel {
                 } else if (authProgress == AuthRepo.AuthProgress.FAILED) {
                     mAuthState.postValue(AuthState.FAILED);
                     mAuthState.removeSource(progressLiveData);
-                }else if (authProgress == AuthRepo.AuthProgress.FAILED_NET) {
+                } else if (authProgress == AuthRepo.AuthProgress.FAILED_NET) {
                     mAuthState.postValue(AuthState.FAILED_NET);
                     mAuthState.removeSource(progressLiveData);
                 }
@@ -63,12 +63,12 @@ public class AuthViewModel extends AndroidViewModel {
     public static class AuthData {
         private final String mLogin;
         private final String mPassword;
-        private final String mUrl;
+        private final Integer mIndex;
 
         public AuthData(String login, String password, int page) {
             mLogin = login;
             mPassword = password;
-            mUrl = pageUrl[page];
+            mIndex = page;
         }
 
         public String getAuth() {
@@ -79,24 +79,8 @@ public class AuthViewModel extends AndroidViewModel {
             return mPassword;
         }
 
-        public String getUrl() {
-            return mUrl;
+        public Integer getIndex() {
+            return mIndex;
         }
-
-
-        String[] pageUrl = new String[]{
-                "https://park.mail.ru/api/mobile/v1/",
-                "https://sphere.mail.ru/api/mobile/v1/",
-                "https://track.mail.ru/api/mobile/v1/",
-                "https://polis.mail.ru/api/mobile/v1/",
-                "https://technoatom.mail.ru/api/mobile/v1/",
-                "https://vgu.mail.ru/api/mobile/v1/",
-                "https://pgu.mail.ru/api/mobile/v1/",
-                "https://pm.mail.ru/api/mobile/v1/",
-                "https://data.mail.ru/api/mobile/v1/"
-
-        };
-
-
     }
 }

@@ -9,6 +9,7 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.security.crypto.EncryptedSharedPreferences;
 import androidx.security.crypto.MasterKeys;
 
+import com.example.technoparkmobileproject.SecretData;
 import com.example.technoparkmobileproject.TechnoparkApplication;
 import com.example.technoparkmobileproject.network.ApiRepo;
 import com.example.technoparkmobileproject.network.AuthApi;
@@ -33,6 +34,7 @@ public class AuthRepo {
     static String AUTH_TOKEN = "auth_token";
     static String LOGIN = "login";
     static String PASSWORD = "password";
+    private static String SITE = "site";
 
     public AuthRepo(ApiRepo apiRepo) {
         mApiRepo = apiRepo;
@@ -41,50 +43,25 @@ public class AuthRepo {
 
     @NonNull
     public static AuthRepo getInstance(Context context) {
-        String masterKeyAlias = null;
-        try {
-            masterKeyAlias = MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC);
-        } catch (GeneralSecurityException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        try {
-            mSettings = EncryptedSharedPreferences.create(
-                    "secret_shared_prefs",
-                    masterKeyAlias,
-                    context,
-                    EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-                    EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
-            );
-        } catch (GeneralSecurityException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        mSettings = new SecretData().getSecretData(context);
         editor = mSettings.edit();
-
         return TechnoparkApplication.from(context).getAuthRepo();
 
     }
 
     private MutableLiveData<AuthProgress> mAuthProgress;
 
-    public LiveData<AuthProgress> login(@NonNull String login, @NonNull String password,@NonNull String url) {
+    public LiveData<AuthProgress> login(@NonNull String login, @NonNull String password,@NonNull Integer index) {
         mAuthProgress = new MutableLiveData<>(AuthProgress.IN_PROGRESS);
-        login(mAuthProgress, login, password,url);
+        login(mAuthProgress, login, password,index);
         return mAuthProgress;
     }
 
     private void login(final MutableLiveData<AuthProgress> progress,
                        @NonNull final String login,
                        @NonNull final String password,
-                       @NonNull final String url) {
-
-
-       mApiRepo.setUrl(url);
-        AuthApi api = mApiRepo.getAuthApi();
+                       @NonNull final Integer index) {
+        AuthApi api = mApiRepo.getAuthApi(index);
 
         String req=new BigInteger(16 * 4, new Random()).toString(16);
         api.getAuth(new AuthApi.ProfileAuth(login,password,req, sha256(req+mSettings.getString(SALT,""))))
@@ -94,9 +71,10 @@ public class AuthRepo {
                                    Response<AuthApi.UserAuth> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     AuthApi.UserAuth user = response.body();
-                    editor.putString(AUTH_TOKEN, user.getAuthToken()).apply();
-                    editor.putString(LOGIN, login).apply();
-                    editor.putString(PASSWORD, password).apply();
+                    editor.putString(AUTH_TOKEN, user.getAuthToken())
+                            .putString(LOGIN, login)
+                            .putString(PASSWORD, password)
+                            .putInt(SITE, index).apply();
 
                     progress.postValue(AuthProgress.SUCCESS);
                 } else {

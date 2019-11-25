@@ -8,7 +8,6 @@ import androidx.lifecycle.AndroidViewModel;
 
 import androidx.lifecycle.LiveData;
 
-import java.util.List;
 
 public class NewsViewModel extends AndroidViewModel {
 

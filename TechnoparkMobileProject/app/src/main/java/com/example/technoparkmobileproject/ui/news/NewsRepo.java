@@ -1,20 +1,16 @@
 package com.example.technoparkmobileproject.ui.news;
 
-
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-import androidx.security.crypto.EncryptedSharedPreferences;
-import androidx.security.crypto.MasterKeys;
 
+import com.example.technoparkmobileproject.SecretData;
 import com.example.technoparkmobileproject.network.ApiRepo;
 import com.example.technoparkmobileproject.network.NewsApi;
 
-import java.io.IOException;
-import java.security.GeneralSecurityException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -30,16 +26,14 @@ class NewsRepo {
    // private static SimpleDateFormat sSimpleDateFormat = new SimpleDateFormat("dd.MM.yyyy", Locale.US);
     private final static MutableLiveData<UserNews> mNews = new MutableLiveData<>();
     private SharedPreferences mSettings;
-    //SharedPreferences.Editor editor;
     private final Context mContext;
     private NewsApi mNewsApi;
     private static String AUTH_TOKEN = "auth_token";
-    static String LOGIN = "login";
-    static String PASSWORD = "password";
+    private static String SITE = "site";
 
     NewsRepo(Context context) {
         mContext = context;
-        mNewsApi = ApiRepo.from(mContext).getNewsApi();
+        mNewsApi = ApiRepo.from(mContext).getNewsApi(new SecretData().getSecretData(mContext).getInt(SITE,0));
 
     }
 
@@ -48,25 +42,7 @@ class NewsRepo {
     }
 
     public void refresh() {
-        String masterKeyAlias = null;
-        try {
-            masterKeyAlias = MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC);
-        } catch (GeneralSecurityException | IOException e) {
-            e.printStackTrace();
-        }
-
-        try {
-            assert masterKeyAlias != null;
-            mSettings = EncryptedSharedPreferences.create(
-                    "secret_shared_prefs",
-                    masterKeyAlias,
-                    mContext,
-                    EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-                    EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
-            );
-        } catch (GeneralSecurityException | IOException e) {
-            e.printStackTrace();
-        }
+        mSettings=new SecretData().getSecretData(mContext);
         mNewsApi.getUserNews(" Token "+mSettings.getString(AUTH_TOKEN,"")).enqueue(new Callback<NewsApi.UserNewsPlain>() {
             @Override
             public void onResponse(Call<NewsApi.UserNewsPlain> call,
@@ -75,32 +51,13 @@ class NewsRepo {
                     NewsApi.UserNewsPlain result = response.body();
                     mNews.postValue(transform(result));
                 } else {
-                    if (response.code() == 401) {/*
-                        final MediatorLiveData<AuthViewModel.AuthState> mAuthState = new MediatorLiveData<>();
-
-                        final LiveData<AuthRepo.AuthProgress> progressLiveData = AuthRepo.getInstance(TechnoparkApplication.from(mContext))
-                                .login(mSettings.getString(LOGIN, ""), mSettings.getString(PASSWORD, ""));
-                        mAuthState.addSource(progressLiveData, new Observer<AuthRepo.AuthProgress>() {
-                            @Override
-                            public void onChanged(AuthRepo.AuthProgress authProgress) {
-                                if (authProgress == AuthRepo.AuthProgress.SUCCESS) {
-                                   refresh();
-                                   mAuthState.removeSource(progressLiveData);
-                                } else if (authProgress == AuthRepo.AuthProgress.FAILED) {
-
-                                    mAuthState.removeSource(progressLiveData);
-                                } else if (authProgress == AuthRepo.AuthProgress.FAILED_NET) {
-
-                                    mAuthState.removeSource(progressLiveData);
-                                }
-                            }
-                        });*/
-                    }
+                    //DataBase
                 }
             }
             @Override
             public void onFailure(Call<NewsApi.UserNewsPlain> call, Throwable t) {
                 Log.e("NewsRepo", "Failed to load", t);
+                //DataBase
             }
         });
     }
