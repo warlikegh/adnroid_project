@@ -14,6 +14,7 @@ import androidx.fragment.app.Fragment;
 import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
+import android.util.Log;
 import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,9 +28,11 @@ import android.widget.TextView;
 
 import com.example.technoparkmobileproject.R;
 import com.google.android.material.tabs.TabLayout;
+import com.imbryk.viewPager.LoopViewPager;
 
 
 public class AuthFragment extends Fragment {
+    private static final String TAG = "MY tag";
     Button enter;
     TextView result;
     EditText mLogin;
@@ -42,6 +45,7 @@ public class AuthFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.auth_fragment, container, false);
+
     }
 
     @SuppressWarnings("ConstantConditions")
@@ -54,16 +58,45 @@ public class AuthFragment extends Fragment {
         mPassword = view.findViewById(R.id.password);
         enter = view.findViewById(R.id.getBtn);
         mProgressBar = view.findViewById(R.id.progress);
-//////////////////////////////выделил сюда всё что связано с ViewPager
-        int[] pictureIds = new int[]{R.drawable.icon1, R.drawable.icon2};
 
+        int[] pictureIds = new int[]{
+                R.mipmap.tech_park,
+                R.mipmap.tech_sfera,
+                R.mipmap.tech_track,
+                R.mipmap.tech_polis,
+                R.mipmap.tech_atom,
+                R.mipmap.voronezsch,
+                R.mipmap.pensa,
+                R.mipmap.p_manager,
+                R.mipmap.big_data
+        };
+
+
+        final LoopViewPager viewpager = view.findViewById(R.id.viewpager);
         ViewPagerAdapter adapter = new ViewPagerAdapter(getContext(), pictureIds);
-
-        ViewPager viewPager = view.findViewById(R.id.photos_viewpager);
-        viewPager.setAdapter(adapter);
+        viewpager.setAdapter(adapter);
 
         TabLayout tabLayout = (TabLayout) view.findViewById(R.id.tab_layout);
-        tabLayout.setupWithViewPager(viewPager, true);
+        tabLayout.setupWithViewPager( viewpager, true);
+
+       /* viewpager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+
+            @Override
+            public void onPageSelected(int position) {
+                Log.d(TAG, "onPageSelected, position = " + position);
+
+            }
+
+            @Override
+            public void onPageScrolled(int position, float positionOffset,
+                                       int positionOffsetPixels) {
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+            }
+        });*/
+
 ////////////////////////////////////
         mAuthViewModel = new ViewModelProvider(getActivity()).get(AuthViewModel.class);
 
@@ -103,12 +136,12 @@ public class AuthFragment extends Fragment {
         enter.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mAuthViewModel.login(mLogin.getText().toString(), mPassword.getText().toString());
+                mAuthViewModel.login(mLogin.getText().toString(), mPassword.getText().toString(),viewpager.getCurrentItem());
             }
         });
 
     }
-//Ниже реализован адаптер для ViewPager, хочешь - меняй, хочешь - удаляй
+
     public class ViewPagerAdapter extends PagerAdapter {
         private Context mContext;
         private int[] mPictureIDs;
@@ -117,6 +150,7 @@ public class AuthFragment extends Fragment {
             this.mContext = context;
             this.mPictureIDs = resids;
         }
+
 
         @Override
         public int getCount() {
@@ -137,13 +171,9 @@ public class AuthFragment extends Fragment {
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             View itemView = inflater.inflate(R.layout.auth_pager_holder, container,
                     false);
-
-
             avatarImageView = itemView.findViewById(R.id.imageViewAvatar);
-            avatarImageView.setImageResource(mPictureIDs[position]);
-
-            container.addView(itemView);
-
+           avatarImageView.setImageResource(mPictureIDs[position]);
+           container.addView(itemView);
             return itemView;
         }
 
@@ -151,5 +181,6 @@ public class AuthFragment extends Fragment {
         public void destroyItem(@NonNull ViewGroup container, int position, @NonNull Object object) {
             container.removeView((LinearLayout) object);
         }
+
     }
 }

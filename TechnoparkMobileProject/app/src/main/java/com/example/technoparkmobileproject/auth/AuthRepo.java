@@ -36,6 +36,7 @@ public class AuthRepo {
 
     public AuthRepo(ApiRepo apiRepo) {
         mApiRepo = apiRepo;
+
     }
 
     @NonNull
@@ -70,14 +71,21 @@ public class AuthRepo {
 
     private MutableLiveData<AuthProgress> mAuthProgress;
 
-    public LiveData<AuthProgress> login(@NonNull String login, @NonNull String password) {
+    public LiveData<AuthProgress> login(@NonNull String login, @NonNull String password,@NonNull String url) {
         mAuthProgress = new MutableLiveData<>(AuthProgress.IN_PROGRESS);
-        login(mAuthProgress, login, password);
+        login(mAuthProgress, login, password,url);
         return mAuthProgress;
     }
 
-    private void login(final MutableLiveData<AuthProgress> progress, @NonNull final String login, @NonNull final String password) {
+    private void login(final MutableLiveData<AuthProgress> progress,
+                       @NonNull final String login,
+                       @NonNull final String password,
+                       @NonNull final String url) {
+
+
+       mApiRepo.setUrl(url);
         AuthApi api = mApiRepo.getAuthApi();
+
         String req=new BigInteger(16 * 4, new Random()).toString(16);
         api.getAuth(new AuthApi.ProfileAuth(login,password,req, sha256(req+mSettings.getString(SALT,""))))
                 .enqueue(new Callback<AuthApi.UserAuth>() {
