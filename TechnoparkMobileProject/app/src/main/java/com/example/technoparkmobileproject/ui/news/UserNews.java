@@ -8,18 +8,18 @@ import java.util.List;
 
 class UserNews {
 
-    public UserNews(){
-        this.count=null;
-        this.next=null;
-        this.previous=null;
-        this.results=null;
+    public UserNews() {
+        this.count = null;
+        this.next = null;
+        this.previous = null;
+        this.results = null;
     }
 
-    public UserNews(Integer mCount,String mNext,String mPrevious,List<Result> mResult){
-        this.count=mCount;
-        this.next=mNext;
-        this.previous=mPrevious;
-        this.results=mResult;
+    public UserNews(Integer mCount, String mNext, String mPrevious, List<Result> mResult) {
+        this.count = mCount;
+        this.next = mNext;
+        this.previous = mPrevious;
+        this.results = mResult;
     }
 
 
@@ -70,12 +70,17 @@ class UserNews {
 
     public class TextShort {
 
-        @SerializedName("content")
+        @SerializedName(value = "content", alternate = "src")
         @Expose
         private String content;
         @SerializedName("type")
         @Expose
         private String type;
+
+        public TextShort(String mType, String mContent) {
+            this.type = mType;
+            this.content = mContent;
+        }
 
         public String getContent() {
             return content;
@@ -97,9 +102,10 @@ class UserNews {
 
     public class Text {
 
-        public Text(String mType, String mContent){
-            this.type=mType;
-            this.content=mContent;
+        public Text(String mType, String mContent) {
+            this.type = mType;
+            this.content = mContent;
+            this.lang=null;
         }
 
         @SerializedName(value = "content", alternate = "src")
@@ -109,6 +115,10 @@ class UserNews {
         @SerializedName("type")
         @Expose
         private String type;
+
+        @SerializedName("lang")
+        @Expose
+        private String lang;
 
         public String getContent() {
             return content;
@@ -122,28 +132,38 @@ class UserNews {
             return type;
         }
 
-        public void setType(String type) {
+        public void setType(String lang) {
             this.type = type;
         }
 
+        public String getLang() {
+            return lang;
+        }
+
+        public void setLang(String lang) {
+            this.lang = lang;
+        }
+
     }
+
     public class Result {
 
-        public Result(Author mAuthor, String mBlog, String mTitle, Double mRating, String mDate, List<Text> mText, int mCommentsCount){
-            this.id=null;
+        public Result(Author mAuthor, String mBlog, String mTitle, Double mRating, String mDate, List<Text> mText,
+                      int mCommentsCount, Integer mId, List<TextShort> mTextShort, String mUrl) {
+            this.id = mId;
             this.blog = mBlog;
             this.author = mAuthor;
-            this.commentsCount=mCommentsCount;
-            this.favoritesCount=null;
-            this.publishDate=mDate;
-            this.title=mTitle;
-            this.rating=mRating;
-            this.text=mText;
-            this.textShort=null;
-            this.url=null;
-            this.userVote=null;
-            this.votesCount=null;
-            this.forbidComment=null;
+            this.commentsCount = mCommentsCount;
+            this.publishDate = mDate;
+            this.title = mTitle;
+            this.rating = mRating;
+            this.text = mText;
+            this.textShort = mTextShort;
+            this.url = mUrl;
+            this.userVote = null;
+            this.votesCount = null;
+            this.forbidComment = null;
+            this.favoritesCount = null;
         }
 
         @SerializedName("id")
@@ -305,13 +325,13 @@ class UserNews {
 
     public class Author {
 
-        public Author(String mFullname, String mAvatarUrl, String mUsername, int mId){
-            this.fullname =mFullname;
-            this.avatarUrl=mAvatarUrl;
-            this.username=mUsername;
-            this.id=mId;
-            this.rating=null;
-            this.online=null;
+        public Author(String mFullname, String mAvatarUrl, String mUsername, int mId) {
+            this.fullname = mFullname;
+            this.avatarUrl = mAvatarUrl;
+            this.username = mUsername;
+            this.id = mId;
+            this.rating = null;
+            this.online = null;
         }
 
         @SerializedName("id")

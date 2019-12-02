@@ -34,7 +34,7 @@ class NewsRepo {
 
     NewsRepo(Context context) {
         mContext = context;
-        mNewsApi = ApiRepo.from(mContext).getNewsApi(new SecretData().getSecretData(mContext).getInt(SITE,0));
+        mNewsApi = ApiRepo.from(mContext).getNewsApi(new SecretData().getSecretData(mContext).getInt(SITE, 0));
 
     }
 
@@ -47,18 +47,20 @@ class NewsRepo {
     }
 
     public void refresh(String url) {
-        mSettings=new SecretData().getSecretData(mContext);
-        mNewsApi.getUserNews(" Token "+mSettings.getString(AUTH_TOKEN,"")).enqueue(new Callback<NewsApi.UserNewsPlain>() {
+        mSettings = new SecretData().getSecretData(mContext);
+        mNewsApi.getUserNews(" Token " + mSettings.getString(AUTH_TOKEN, "")).enqueue(new Callback<NewsApi.UserNewsPlain>() {
             @Override
             public void onResponse(Call<NewsApi.UserNewsPlain> call,
                                    Response<NewsApi.UserNewsPlain> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     NewsApi.UserNewsPlain result = response.body();
                     mNews.postValue(transform(result));
+
                 } else {
                     //DataBase
                 }
             }
+
             @Override
             public void onFailure(Call<NewsApi.UserNewsPlain> call, Throwable t) {
                 Log.e("NewsRepo", "Failed to load", t);
@@ -68,8 +70,8 @@ class NewsRepo {
     }
 
     public void setmNextNews(String url) {
-        mSettings=new SecretData().getSecretData(mContext);
-        mNewsApi.getReUserNews(" Token "+mSettings.getString(AUTH_TOKEN,""), url).enqueue(new Callback<NewsApi.UserNewsPlain>() {
+        mSettings = new SecretData().getSecretData(mContext);
+        mNewsApi.getReUserNews(" Token " + mSettings.getString(AUTH_TOKEN, ""), url).enqueue(new Callback<NewsApi.UserNewsPlain>() {
             @Override
             public void onResponse(Call<NewsApi.UserNewsPlain> call,
                                    Response<NewsApi.UserNewsPlain> response) {
@@ -80,6 +82,7 @@ class NewsRepo {
                     //DataBase
                 }
             }
+
             @Override
             public void onFailure(Call<NewsApi.UserNewsPlain> call, Throwable t) {
                 Log.e("NewsRepo", "Failed to load", t);
@@ -98,7 +101,7 @@ class NewsRepo {
                 e.printStackTrace();
             }
         }
-        return new UserNews(plains.count,plains.next,plains.previous,result);
+        return new UserNews(plains.count, plains.next, plains.previous, result);
     }
 
 
@@ -107,6 +110,19 @@ class NewsRepo {
         for (NewsApi.UserNewsPlain.Text textPlain : plains) {
             try {
                 UserNews.Text text = mapText(textPlain);
+                texts.add(text);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+        }
+        return texts;
+    }
+
+    private static List<UserNews.TextShort> transformTextShort(List<NewsApi.UserNewsPlain.TextShort> plains) {
+        List<UserNews.TextShort> texts = new ArrayList<>();
+        for (NewsApi.UserNewsPlain.TextShort textPlain : plains) {
+            try {
+                UserNews.TextShort text = mapTextShort(textPlain);
                 texts.add(text);
             } catch (ParseException e) {
                 e.printStackTrace();
@@ -130,8 +146,9 @@ class NewsRepo {
 
     private static UserNews.Result map(NewsApi.UserNewsPlain.Result resultPlain) throws ParseException {
         UserNews temp = new UserNews();
-        UserNews.Author author=transformAuthor(resultPlain.author);
-        List<UserNews.Text> text=transformText(resultPlain.text);
+        UserNews.Author author = transformAuthor(resultPlain.author);
+        List<UserNews.Text> text = transformText(resultPlain.text);
+        List<UserNews.TextShort> textShort = transformTextShort(resultPlain.textShort);
         // sSimpleDateFormat.parse(lessonPlain.date)
         return temp.new Result(
                 author,
@@ -140,7 +157,10 @@ class NewsRepo {
                 resultPlain.rating,
                 resultPlain.publishDate,
                 text,
-                resultPlain.commentsCount);
+                resultPlain.commentsCount,
+                resultPlain.id,
+                textShort,
+                resultPlain.url);
     }
 
     private static UserNews.Author mapAuthor(NewsApi.UserNewsPlain.Author authorPlain) throws ParseException {
@@ -156,6 +176,14 @@ class NewsRepo {
     private static UserNews.Text mapText(NewsApi.UserNewsPlain.Text textPlain) throws ParseException {
         UserNews temp = new UserNews();
         return temp.new Text(
+                textPlain.type,
+                textPlain.content
+        );
+    }
+
+    private static UserNews.TextShort mapTextShort(NewsApi.UserNewsPlain.TextShort textPlain) throws ParseException {
+        UserNews temp = new UserNews();
+        return temp.new TextShort(
                 textPlain.type,
                 textPlain.content
         );

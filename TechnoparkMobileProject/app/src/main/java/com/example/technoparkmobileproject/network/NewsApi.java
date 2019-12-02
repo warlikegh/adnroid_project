@@ -16,7 +16,7 @@ public interface NewsApi {
     Call<UserNewsPlain> getUserNews(@Header("Authorization") String auth_token);
 
     @GET
-    Call<UserNewsPlain> getReUserNews(@Header("Authorization") String auth_token,@Url String url);
+    Call<UserNewsPlain> getReUserNews(@Header("Authorization") String auth_token, @Url String url);
 
     class UserNewsPlain {
 
@@ -56,8 +56,8 @@ public interface NewsApi {
             public String type;
 
 
-
         }
+
         public class Result {
 
             @SerializedName("id")
@@ -125,9 +125,9 @@ public interface NewsApi {
             @SerializedName("rating")
             @Expose
             public Double rating;
-            }
-
         }
 
     }
+
+}
 

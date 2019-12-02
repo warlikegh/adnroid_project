@@ -48,8 +48,8 @@ public class HttpInterceptor implements Interceptor {
             mApiRepo = ApiRepo.from(mContext);
             final String login = mSettings.getString(LOGIN, "");
             final String pass = mSettings.getString(PASSWORD, "");
-            AuthApi api = mApiRepo.getAuthApi(new SecretData().getSecretData(mContext).getInt(SITE,0));
-            String req = new BigInteger(16 * 4, new Random()).toString(16);
+            AuthApi api = mApiRepo.getAuthApi(new SecretData().getSecretData(mContext).getInt(SITE, 0));
+            String req = new SecretData().req();
             api.getAuth(new AuthApi.ProfileAuth(login, pass, req, sha256(req + mSettings.getString(SALT, ""))))
                     .enqueue(new Callback<AuthApi.UserAuth>() {
                         @Override

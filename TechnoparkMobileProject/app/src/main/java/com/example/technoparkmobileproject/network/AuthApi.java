@@ -6,6 +6,7 @@ import com.google.gson.annotations.SerializedName;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.POST;
+
 public interface AuthApi {
 
     @POST("auth/")
@@ -26,7 +27,7 @@ public interface AuthApi {
         @Expose
         private String password;
 
-        public ProfileAuth(String mLogin, String mPassword, String mReq, String mToken){
+        public ProfileAuth(String mLogin, String mPassword, String mReq, String mToken) {
             this.login = mLogin;
             this.password = mPassword;
             this.reqId = mReq;
@@ -105,7 +106,6 @@ public interface AuthApi {
         public void setUsername(String username) {
             this.username = username;
         }
-
 
 
     }

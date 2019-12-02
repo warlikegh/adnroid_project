@@ -77,7 +77,7 @@ public class AuthFragment extends Fragment {
         viewpager.setAdapter(adapter);
 
         TabLayout tabLayout = (TabLayout) view.findViewById(R.id.tab_layout);
-        tabLayout.setupWithViewPager( viewpager, true);
+        tabLayout.setupWithViewPager(viewpager, true);
 
        /* viewpager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
 
@@ -108,7 +108,7 @@ public class AuthFragment extends Fragment {
                     enter.setBackgroundColor(getResources().getColor(android.R.color.holo_red_dark));
                     result.setText("Что-то не так! Вероятно, неправильно указаны данные");
                     mProgressBar.setVisibility(View.GONE);
-                }else if (authState == AuthViewModel.AuthState.FAILED_NET) {
+                } else if (authState == AuthViewModel.AuthState.FAILED_NET) {
                     enter.setEnabled(true);
                     enter.setBackgroundColor(getResources().getColor(android.R.color.holo_orange_light));
                     result.setText("Нет соединения!");
@@ -136,7 +136,7 @@ public class AuthFragment extends Fragment {
         enter.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mAuthViewModel.login(mLogin.getText().toString(), mPassword.getText().toString(),viewpager.getCurrentItem());
+                mAuthViewModel.login(mLogin.getText().toString(), mPassword.getText().toString(), viewpager.getCurrentItem());
             }
         });
 
@@ -172,8 +172,8 @@ public class AuthFragment extends Fragment {
             View itemView = inflater.inflate(R.layout.auth_pager_holder, container,
                     false);
             avatarImageView = itemView.findViewById(R.id.imageViewAvatar);
-           avatarImageView.setImageResource(mPictureIDs[position]);
-           container.addView(itemView);
+            avatarImageView.setImageResource(mPictureIDs[position]);
+            container.addView(itemView);
             return itemView;
         }
 
