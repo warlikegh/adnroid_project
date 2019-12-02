@@ -2,6 +2,7 @@ package com.example.technoparkmobileproject.ui.news;
 
 import androidx.fragment.app.Fragment;
 
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.Html;
@@ -39,6 +40,9 @@ public class NewsFragment extends Fragment {
     private NewsViewModel mNewsViewModel;
     private static FragmentManager fragmentManager = null;
     public static final String STATE = "change";
+    public static String mUrl = "";
+    public static String BASE_URL = "topics/subscribed/";
+    RecyclerView recycler;
 
     private EndlessRecyclerViewScrollListener scrollListener;
 
@@ -64,7 +68,7 @@ public class NewsFragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.refresh) {
-            mNewsViewModel.refresh("topics/main/");
+            mNewsViewModel.refresh(BASE_URL);
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -74,7 +78,7 @@ public class NewsFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        RecyclerView recycler = view.findViewById(R.id.news);
+        recycler = view.findViewById(R.id.news);
         adapter = new NewsAdapter();
         recycler.setAdapter(adapter);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
@@ -83,15 +87,15 @@ public class NewsFragment extends Fragment {
         scrollListener = new EndlessRecyclerViewScrollListener(linearLayoutManager) {
             @Override
             public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
-                // Triggered only when new data needs to be appended to the list
-                // Add whatever code is needed to append new items to the bottom of the list
-                if (mNews.getNext()!=null) {
-                    String url = "topics/main/?" + mNews.getNext().substring(mNews.getNext().indexOf("?") + 1);
-                    loadNextDataFromApi(url);
+                if (mNews.getNext() != null) {
+                    mUrl = BASE_URL + "?" + mNews.getNext().substring(mNews.getNext().indexOf("?") + 1);
+                    loadNextDataFromApi(mUrl);
+                    Log.d("okhttp", "resave");
                 }
 
             }
         };
+
         recycler.addOnScrollListener(scrollListener);
 
 
@@ -99,37 +103,47 @@ public class NewsFragment extends Fragment {
             @Override
             public void onChanged(UserNews news) {
                 if (news != null) {
+                    adapter.setNews(news.getResults());
+                    mNews = news;
+                }
+            }
+        };
+
+        Observer<UserNews> observer_next = new Observer<UserNews>() {
+            @Override
+            public void onChanged(UserNews news) {
+                if (news != null) {
                     List<UserNews.Result> tempResult = new ArrayList<>();
-                    if (mNews!=null)
+                    if (mNews != null)
                         tempResult.addAll(mNews.getResults());
                     tempResult.addAll(news.getResults());
-                    if (mNews!=null){
+                    if (mNews != null) {
                         UserNews temp = new UserNews(news.getCount() + mNews.getCount(), news.getNext(), news.getPrevious(), tempResult);
-                        mNews=temp;
-                    }else{
-                        mNews=news;
+                        mNews = temp;
+                    } else {
+                        mNews = news;
                     }
                     adapter.setNews(mNews.getResults());
                 }
             }
         };
+
         mNewsViewModel = new ViewModelProvider(getActivity())
                 .get(NewsViewModel.class);
         mNewsViewModel
                 .getNews()
                 .observe(getViewLifecycleOwner(), observer);
-        mNewsViewModel.refresh("topics/main/");
-
+        mNewsViewModel
+                .getNextNews()
+                .observe(getViewLifecycleOwner(), observer_next);
+        mNewsViewModel.refresh(BASE_URL);
     }
 
     public void loadNextDataFromApi(String url) {
-        // Send an API request to retrieve appropriate paginated data
-        //  --> Send the request including an offset value (i.e `page`) as a query parameter.
-        //  --> Deserialize and construct new model objects from the API response
-        //  --> Append the new data objects to the existing set of items inside the array of items
-        //  --> Notify the adapter of the new items made with `notifyItemRangeInserted()`
-        mNewsViewModel.refresh(url);
-        adapter.notifyItemInserted(mNews.getCount() - 1);
+        MyTask mt = new MyTask();
+        mt.execute();
+
+       // adapter.notifyItemInserted(mNews.getCount() - 1);
     }
     /*
      public interface OnItemSelectedListener {
@@ -181,7 +195,7 @@ public class NewsFragment extends Fragment {
             }
             Glide.with(getContext())
                     .load(news.getAuthor().getAvatarUrl())
-/*rewrite*/.placeholder(R.drawable.ic_launcher_foreground)
+                    .placeholder(R.drawable.ic_launcher_foreground)
                     .apply(RequestOptions.circleCropTransform())
                     .into(holder.mAvatar);
 
@@ -235,7 +249,6 @@ public class NewsFragment extends Fragment {
     private UserNews restoreState(Bundle savedInstanceState) {
         UserNews news = new UserNews();
         if (savedInstanceState != null) {
-
         }
         return news;
     }
@@ -243,23 +256,24 @@ public class NewsFragment extends Fragment {
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-       /* outState.putStringArrayList("title",result.getTitle());
-        outState.putStringArrayList("author",result.getAuthor().getFullname());
-        outState.putIntegerArrayList("commentsCount",result.getCommentsCount());
-        outState.putStringArrayList("blog",result.getBlog());
-        outState.putStringArrayList("date",result.getPublishDate());
-        outState.putDoubleArray("rating",result.getRating());
-        ArrayList<String> text=new ArrayList<>();
-        for (int i = 0; i < result.getText().size(); i++){
-            text.add(result.getText().get(i).getContent());
-        }
-        ArrayList<String> type=new ArrayList<>();
-        for (int i = 0; i < result.getText().size(); i++){
-            type.add(result.getText().get(i).getType());
-        }
-        outState.put("content",text);
-        outState.putStringArrayList("type",type);*/
     }
 
+    class MyTask extends AsyncTask<Void, Void, Void> {
 
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            mNewsViewModel.setmNextNews(mUrl);
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
+            super.onPostExecute(result);
+        }
+    }
 }
