@@ -1,7 +1,6 @@
 package com.example.technoparkmobileproject.network;
 
 import android.content.Context;
-import android.util.Log;
 
 import com.example.technoparkmobileproject.TechnoparkApplication;
 
@@ -13,12 +12,6 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class ApiRepo {
     private static final String TAG = "URL_Find";
-  /*  private final AuthApi mAuthApi;
-    private final NewsApi mNewsApi;
-    private final ScheduleApi mScheduleApi;
-    private final CheckApi mCheckApi;
-    private final ProfileApi mProfileApi;
-    private final PushApi mPushApi;*/
     private final OkHttpClient mOkHttpClient;
     private String[] BASE_URL = new String[]{
             "https://park.mail.ru/api/mobile/v1/",
@@ -55,13 +48,6 @@ public class ApiRepo {
                     .client(mOkHttpClient)
                     .build();
         }
-
-   /*     mAuthApi = retrofit.create(AuthApi.class);
-        mNewsApi = retrofit.create(NewsApi.class);
-        mScheduleApi = retrofit.create(ScheduleApi.class);
-        mCheckApi = retrofit.create(CheckApi.class);
-        mProfileApi = retrofit.create(ProfileApi.class);
-        mPushApi = retrofit.create(PushApi.class);*/
     }
 
     public AuthApi getAuthApi(int index) {

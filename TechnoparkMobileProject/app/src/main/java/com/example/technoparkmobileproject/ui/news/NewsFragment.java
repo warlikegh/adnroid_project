@@ -24,6 +24,7 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.room.Room;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
@@ -90,9 +91,7 @@ public class NewsFragment extends Fragment {
                 if (mNews.getNext() != null) {
                     mUrl = BASE_URL + "?" + mNews.getNext().substring(mNews.getNext().indexOf("?") + 1);
                     loadNextDataFromApi(mUrl);
-                    Log.d("okhttp", "resave");
                 }
-
             }
         };
 
@@ -136,14 +135,14 @@ public class NewsFragment extends Fragment {
         mNewsViewModel
                 .getNextNews()
                 .observe(getViewLifecycleOwner(), observer_next);
-        mNewsViewModel.refresh(BASE_URL);
+        if (savedInstanceState == null) {
+            mNewsViewModel.refresh(BASE_URL);
+        }
     }
 
     public void loadNextDataFromApi(String url) {
         MyTask mt = new MyTask();
         mt.execute();
-
-       // adapter.notifyItemInserted(mNews.getCount() - 1);
     }
     /*
      public interface OnItemSelectedListener {
@@ -177,11 +176,12 @@ public class NewsFragment extends Fragment {
             holder.mDate.setText(news.getPublishDate());
             holder.mRating.setText(news.getRating().toString());
 
-            if (news.getText().get(0).getType().equals("p") || news.getText().get(0).getType().equals("u1")) {
+            if (news.getText().get(0).getType().equals("p") || news.getText().get(0).getType().equals("u1")
+                    || news.getText().get(0).getType().equals("code")) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                    holder.mContent.setText(Html.fromHtml(news.getText().get(0).getContent(), Html.FROM_HTML_MODE_COMPACT));
+                    holder.mContent.setText(Html.fromHtml(news.getTextShort().get(0).getContent(), Html.FROM_HTML_MODE_COMPACT));
                 } else {
-                    holder.mContent.setText(Html.fromHtml(news.getText().get(0).getContent()));
+                    holder.mContent.setText(Html.fromHtml(news.getTextShort().get(0).getContent()));
                 }
                 holder.mContent.setMovementMethod(LinkMovementMethod.getInstance());
             }
@@ -205,6 +205,7 @@ public class NewsFragment extends Fragment {
         public int getItemCount() {
             return mNews.size();
         }
+
     }
 
     static class NewsViewHolder extends RecyclerView.ViewHolder {

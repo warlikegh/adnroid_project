@@ -47,12 +47,11 @@ public class SplashScreenActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
-        if (!mSettings.getString(AUTH_TOKEN,"").isEmpty()){
+        if (!mSettings.getString(AUTH_TOKEN, "").isEmpty()) {
             startActivity(new Intent(getApplicationContext(), MainActivity.class)
                     .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
                     .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
-        }
-        else {
+        } else {
             startActivity(new Intent(getApplicationContext(), AuthActivity.class)
                     .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
                     .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));

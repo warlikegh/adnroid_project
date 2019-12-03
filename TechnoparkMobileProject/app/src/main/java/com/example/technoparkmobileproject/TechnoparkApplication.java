@@ -19,10 +19,10 @@ public class TechnoparkApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        mSettings=new SecretData().getSecretData(getApplicationContext());
+        mSettings = new SecretData().getSecretData(getApplicationContext());
         editor = mSettings.edit();
         editor.putString(SALT, "").apply();
-        mApiRepo = new ApiRepo( getApplicationContext());
+        mApiRepo = new ApiRepo(getApplicationContext());
         mAuthRepo = new AuthRepo(mApiRepo);
     }
 

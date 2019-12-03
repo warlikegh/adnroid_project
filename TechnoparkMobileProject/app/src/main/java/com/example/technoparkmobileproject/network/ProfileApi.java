@@ -17,8 +17,6 @@ public interface ProfileApi {
     class UserProfile {
 
 
-
-
         @SerializedName("id")
         @Expose
         private Integer id;

@@ -45,27 +45,27 @@ public class ArticleFragment extends Fragment {
         mContent = view.findViewById(R.id.content);
 
         Bundle arguments = getArguments();
-        ArrayList<String> text=new ArrayList<>();
-        ArrayList<String> type=new ArrayList<>();
-        String title="";
-        String blog="";
-        String date="";
-        String author="";
-        String authorAvatar="";
-        Integer сommentsCount=0;
-        Double rating=0.;
+        ArrayList<String> text = new ArrayList<>();
+        ArrayList<String> type = new ArrayList<>();
+        String title = "";
+        String blog = "";
+        String date = "";
+        String author = "";
+        String authorAvatar = "";
+        Integer сommentsCount = 0;
+        Double rating = 0.;
 
         if (arguments != null) {
 
-            title=arguments.getString("title");
-            blog=arguments.getString("blog");
-            author=arguments.getString("author");
-            date=arguments.getString("date");
+            title = arguments.getString("title");
+            blog = arguments.getString("blog");
+            author = arguments.getString("author");
+            date = arguments.getString("date");
             rating = arguments.getDouble("rating");
             сommentsCount = arguments.getInt("commentsCount");
             text = arguments.getStringArrayList("content");
             type = arguments.getStringArrayList("type");
-            authorAvatar=arguments.getString("avatar");
+            authorAvatar = arguments.getString("avatar");
         }
         final PageAdapter adapter = new PageAdapter();
         adapter.setContent(text, type, title, blog, author, date, сommentsCount, rating, authorAvatar, getContext());
@@ -97,21 +97,21 @@ public class ArticleFragment extends Fragment {
         public void onBindViewHolder(@NonNull ContentViewHolder holder, int position) {
             final String text = mText.get(position);
             final String type = mType.get(position);
-            if (type.equals("p")||type.equals("ul")){
+            if (type.equals("p") || type.equals("ul")) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                     holder.mTextNews.setText(Html.fromHtml(text, Html.FROM_HTML_MODE_COMPACT));
                 } else {
                     holder.mTextNews.setText(Html.fromHtml(text));
                 }
                 holder.mTextNews.setMovementMethod(LinkMovementMethod.getInstance());
-            } else
-            if (type.equals("img")){
+            } else if (type.equals("img")) {
                 Glide.with(getContext())
                         .load(text)
-/*rewrite*/             .placeholder(R.drawable.ic_launcher_foreground)
+/*rewrite*/.placeholder(R.drawable.ic_launcher_foreground)
                         .into(holder.mImageNews);
                 holder.mTextNews.setEnabled(true);
             } else {
+                holder.mTextNews.setText(type);
             }
         }
 
@@ -129,34 +129,32 @@ public class ArticleFragment extends Fragment {
         public ContentViewHolder(@NonNull View itemView) {
             super(itemView);
             mTextNews = itemView.findViewById(R.id.text_news);
-            mImageNews=itemView.findViewById(R.id.photo);
+            mImageNews = itemView.findViewById(R.id.photo);
         }
     }
 
 
-
-
     public static ArticleFragment newInstance(UserNews.Result result) {
         ArticleFragment fragment = new ArticleFragment();
-        Bundle bundle =new Bundle();
-        bundle.putString("title",result.getTitle());
-        bundle.putString("author",result.getAuthor().getFullname());
-        bundle.putInt("commentsCount",result.getCommentsCount());
-        bundle.putString("blog",result.getBlog());
-        bundle.putString("date",result.getPublishDate());
-        bundle.putDouble("rating",result.getRating());
-        ArrayList<String> text=new ArrayList<>();
-        for (int i = 0; i < result.getText().size(); i++){
+        Bundle bundle = new Bundle();
+        bundle.putString("title", result.getTitle());
+        bundle.putString("author", result.getAuthor().getFullname());
+        bundle.putInt("commentsCount", result.getCommentsCount());
+        bundle.putString("blog", result.getBlog());
+        bundle.putString("date", result.getPublishDate());
+        bundle.putDouble("rating", result.getRating());
+        ArrayList<String> text = new ArrayList<>();
+        for (int i = 0; i < result.getText().size(); i++) {
             text.add(result.getText().get(i).getContent());
         }
-        ArrayList<String> type=new ArrayList<>();
-        for (int i = 0; i < result.getText().size(); i++){
+        ArrayList<String> type = new ArrayList<>();
+        for (int i = 0; i < result.getText().size(); i++) {
             type.add(result.getText().get(i).getType());
         }
-        bundle.putStringArrayList("content",text);
-        bundle.putStringArrayList("type",type);
+        bundle.putStringArrayList("content", text);
+        bundle.putStringArrayList("type", type);
         fragment.setArguments(bundle);
-        bundle.putString("avatar",result.getAuthor().getAvatarUrl());
+        bundle.putString("avatar", result.getAuthor().getAvatarUrl());
         return fragment;
     }
 
@@ -177,14 +175,14 @@ public class ArticleFragment extends Fragment {
                                String author, String date, Integer count, Double rating, String avatar, Context context) {
             mText = text;
             mType = type;
-            mTitle=title;
-            mBlog= blog;
+            mTitle = title;
+            mBlog = blog;
             mAuthor = author;
-            mDate=date;
-            mCommentsCount=count;
-            mRating=rating;
-            mAvatar=avatar;
-            mComtext=context;
+            mDate = date;
+            mCommentsCount = count;
+            mRating = rating;
+            mAvatar = avatar;
+            mComtext = context;
             notifyDataSetChanged();
         }
 
@@ -206,7 +204,7 @@ public class ArticleFragment extends Fragment {
 
             Glide.with(mComtext)
                     .load(mAvatar)
-/*rewrite*/         .placeholder(R.drawable.ic_launcher_foreground)
+/*rewrite*/.placeholder(R.drawable.ic_launcher_foreground)
                     .apply(RequestOptions.circleCropTransform())
                     .into(holder.mAvatar);
 
@@ -243,7 +241,7 @@ public class ArticleFragment extends Fragment {
             mDate = itemView.findViewById(R.id.date_news_author);
             mRating = itemView.findViewById(R.id.rating_news_author);
             mCommentsCount = itemView.findViewById(R.id.comments_news);
-            mAvatar=itemView.findViewById(R.id.photo);
+            mAvatar = itemView.findViewById(R.id.photo);
         }
     }
 

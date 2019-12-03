@@ -7,12 +7,14 @@ import androidx.security.crypto.EncryptedSharedPreferences;
 import androidx.security.crypto.MasterKeys;
 
 import java.io.IOException;
+import java.math.BigInteger;
 import java.security.GeneralSecurityException;
+import java.util.Random;
 
 public class SecretData {
     static SharedPreferences mSettings;
 
-    public SharedPreferences getSecretData(Context context){
+    public SharedPreferences getSecretData(Context context) {
         String masterKeyAlias = null;
         try {
             masterKeyAlias = MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC);
@@ -35,5 +37,9 @@ public class SecretData {
             e.printStackTrace();
         }
         return mSettings;
+    }
+
+    public String req() {
+        return new BigInteger(16 * 4, new Random()).toString(16);
     }
 }

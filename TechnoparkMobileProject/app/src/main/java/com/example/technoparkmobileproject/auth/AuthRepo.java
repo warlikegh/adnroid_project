@@ -6,19 +6,13 @@ import android.content.SharedPreferences;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-import androidx.security.crypto.EncryptedSharedPreferences;
-import androidx.security.crypto.MasterKeys;
 
 import com.example.technoparkmobileproject.SecretData;
 import com.example.technoparkmobileproject.TechnoparkApplication;
 import com.example.technoparkmobileproject.network.ApiRepo;
 import com.example.technoparkmobileproject.network.AuthApi;
 
-import java.io.IOException;
-import java.math.BigInteger;
-import java.security.GeneralSecurityException;
 import java.security.MessageDigest;
-import java.util.Random;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -30,7 +24,7 @@ public class AuthRepo {
     private final ApiRepo mApiRepo;
     static SharedPreferences mSettings;
     static SharedPreferences.Editor editor;
-    static String SALT="salt";
+    static String SALT = "salt";
     static String AUTH_TOKEN = "auth_token";
     static String LOGIN = "login";
     static String PASSWORD = "password";
@@ -51,9 +45,9 @@ public class AuthRepo {
 
     private MutableLiveData<AuthProgress> mAuthProgress;
 
-    public LiveData<AuthProgress> login(@NonNull String login, @NonNull String password,@NonNull Integer index) {
+    public LiveData<AuthProgress> login(@NonNull String login, @NonNull String password, @NonNull Integer index) {
         mAuthProgress = new MutableLiveData<>(AuthProgress.IN_PROGRESS);
-        login(mAuthProgress, login, password,index);
+        login(mAuthProgress, login, password, index);
         return mAuthProgress;
     }
 
@@ -63,30 +57,30 @@ public class AuthRepo {
                        @NonNull final Integer index) {
         AuthApi api = mApiRepo.getAuthApi(index);
 
-        String req=new BigInteger(16 * 4, new Random()).toString(16);
-        api.getAuth(new AuthApi.ProfileAuth(login,password,req, sha256(req+mSettings.getString(SALT,""))))
+        String req = new SecretData().req();
+        api.getAuth(new AuthApi.ProfileAuth(login, password, req, sha256(req + mSettings.getString(SALT, ""))))
                 .enqueue(new Callback<AuthApi.UserAuth>() {
-            @Override
-            public void onResponse(Call<AuthApi.UserAuth> call,
-                                   Response<AuthApi.UserAuth> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    AuthApi.UserAuth user = response.body();
-                    editor.putString(AUTH_TOKEN, user.getAuthToken())
-                            .putString(LOGIN, login)
-                            .putString(PASSWORD, password)
-                            .putInt(SITE, index).apply();
+                    @Override
+                    public void onResponse(Call<AuthApi.UserAuth> call,
+                                           Response<AuthApi.UserAuth> response) {
+                        if (response.isSuccessful() && response.body() != null) {
+                            AuthApi.UserAuth user = response.body();
+                            editor.putString(AUTH_TOKEN, user.getAuthToken())
+                                    .putString(LOGIN, login)
+                                    .putString(PASSWORD, password)
+                                    .putInt(SITE, index).apply();
 
-                    progress.postValue(AuthProgress.SUCCESS);
-                } else {
-                progress.postValue(AuthProgress.FAILED);
-                }
-            }
+                            progress.postValue(AuthProgress.SUCCESS);
+                        } else {
+                            progress.postValue(AuthProgress.FAILED);
+                        }
+                    }
 
-            @Override
-            public void onFailure(Call<AuthApi.UserAuth> call, Throwable t) {
-                progress.postValue(AuthProgress.FAILED_NET);
-            }
-        });
+                    @Override
+                    public void onFailure(Call<AuthApi.UserAuth> call, Throwable t) {
+                        progress.postValue(AuthProgress.FAILED_NET);
+                    }
+                });
     }
 
     public enum AuthProgress {
@@ -97,19 +91,19 @@ public class AuthRepo {
     }
 
     public static String sha256(String base) {                                          //Algorithm for SHA256
-        try{
+        try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
             byte[] hash = digest.digest(base.getBytes("UTF-8"));
             StringBuffer hexString = new StringBuffer();
 
             for (int i = 0; i < hash.length; i++) {
                 String hex = Integer.toHexString(0xff & hash[i]);
-                if(hex.length() == 1) hexString.append('0');
+                if (hex.length() == 1) hexString.append('0');
                 hexString.append(hex);
             }
 
             return hexString.toString();
-        } catch(Exception ex){
+        } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
     }
