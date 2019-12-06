@@ -153,8 +153,8 @@ public class ArticleFragment extends Fragment {
         }
         bundle.putStringArrayList("content", text);
         bundle.putStringArrayList("type", type);
-        fragment.setArguments(bundle);
         bundle.putString("avatar", result.getAuthor().getAvatarUrl());
+        fragment.setArguments(bundle);
         return fragment;
     }
 

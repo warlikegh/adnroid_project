@@ -2,6 +2,7 @@ package com.example.technoparkmobileproject.ui.news;
 
 import androidx.fragment.app.Fragment;
 
+import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -44,12 +45,26 @@ public class NewsFragment extends Fragment {
     public static String mUrl = "";
     public static String BASE_URL = "topics/subscribed/";
     RecyclerView recycler;
+    boolean isSaveState;
+    static Context context;
 
     private EndlessRecyclerViewScrollListener scrollListener;
+
+    public NewsFragment() {
+    }
+
+    public static NewsFragment newInstance() {
+        return new NewsFragment();
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        if (savedInstanceState == null) {
+            isSaveState = false;
+        } else {
+            isSaveState = true;
+        }
         return inflater.inflate(R.layout.fragment_home, container, false);
     }
 
@@ -58,6 +73,7 @@ public class NewsFragment extends Fragment {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
         fragmentManager = getFragmentManager();
+        context = getContext();
     }
 
     @Override
@@ -135,19 +151,19 @@ public class NewsFragment extends Fragment {
         mNewsViewModel
                 .getNextNews()
                 .observe(getViewLifecycleOwner(), observer_next);
-        if (savedInstanceState == null) {
-            mNewsViewModel.refresh(BASE_URL);
-        }
+
+        mNewsViewModel.refresh(BASE_URL);
+
     }
 
     public void loadNextDataFromApi(String url) {
         MyTask mt = new MyTask();
         mt.execute();
     }
-    /*
-     public interface OnItemSelectedListener {
-   public void onItemSelected(UserNews.Result result);
-    }*/
+
+    public interface OnItemSelectedListener {
+        public void onItemSelected(int id);
+    }
 
 
     private class NewsAdapter extends RecyclerView.Adapter<NewsViewHolder> {
@@ -188,7 +204,8 @@ public class NewsFragment extends Fragment {
 
 
             holder.mCommentsCount.setText(news.getCommentsCount().toString());
-            if (news.getText().size() > 1) {
+            if (news.getText().size() > 1 ||
+                    (!(news.getText().get(0).getContent().equals(news.getTextShort().get(0).getContent())))) {
                 holder.mNext.setText("Читать дальше...");
                 holder.mNext.setTextColor(getResources().getColor(android.R.color.holo_blue_light));
                 holder.mNext.setTextSize(17);
@@ -236,28 +253,27 @@ public class NewsFragment extends Fragment {
                 public void onClick(View view) {
                     int pos = NewsViewHolder.this.getAdapterPosition();
                     UserNews.Result myData = adapter.mNews.get(pos);
-                    //((OnItemSelectedListener)context).onItemSelected(myData);
-                    fragmentManager
+                    ((OnItemSelectedListener) context).onItemSelected(1);
+                   /* fragmentManager
                             .beginTransaction()
                             .replace(R.id.nav_host_fragment, ArticleFragment.newInstance(myData))
                             .addToBackStack(null)
-                            .commit();
+                            .commit();*/
                 }
             });
         }
     }
 
-    private UserNews restoreState(Bundle savedInstanceState) {
+    private boolean restoreState(Bundle savedInstanceState) {
         UserNews news = new UserNews();
-        if (savedInstanceState != null) {
-        }
-        return news;
+        return savedInstanceState != null;
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
     }
+
 
     class MyTask extends AsyncTask<Void, Void, Void> {
 

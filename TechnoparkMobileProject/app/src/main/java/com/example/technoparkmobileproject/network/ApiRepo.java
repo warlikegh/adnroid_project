@@ -24,8 +24,8 @@ public class ApiRepo {
             "https://pm.mail.ru/api/mobile/v1/",
             "https://data.mail.ru/api/mobile/v1/"
     };
-    private Retrofit[] retrofits = new Retrofit[]{null, null, null, null, null, null, null, null};
-    Integer SITES_COUNT = 8;
+    private Retrofit[] retrofits = new Retrofit[]{null, null, null, null, null, null, null, null, null};
+    Integer SITES_COUNT = 9;
 
     public ApiRepo(Context context) {
 

@@ -19,6 +19,7 @@ import androidx.security.crypto.MasterKeys;
 
 import com.example.technoparkmobileproject.R;
 import com.example.technoparkmobileproject.auth.AuthActivity;
+import com.example.technoparkmobileproject.ui.news.NewsFragment;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
@@ -34,6 +35,13 @@ public class ProfileFragment extends Fragment {
     static String LOGIN = "login";
     static String PASSWORD = "password";
 
+
+    public ProfileFragment() {
+    }
+
+    public static ProfileFragment newInstance() {
+        return new ProfileFragment();
+    }
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         profileViewModel =
@@ -48,6 +56,7 @@ public class ProfileFragment extends Fragment {
         });
         return root;
     }
+
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {

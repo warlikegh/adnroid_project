@@ -7,12 +7,10 @@ import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
 
-@Database(entities = {News.class, Content.class}, version = 1, exportSchema = false)
+@Database(entities = {News.class}, version = 1, exportSchema = false)
 public abstract class AppDataBase extends RoomDatabase {
 
     public abstract NewsDao getNewsDao();
-
-    public abstract ContentDao getContentDao();
 
     private static AppDataBase instance;
 
