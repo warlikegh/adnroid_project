@@ -1,26 +1,17 @@
 package com.example.technoparkmobileproject;
 
 import android.os.Bundle;
-import android.view.MenuItem;
 
-import com.example.technoparkmobileproject.ui.news.ArticleFragment;
 import com.example.technoparkmobileproject.ui.news.NewsFragment;
-import com.example.technoparkmobileproject.ui.profile.ProfileFragment;
-import com.example.technoparkmobileproject.ui.shedule.ScheduleFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.android.material.navigation.NavigationView;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.view.GravityCompat;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
-public class MainActivity extends AppCompatActivity implements NewsFragment.OnItemSelectedListener {
+public class MainActivity extends AppCompatActivity /*implements NewsFragment.OnItemSelectedListener*/ {
 
     NavController navController;
 
@@ -33,7 +24,7 @@ public class MainActivity extends AppCompatActivity implements NewsFragment.OnIt
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.navigation_home, R.id.navigation_dashboard, R.id.navigation_notifications, R.id.articleFragment)
+                R.id.navigation_home, R.id.navigation_dashboard, R.id.navigation_notifications)
                 .build();
         navController = Navigation.findNavController(this, R.id.nav_host_fragment);
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
@@ -41,13 +32,13 @@ public class MainActivity extends AppCompatActivity implements NewsFragment.OnIt
     }
 
 
-    public void onItemSelected(int id) {
+ /*   public void onItemSelected(int id) {
         navController.navigate(R.id.articleFragment);
         /*getSupportFragmentManager()
                 .beginTransaction()
                 .replace(R.id.nav_host_fragment,  ArticleFragment.newInstance(result))
                 .addToBackStack(null)
-                .commit();*/
-    }
+                .commit();
+    }*/
 }
 

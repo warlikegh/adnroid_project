@@ -20,6 +20,17 @@ public interface NewsApi {
 
     class UserNewsPlain {
 
+        public UserNewsPlain(Integer mCount, String mNext, String mPrevious, List<Result> mResult) {
+            this.count = mCount;
+            this.next = mNext;
+            this.previous = mPrevious;
+            this.results = mResult;
+        }
+
+        public UserNewsPlain() {
+
+        }
+
         @SerializedName("count")
         @Expose
         public Integer count;
@@ -33,6 +44,9 @@ public interface NewsApi {
         @Expose
         public List<Result> results = null;
 
+        public void setNext(String next) {
+            this.next = next;
+        }
 
         public class TextShort {
 
@@ -42,6 +56,27 @@ public interface NewsApi {
             @SerializedName("type")
             @Expose
             public String type;
+
+            public TextShort(String mType, String mContent) {
+                this.type = mType;
+                this.content = mContent;
+            }
+
+            public String getContent() {
+                return content;
+            }
+
+            public void setContent(String content) {
+                this.content = content;
+            }
+
+            public String getType() {
+                return type;
+            }
+
+            public void setType(String type) {
+                this.type = type;
+            }
 
         }
 
@@ -54,6 +89,43 @@ public interface NewsApi {
             @SerializedName("type")
             @Expose
             public String type;
+
+            public Text(String mType, String mContent) {
+                this.type = mType;
+                this.content = mContent;
+            }
+
+            public Text() {
+
+            }
+
+            @SerializedName("lang")
+            @Expose
+            private String lang;
+
+            public String getContent() {
+                return content;
+            }
+
+            public void setContent(String content) {
+                this.content = content;
+            }
+
+            public String getType() {
+                return type;
+            }
+
+            public void setType(String type) {
+                this.type = type;
+            }
+
+            public String getLang() {
+                return lang;
+            }
+
+            public void setLang(String lang) {
+                this.lang = lang;
+            }
 
 
         }
@@ -103,6 +175,25 @@ public interface NewsApi {
             @Expose
             public String url;
 
+
+            public Result(Author mAuthor, String mBlog, String mTitle, Double mRating, String mDate, List<Text> mText,
+                          int mCommentsCount, Integer mId, List<TextShort> mTextShort, String mUrl) {
+                this.id = mId;
+                this.blog = mBlog;
+                this.author = mAuthor;
+                this.commentsCount = mCommentsCount;
+                this.publishDate = mDate;
+                this.title = mTitle;
+                this.rating = mRating;
+                this.text = mText;
+                this.textShort = mTextShort;
+                this.url = mUrl;
+                this.userVote = null;
+                this.votesCount = null;
+                this.forbidComment = null;
+                this.favoritesCount = null;
+            }
+
         }
 
         public class Author {
@@ -125,6 +216,15 @@ public interface NewsApi {
             @SerializedName("rating")
             @Expose
             public Double rating;
+
+            public Author(String mFullname, String mAvatarUrl, String mUsername, int mId) {
+                this.fullname = mFullname;
+                this.avatarUrl = mAvatarUrl;
+                this.username = mUsername;
+                this.id = mId;
+                this.rating = null;
+                this.online = null;
+            }
         }
 
     }
