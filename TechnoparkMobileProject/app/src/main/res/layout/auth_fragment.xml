@@ -12,7 +12,8 @@
     <com.imbryk.viewPager.LoopViewPager
         android:id="@+id/viewpager"
         android:layout_width="match_parent"
-        android:layout_height="192dp">
+        android:layout_height="192dp"
+        android:background="@color/colorWindow">
     </com.imbryk.viewPager.LoopViewPager>
 
     <com.google.android.material.tabs.TabLayout

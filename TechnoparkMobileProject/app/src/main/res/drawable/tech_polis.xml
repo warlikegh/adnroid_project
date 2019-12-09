@@ -6,7 +6,7 @@
     <item>
         <bitmap
             android:gravity="center"
-            android:src="@mipmap/tech_track"/>
+            android:src="@mipmap/tech_polis"/>
     </item>
 
 </layer-list>

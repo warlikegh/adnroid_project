@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 
@@ -181,6 +182,7 @@ public class ScheduleFragment extends Fragment {
         protected TextView mLocation;
         protected TextView mTime;
         protected TextView mTitle;
+        //protected ImageView mTitle
 
         public ScheduleViewHolder(@NonNull View itemView) {
             super(itemView);

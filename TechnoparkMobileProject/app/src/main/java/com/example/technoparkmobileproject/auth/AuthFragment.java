@@ -73,6 +73,7 @@ public class AuthFragment extends Fragment {
 
 
         final LoopViewPager viewpager = view.findViewById(R.id.viewpager);
+        viewpager.setBackgroundColor(getResources().getColor(R.color.colorWindow));
         ViewPagerAdapter adapter = new ViewPagerAdapter(getContext(), pictureIds);
         viewpager.setAdapter(adapter);
 
