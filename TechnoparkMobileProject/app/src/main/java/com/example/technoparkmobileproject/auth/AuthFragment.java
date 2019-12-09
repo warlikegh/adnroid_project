@@ -60,15 +60,15 @@ public class AuthFragment extends Fragment {
         mProgressBar = view.findViewById(R.id.progress);
 
         int[] pictureIds = new int[]{
-                R.mipmap.tech_park,
-                R.mipmap.tech_sfera,
-                R.mipmap.tech_track,
-                R.mipmap.tech_polis,
-                R.mipmap.tech_atom,
-                R.mipmap.voronezsch,
-                R.mipmap.pensa,
-                R.mipmap.p_manager,
-                R.mipmap.big_data
+                R.drawable.tech_park,
+                R.drawable.tech_sfera,
+                R.drawable.tech_track,
+                R.drawable.tech_polis,
+                R.drawable.tech_atom,
+                R.drawable.voronezsch,
+                R.drawable.pensa,
+                R.drawable.p_manager,
+                R.drawable.big_data
         };
 
 

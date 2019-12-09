@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-
+    <item
+        android:drawable="@color/colorWindow"/>
 
     <item>
         <bitmap
             android:gravity="center"
-            android:src="@mipmap/kiss5"/>
+            android:src="@mipmap/tech_track"/>
     </item>
 
 </layer-list>

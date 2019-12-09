@@ -3,7 +3,6 @@ package com.example.technoparkmobileproject.ui.news;
 import androidx.fragment.app.Fragment;
 
 import android.content.Context;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.Html;
@@ -25,7 +24,6 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.room.Room;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
@@ -33,6 +31,8 @@ import com.example.technoparkmobileproject.R;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 
 public class NewsFragment extends Fragment {
@@ -51,10 +51,6 @@ public class NewsFragment extends Fragment {
     private EndlessRecyclerViewScrollListener scrollListener;
 
     public NewsFragment() {
-    }
-
-    public static NewsFragment newInstance() {
-        return new NewsFragment();
     }
 
     @Override
@@ -90,6 +86,17 @@ public class NewsFragment extends Fragment {
         }
         return super.onOptionsItemSelected(item);
     }
+
+    private boolean restoreState(Bundle savedInstanceState) {
+        UserNews news = new UserNews();
+        return savedInstanceState != null;
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+    }
+
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
@@ -157,8 +164,13 @@ public class NewsFragment extends Fragment {
     }
 
     public void loadNextDataFromApi(String url) {
-        MyTask mt = new MyTask();
-        mt.execute();
+        final Executor executor = Executors.newSingleThreadExecutor();
+        executor.execute(new Runnable() {
+            @Override
+            public void run() {
+                mNewsViewModel.setmNextNews(mUrl);
+            }
+        });
     }
 
     public interface OnItemSelectedListener {
@@ -186,36 +198,41 @@ public class NewsFragment extends Fragment {
         @Override
         public void onBindViewHolder(@NonNull NewsViewHolder holder, int position) {
             final UserNews.Result news = mNews.get(position);
-            holder.mTitle.setText(news.getTitle());
+            String url = "<a href=\"" + news.getUrl() + "\" target=\"_blank\">" + news.getTitle() + "</a>";
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                holder.mTitle.setText(Html.fromHtml(url, Html.FROM_HTML_MODE_COMPACT));
+            } else {
+                holder.mTitle.setText(Html.fromHtml(url));
+            }
+            holder.mTitle.setMovementMethod(LinkMovementMethod.getInstance());
+            holder.mTitle.setTextColor(getResources().getColor(android.R.color.black));                                   //       overthink
             holder.mBlog.setText(news.getBlog());
             holder.mAuthor.setText(news.getAuthor().getFullname());
             holder.mDate.setText(news.getPublishDate());
             holder.mRating.setText(news.getRating().toString());
 
-            if (news.getText().get(0).getType().equals("p") || news.getText().get(0).getType().equals("u1")
-                    || news.getText().get(0).getType().equals("code")) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                    holder.mContent.setText(Html.fromHtml(news.getTextShort().get(0).getContent(), Html.FROM_HTML_MODE_COMPACT));
-                } else {
-                    holder.mContent.setText(Html.fromHtml(news.getTextShort().get(0).getContent()));
-                }
-                holder.mContent.setMovementMethod(LinkMovementMethod.getInstance());
-            }
-
-
+            boolean buttonIsActive = false;
             holder.mCommentsCount.setText(news.getCommentsCount().toString());
             if (news.getText().size() > 1 ||
                     (!(news.getText().get(0).getContent().equals(news.getTextShort().get(0).getContent())))) {
-                holder.mNext.setText("Читать дальше...");
+                holder.mNext.setText("Показать полностью...");
                 holder.mNext.setTextColor(getResources().getColor(android.R.color.holo_blue_light));
                 holder.mNext.setTextSize(17);
+                buttonIsActive = true;
             }
+
+            final ContentAdapter contentAdapter = new ContentAdapter();
+            List<UserNews.TextShort> textShort=new ArrayList<UserNews.TextShort>();
+            textShort.add(news.getTextShort().get(0));
+            contentAdapter.setContent(news.getText(), textShort, buttonIsActive);
+            holder.mContent.setAdapter(contentAdapter);
+            holder.mContent.setLayoutManager(new LinearLayoutManager(getContext()));
+
             Glide.with(getContext())
                     .load(news.getAuthor().getAvatarUrl())
                     .placeholder(R.drawable.ic_launcher_foreground)
                     .apply(RequestOptions.circleCropTransform())
                     .into(holder.mAvatar);
-
         }
 
         @Override
@@ -223,12 +240,19 @@ public class NewsFragment extends Fragment {
             return mNews.size();
         }
 
+        public void setDisactive(@NonNull NewsViewHolder holder, int pos) {
+            final UserNews.Result news = mNews.get(pos);
+            final ContentAdapter contentAdapter = new ContentAdapter();
+            contentAdapter.setContent(news.getText(), news.getTextShort(), false);
+            holder.mContent.setAdapter(contentAdapter);
+            holder.mContent.setLayoutManager(new LinearLayoutManager(getContext()));
+        }
     }
 
     static class NewsViewHolder extends RecyclerView.ViewHolder {
         protected TextView mTitle;
         protected TextView mBlog;
-        protected TextView mContent;
+        protected RecyclerView mContent;
         protected TextView mAuthor;
         protected TextView mDate;
         protected TextView mRating;
@@ -251,46 +275,83 @@ public class NewsFragment extends Fragment {
             mNext.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
+                    mNext.setTextSize(0);
                     int pos = NewsViewHolder.this.getAdapterPosition();
-                    UserNews.Result myData = adapter.mNews.get(pos);
-                    ((OnItemSelectedListener) context).onItemSelected(1);
-                   /* fragmentManager
-                            .beginTransaction()
-                            .replace(R.id.nav_host_fragment, ArticleFragment.newInstance(myData))
-                            .addToBackStack(null)
-                            .commit();*/
+                    adapter.setDisactive(NewsViewHolder.this, pos);
                 }
+
             });
         }
     }
 
-    private boolean restoreState(Bundle savedInstanceState) {
-        UserNews news = new UserNews();
-        return savedInstanceState != null;
-    }
 
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-    }
+    private class ContentAdapter extends RecyclerView.Adapter<ContentViewHolder> {
 
+        private List<UserNews.Text> mText = new ArrayList<>();
+        private List<UserNews.TextShort> mTextShort = new ArrayList<>();
+        private List<String> mType = new ArrayList<>();
+        private boolean isActive;
 
-    class MyTask extends AsyncTask<Void, Void, Void> {
+        public void setContent(List<UserNews.Text> text, List<UserNews.TextShort> textShort, boolean buttonisActive) {
+            mText = text;
+            mTextShort = textShort;
+            isActive = buttonisActive;
+            notifyDataSetChanged();
+        }
 
+        @NonNull
         @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
+        public ContentViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            return new ContentViewHolder(LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.news_text_item, parent, false));
         }
 
         @Override
-        protected Void doInBackground(Void... params) {
-            mNewsViewModel.setmNextNews(mUrl);
-            return null;
+        public void onBindViewHolder(@NonNull ContentViewHolder holder, int position) {
+            final String text;
+            final String type;
+            if (isActive) {
+                text = mTextShort.get(position).getContent();
+                type = mTextShort.get(position).getType();
+            } else {
+                text = mText.get(position).getContent();
+                type = mText.get(position).getType();
+            }
+            if (type.equals("p") || type.equals("ul")|| type.equals("code")) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    holder.mTextNews.setText(Html.fromHtml(text, Html.FROM_HTML_MODE_COMPACT));
+                } else {
+                    holder.mTextNews.setText(Html.fromHtml(text));
+                }
+                holder.mTextNews.setMovementMethod(LinkMovementMethod.getInstance());
+            } else if (type.equals("img")) {
+                Glide.with(getContext())
+                        .load(text)
+/*rewrite*/.placeholder(R.drawable.ic_launcher_foreground)
+                        .into(holder.mImageNews);
+                holder.mTextNews.setEnabled(true);
+            } else {
+                holder.mTextNews.setText(type);
+            }
         }
 
         @Override
-        protected void onPostExecute(Void result) {
-            super.onPostExecute(result);
+        public int getItemCount() {
+            if (isActive)
+                return mTextShort.size();
+            else return mText.size();
+        }
+    }
+
+    static class ContentViewHolder extends RecyclerView.ViewHolder {
+
+        protected TextView mTextNews;
+        protected ImageView mImageNews;
+
+        public ContentViewHolder(@NonNull View itemView) {
+            super(itemView);
+            mTextNews = itemView.findViewById(R.id.text_news);
+            mImageNews = itemView.findViewById(R.id.photo);
         }
     }
 }

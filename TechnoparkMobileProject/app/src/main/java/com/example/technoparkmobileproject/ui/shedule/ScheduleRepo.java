@@ -1,0 +1,173 @@
+package com.example.technoparkmobileproject.ui.shedule;
+
+import android.content.Context;
+import android.content.SharedPreferences;
+
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
+
+import com.example.technoparkmobileproject.SecretData;
+import com.example.technoparkmobileproject.network.ApiRepo;
+import com.example.technoparkmobileproject.network.ScheduleApi;
+
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+public class ScheduleRepo {
+    // private static SimpleDateFormat sSimpleDateFormat = new SimpleDateFormat("dd.MM.yyyy", Locale.US);
+    private final static MutableLiveData<List<UserSchedule>> mSchedule = new MutableLiveData<>();
+    private SharedPreferences mSettings;
+    private final Context mContext;
+    private ScheduleApi mScheduleApi;
+    private static String AUTH_TOKEN = "auth_token";
+    private static String SITE = "site";
+    private final Executor executor = Executors.newSingleThreadExecutor();
+
+    private final DbManager.ReadAllListener<Schedule> readListener = new DbManager.ReadAllListener<Schedule>() {
+        @Override
+        public void onReadAll(final Collection<Schedule> allItems) {
+            Runnable runnable = new Runnable() {
+                @Override
+                public void run() {
+                    postList(allItems);
+                }
+            };
+            Thread thread = new Thread(runnable);
+            thread.start();
+        }
+    };
+
+    ScheduleRepo(Context context) {
+        mContext = context;
+        mScheduleApi = ApiRepo.from(mContext).getScheduleApi(new SecretData().getSecretData(mContext).getInt(SITE, 0));
+    }
+
+    public LiveData<List<UserSchedule>> getSchedule() {
+        return mSchedule;
+    }
+
+
+    public void refresh() {
+           final DbManager manager = DbManager.getInstance(mContext);
+        mSettings = new SecretData().getSecretData(mContext);
+        mScheduleApi.getUserSchedule(" Token " + mSettings.getString(AUTH_TOKEN, "")).enqueue(new Callback<List<ScheduleApi.UserSchedulePlain>>() {
+            @Override
+            public void onResponse(Call<List<ScheduleApi.UserSchedulePlain>> call,
+                                   Response<List<ScheduleApi.UserSchedulePlain>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    List<ScheduleApi.UserSchedulePlain> result = response.body();
+                    mSchedule.postValue(transform(result));
+                       manager.clean();
+                      savedata(result);
+                } else {
+                      manager.readAll(readListener);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<ScheduleApi.UserSchedulePlain>> call, Throwable t) {
+                    manager.readAll(readListener);
+            }
+        });
+    }
+
+
+    private static List<UserSchedule> transform(List<ScheduleApi.UserSchedulePlain> plains) {
+        List<UserSchedule> result = new ArrayList<>();
+        for (ScheduleApi.UserSchedulePlain schedulePlain : plains) {
+            try {
+                UserSchedule schedule = map(schedulePlain);
+                result.add(schedule);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+        }
+        return result;
+    }
+
+
+    private static List<UserSchedule.Group> transformGroup(List<ScheduleApi.UserSchedulePlain.Group> plains) {
+        List<UserSchedule.Group> groups = new ArrayList<>();
+        for (ScheduleApi.UserSchedulePlain.Group groupPlain : plains) {
+            try {
+                UserSchedule.Group group = mapGroup(groupPlain);
+                groups.add(group);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+        }
+        return groups;
+    }
+
+
+    private static UserSchedule map(ScheduleApi.UserSchedulePlain resultPlain) throws ParseException {
+
+        List<UserSchedule.Group> groups = transformGroup(resultPlain.getGroups());
+
+        return new UserSchedule(resultPlain.getId(),
+                resultPlain.getDiscipline(),
+                resultPlain.getTitle(),
+                resultPlain.getShortTitle(),
+                resultPlain.getSuperShortTitle(),
+                resultPlain.getDate(),
+                resultPlain.getStartTime(),
+                resultPlain.getEndTime(),
+                resultPlain.getLocation(),
+                groups);
+    }
+
+
+    private static UserSchedule.Group mapGroup(ScheduleApi.UserSchedulePlain.Group textPlain) throws ParseException {
+        UserSchedule temp = new UserSchedule();
+        return temp.new Group(
+                textPlain.getId(),
+                textPlain.getName());
+    }
+
+
+    private void savedata(List<ScheduleApi.UserSchedulePlain> result) {
+        for (int i = 0; i < result.size(); i++) {
+            DbManager.getInstance(mContext).insert(result.get(i).getId(),result.get(i).getTitle(),result.get(i).getDiscipline(),
+                    result.get(i).getShortTitle(),result.get(i).getSuperShortTitle(),result.get(i).getDate(),result.get(i).getStartTime(),
+                    result.get(i).getEndTime(),result.get(i).getGroups(),result.get(i).getLocation());
+        }
+
+    }
+
+    private void postList(Collection<Schedule> list) {
+        List<Schedule> data = new ArrayList();
+        Comparator<Schedule> comp = new Comparator<Schedule>() {
+            @Override
+            public int compare(Schedule a, Schedule b) {
+                if (b.id > a.id) {
+                    return -1;
+                } else if (b.id == a.id) {
+                    return 0;
+                } else {
+                    return 1;
+                }
+            }
+        };
+        data.addAll(list);
+        Collections.sort(data, comp);
+        List<ScheduleApi.UserSchedulePlain> tempResult = new ArrayList<>();
+        for (int i = 0; i < data.size(); i++) {
+            ScheduleApi.UserSchedulePlain temp = new ScheduleApi.UserSchedulePlain(data.get(i).id,
+                    data.get(i).discipline,data.get(i).title,data.get(i).shortTitle,data.get(i).superShortTitle,
+                    data.get(i).date,data.get(i).startTime,data.get(i).endTime,data.get(i).location,data.get(i).getGroup());
+            tempResult.add(temp);
+        }
+        mSchedule.postValue(transform(tempResult));
+
+    }
+}

@@ -1,19 +1,32 @@
 package com.example.technoparkmobileproject.ui.shedule;
 
+
+import android.app.Application;
+import android.util.Log;
+
+import androidx.annotation.NonNull;
+
+import androidx.lifecycle.AndroidViewModel;
+
 import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModel;
 
-public class ScheduleViewModel extends ViewModel {
+import java.util.List;
 
-    private MutableLiveData<String> mText;
+public class ScheduleViewModel extends AndroidViewModel {
 
-    public ScheduleViewModel() {
-        mText = new MutableLiveData<>();
-        mText.setValue("This is dashboard fragment");
+    private ScheduleRepo mRepo = new ScheduleRepo(getApplication());
+    private LiveData<List<UserSchedule>> mSchedule = mRepo.getSchedule();
+
+    public ScheduleViewModel(@NonNull Application application) {
+        super(application);
     }
 
-    public LiveData<String> getText() {
-        return mText;
+    public LiveData<List<UserSchedule>> getSchedule() {
+        return mSchedule;
     }
+
+    public void refresh() {
+        mRepo.refresh();
+    }
+
 }

@@ -6,6 +6,7 @@ import android.util.Log;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
+import androidx.room.Room;
 
 import com.example.technoparkmobileproject.SecretData;
 import com.example.technoparkmobileproject.network.ApiRepo;
@@ -14,8 +15,13 @@ import com.example.technoparkmobileproject.network.NewsApi;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -31,11 +37,25 @@ class NewsRepo {
     private NewsApi mNewsApi;
     private static String AUTH_TOKEN = "auth_token";
     private static String SITE = "site";
+    private final Executor executor = Executors.newSingleThreadExecutor();
+
+    private final DbManager.ReadAllListener<News> readListener = new DbManager.ReadAllListener<News>() {
+        @Override
+        public void onReadAll(final Collection<News> allItems) {
+            Runnable runnable = new Runnable() {
+                @Override
+                public void run() {
+                    postList(allItems);
+                }
+            };
+            Thread thread = new Thread(runnable);
+            thread.start();
+        }
+    };
 
     NewsRepo(Context context) {
         mContext = context;
         mNewsApi = ApiRepo.from(mContext).getNewsApi(new SecretData().getSecretData(mContext).getInt(SITE, 0));
-
     }
 
     public LiveData<UserNews> getNews() {
@@ -47,6 +67,7 @@ class NewsRepo {
     }
 
     public void refresh(String url) {
+        final DbManager manager = DbManager.getInstance(mContext);
         mSettings = new SecretData().getSecretData(mContext);
         mNewsApi.getUserNews(" Token " + mSettings.getString(AUTH_TOKEN, "")).enqueue(new Callback<NewsApi.UserNewsPlain>() {
             @Override
@@ -55,19 +76,20 @@ class NewsRepo {
                 if (response.isSuccessful() && response.body() != null) {
                     NewsApi.UserNewsPlain result = response.body();
                     mNews.postValue(transform(result));
-
+                    manager.clean();
+                    savedata(result);
                 } else {
-                    //DataBase
+                    manager.readAll(readListener);
                 }
             }
 
             @Override
             public void onFailure(Call<NewsApi.UserNewsPlain> call, Throwable t) {
-                Log.e("NewsRepo", "Failed to load", t);
-                //DataBase
+                manager.readAll(readListener);
             }
         });
     }
+
 
     public void setmNextNews(String url) {
         mSettings = new SecretData().getSecretData(mContext);
@@ -78,15 +100,16 @@ class NewsRepo {
                 if (response.isSuccessful() && response.body() != null) {
                     NewsApi.UserNewsPlain result = response.body();
                     mNextNews.postValue(transform(result));
+                    savedata(result);
                 } else {
-                    //DataBase
+
                 }
             }
 
             @Override
             public void onFailure(Call<NewsApi.UserNewsPlain> call, Throwable t) {
                 Log.e("NewsRepo", "Failed to load", t);
-                //DataBase
+
             }
         });
     }
@@ -188,4 +211,51 @@ class NewsRepo {
                 textPlain.content
         );
     }
+
+    private void savedata(NewsApi.UserNewsPlain result) {
+        for (int i = 0; i < result.results.size(); i++) {
+            DbManager.getInstance(mContext).insert(result.results.get(i).id, result.results.get(i).title, result.results.get(i).blog,
+                    result.results.get(i).author.fullname, result.results.get(i).author.id,
+                    result.results.get(i).author.avatarUrl, result.results.get(i).commentsCount,
+                    result.results.get(i).publishDate, result.results.get(i).rating, result.results.get(i).text,
+                    result.results.get(i).textShort, result.results.get(i).url, result.next);
+        }
+
+    }
+
+    private void postList(Collection<News> list) {
+        List<News> data = new ArrayList();
+        Comparator<News> comp = new Comparator<News>() {
+            @Override
+            public int compare(News a, News b) {
+                if (b.id > a.id) {
+                    return 1;
+                } else if (b.id == a.id) {
+                    return 0;
+                } else {
+                    return -1;
+                }
+            }
+        };
+        data.addAll(list);
+        Collections.sort(data, comp);
+
+        List<NewsApi.UserNewsPlain.Result> tempResult = new ArrayList<>();
+
+        for (int i = 0; i < data.size(); i++) {
+            NewsApi.UserNewsPlain temp = new NewsApi.UserNewsPlain();
+            NewsApi.UserNewsPlain.Author tempAuthor = temp.new Author(data.get(i).authorName,
+                    data.get(i).authorAva,
+                    null,
+                    data.get(i).authorId);
+            tempResult.add(temp.new Result(tempAuthor, data.get(i).blog, data.get(i).title, data.get(i).rating,
+                    data.get(i).publishDate, data.get(i).getText(), data.get(i).commentsCount, data.get(i).id,
+                    data.get(i).getTextShort(), data.get(i).url));
+        }
+        NewsApi.UserNewsPlain temp = new NewsApi.UserNewsPlain(null, data.get(data.size() - 1).next,
+                null, tempResult);
+        mNews.postValue(transform(temp));
+
+    }
+
 }

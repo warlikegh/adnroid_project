@@ -11,9 +11,25 @@ import retrofit2.http.Header;
 
 public interface ScheduleApi {
     @GET("schedule/")
-    Call<UserSchedule> getUserSchedule(@Header("Authorization") String auth_token);
+    Call<List<UserSchedulePlain>> getUserSchedule(@Header("Authorization") String auth_token);
 
-    class UserSchedule {
+    class UserSchedulePlain {
+        public UserSchedulePlain(Integer mId, String mDiscipline, String mTitle, String mShortTitle, String mSuperShortTitle,
+                            String mDate, String mStartTime, String mEndTime, String mLocation, List<Group> mGroups) {
+            this.id = mId;
+            this.discipline = mDiscipline;
+            this.title = mTitle;
+            this.shortTitle = mShortTitle;
+            this.superShortTitle = mSuperShortTitle;
+            this.date = mDate;
+            this.startTime = mStartTime;
+            this.endTime = mEndTime;
+            this.location = mLocation;
+            this.groups = mGroups;
+        }
+        public UserSchedulePlain() {
+        }
+
 
         @SerializedName("id")
         @Expose
@@ -183,6 +199,11 @@ public interface ScheduleApi {
 
             public void setName(String name) {
                 this.name = name;
+            }
+
+            public Group(Integer mId, String mName) {
+                this.id = mId;
+                this.name = mName;
             }
 
         }
