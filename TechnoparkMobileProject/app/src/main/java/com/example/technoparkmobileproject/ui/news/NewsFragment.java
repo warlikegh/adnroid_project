@@ -1,5 +1,6 @@
 package com.example.technoparkmobileproject.ui.news;
 
+import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 
 import android.content.Context;
@@ -29,10 +30,19 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.technoparkmobileproject.R;
 
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
+
+import static java.time.format.DateTimeFormatter.ISO_LOCAL_DATE;
 
 
 public class NewsFragment extends Fragment {
@@ -47,6 +57,7 @@ public class NewsFragment extends Fragment {
     RecyclerView recycler;
     boolean isSaveState;
     static Context context;
+    Integer positionSave;
 
     private EndlessRecyclerViewScrollListener scrollListener;
 
@@ -56,56 +67,20 @@ public class NewsFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        if (savedInstanceState == null) {
-            isSaveState = false;
-        } else {
-            isSaveState = true;
-        }
-        return inflater.inflate(R.layout.fragment_home, container, false);
-    }
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
-        fragmentManager = getFragmentManager();
-        context = getContext();
-    }
-
-    @Override
-    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-        inflater.inflate(R.menu.news_menu, menu);
-        super.onCreateOptionsMenu(menu, inflater);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if (item.getItemId() == R.id.refresh) {
-            mNewsViewModel.refresh(BASE_URL);
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-    private boolean restoreState(Bundle savedInstanceState) {
-        UserNews news = new UserNews();
-        return savedInstanceState != null;
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-    }
-
-
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
+        View view = inflater.inflate(R.layout.fragment_home, container, false);
 
         recycler = view.findViewById(R.id.news);
         adapter = new NewsAdapter();
         recycler.setAdapter(adapter);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
+        if (savedInstanceState != null) {
+            positionSave = savedInstanceState.getInt("pos", -1);
+        } else {
+            positionSave = 0;
+            Log.d("save", "null");
+        }
+        Log.d("save", positionSave.toString());
+        //linearLayoutManager.scrollToPosition(positionSave);
         recycler.setLayoutManager(linearLayoutManager);
 
         scrollListener = new EndlessRecyclerViewScrollListener(linearLayoutManager) {
@@ -150,8 +125,7 @@ public class NewsFragment extends Fragment {
             }
         };
 
-        mNewsViewModel = new ViewModelProvider(getActivity())
-                .get(NewsViewModel.class);
+
         mNewsViewModel
                 .getNews()
                 .observe(getViewLifecycleOwner(), observer);
@@ -159,9 +133,68 @@ public class NewsFragment extends Fragment {
                 .getNextNews()
                 .observe(getViewLifecycleOwner(), observer_next);
 
-        mNewsViewModel.refresh(BASE_URL);
-
+        Bundle bundle = new Bundle();
+        bundle.putInt("pos", positionSave);
+        this.setArguments(bundle);
+        if (savedInstanceState == null) {
+            //  Log.d("save","refresh");
+        }
+        return view;
     }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+        fragmentManager = getFragmentManager();
+        context = getContext();
+        mNewsViewModel = new ViewModelProvider(getActivity())
+                .get(NewsViewModel.class);
+        if (savedInstanceState == null) {
+            mNewsViewModel.refresh(BASE_URL);
+            Log.d("save", "refresh");
+        }
+    }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        inflater.inflate(R.menu.news_menu, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == R.id.refresh) {
+            mNewsViewModel.refresh(BASE_URL);
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    private boolean restoreState(Bundle savedInstanceState) {
+        return savedInstanceState != null;
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        //   outState.putInt("pos", positionSave);
+//        Log.d("save", positionSave.toString());
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        Log.d("save", "destroy");
+        onSaveInstanceState(new Bundle());
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        Log.d("save", "detach");
+    }
+
 
     public void loadNextDataFromApi(String url) {
         final Executor executor = Executors.newSingleThreadExecutor();
@@ -195,8 +228,10 @@ public class NewsFragment extends Fragment {
                     .inflate(R.layout.news_item, parent, false));
         }
 
+        @RequiresApi(api = Build.VERSION_CODES.O)
         @Override
         public void onBindViewHolder(@NonNull NewsViewHolder holder, int position) {
+            positionSave = position;
             final UserNews.Result news = mNews.get(position);
             String url = "<a href=\"" + news.getUrl() + "\" target=\"_blank\">" + news.getTitle() + "</a>";
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -208,7 +243,12 @@ public class NewsFragment extends Fragment {
             holder.mTitle.setTextColor(getResources().getColor(android.R.color.black));                                   //       overthink
             holder.mBlog.setText(news.getBlog());
             holder.mAuthor.setText(news.getAuthor().getFullname());
-            holder.mDate.setText(news.getPublishDate());
+
+            String data = news.getPublishDate().replace("T", " ").replace("Z", "");
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").withLocale(Locale.US);
+            LocalDateTime localDateTime = LocalDateTime.parse(data, formatter);
+
+            holder.mDate.setText(localDateTime.format(formatter));
             holder.mRating.setText(news.getRating().toString());
 
             boolean buttonIsActive = false;
@@ -222,7 +262,7 @@ public class NewsFragment extends Fragment {
             }
 
             final ContentAdapter contentAdapter = new ContentAdapter();
-            List<UserNews.TextShort> textShort=new ArrayList<UserNews.TextShort>();
+            List<UserNews.TextShort> textShort = new ArrayList<UserNews.TextShort>();
             textShort.add(news.getTextShort().get(0));
             contentAdapter.setContent(news.getText(), textShort, buttonIsActive);
             holder.mContent.setAdapter(contentAdapter);
@@ -289,7 +329,6 @@ public class NewsFragment extends Fragment {
 
         private List<UserNews.Text> mText = new ArrayList<>();
         private List<UserNews.TextShort> mTextShort = new ArrayList<>();
-        private List<String> mType = new ArrayList<>();
         private boolean isActive;
 
         public void setContent(List<UserNews.Text> text, List<UserNews.TextShort> textShort, boolean buttonisActive) {
@@ -317,7 +356,7 @@ public class NewsFragment extends Fragment {
                 text = mText.get(position).getContent();
                 type = mText.get(position).getType();
             }
-            if (type.equals("p") || type.equals("ul")|| type.equals("code")) {
+            if (type.equals("p") || type.equals("ul") || type.equals("code")) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                     holder.mTextNews.setText(Html.fromHtml(text, Html.FROM_HTML_MODE_COMPACT));
                 } else {

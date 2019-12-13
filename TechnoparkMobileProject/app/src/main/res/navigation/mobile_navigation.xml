@@ -22,7 +22,7 @@
         android:id="@+id/navigation_dashboard"
         android:name="com.example.technoparkmobileproject.ui.shedule.ScheduleFragment"
         android:label="@string/title_dashboard"
-        tools:layout="@layout/fragment_schedule" />
+        tools:layout="@layout/fragment_schedule_all" />
 
     <fragment
         android:id="@+id/navigation_notifications"
