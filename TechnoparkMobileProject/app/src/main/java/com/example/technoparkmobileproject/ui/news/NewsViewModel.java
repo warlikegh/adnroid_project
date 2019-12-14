@@ -28,11 +28,15 @@ public class NewsViewModel extends AndroidViewModel {
         return mNextNews;
     }
 
-    public void refresh(String url) {
-        mRepo.refresh(url);
+    public void refresh() {
+        mRepo.refresh();
     }
 
-    public void setmNextNews(String url) {
-        mRepo.setmNextNews(url);
+    public void setNextNews(String url) {
+        mRepo.setNextNews(url);
+    }
+
+    public void pullFromDB() {
+        mRepo.pullFromDB();
     }
 }

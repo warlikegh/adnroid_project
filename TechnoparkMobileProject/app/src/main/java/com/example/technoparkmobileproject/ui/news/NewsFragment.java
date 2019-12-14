@@ -4,11 +4,11 @@ import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -30,19 +30,14 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.technoparkmobileproject.R;
 
-
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
-
-import static java.time.format.DateTimeFormatter.ISO_LOCAL_DATE;
 
 
 public class NewsFragment extends Fragment {
@@ -57,7 +52,9 @@ public class NewsFragment extends Fragment {
     RecyclerView recycler;
     boolean isSaveState;
     static Context context;
-    Integer positionSave;
+    Integer positionSave=0;
+    SharedPreferences mSettings;
+    SharedPreferences.Editor mEditor;
 
     private EndlessRecyclerViewScrollListener scrollListener;
 
@@ -73,15 +70,9 @@ public class NewsFragment extends Fragment {
         adapter = new NewsAdapter();
         recycler.setAdapter(adapter);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
-        if (savedInstanceState != null) {
-            positionSave = savedInstanceState.getInt("pos", -1);
-        } else {
-            positionSave = 0;
-            Log.d("save", "null");
-        }
-        Log.d("save", positionSave.toString());
-        //linearLayoutManager.scrollToPosition(positionSave);
+        linearLayoutManager.scrollToPositionWithOffset(positionSave,0);
         recycler.setLayoutManager(linearLayoutManager);
+
 
         scrollListener = new EndlessRecyclerViewScrollListener(linearLayoutManager) {
             @Override
@@ -115,7 +106,7 @@ public class NewsFragment extends Fragment {
                         tempResult.addAll(mNews.getResults());
                     tempResult.addAll(news.getResults());
                     if (mNews != null) {
-                        UserNews temp = new UserNews(news.getCount() + mNews.getCount(), news.getNext(), news.getPrevious(), tempResult);
+                        UserNews temp = new UserNews(news.getCount(), news.getNext(), news.getPrevious(), tempResult);
                         mNews = temp;
                     } else {
                         mNews = news;
@@ -125,20 +116,12 @@ public class NewsFragment extends Fragment {
             }
         };
 
-
         mNewsViewModel
                 .getNews()
                 .observe(getViewLifecycleOwner(), observer);
         mNewsViewModel
                 .getNextNews()
                 .observe(getViewLifecycleOwner(), observer_next);
-
-        Bundle bundle = new Bundle();
-        bundle.putInt("pos", positionSave);
-        this.setArguments(bundle);
-        if (savedInstanceState == null) {
-            //  Log.d("save","refresh");
-        }
         return view;
     }
 
@@ -148,11 +131,16 @@ public class NewsFragment extends Fragment {
         setHasOptionsMenu(true);
         fragmentManager = getFragmentManager();
         context = getContext();
-        mNewsViewModel = new ViewModelProvider(getActivity())
+        mNewsViewModel = new ViewModelProvider(Objects.requireNonNull(getActivity()))
                 .get(NewsViewModel.class);
-        if (savedInstanceState == null) {
-            mNewsViewModel.refresh(BASE_URL);
-            Log.d("save", "refresh");
+
+        mSettings = Objects.requireNonNull(getContext()).getSharedPreferences("createFirst", Context.MODE_PRIVATE);
+        mEditor = mSettings.edit();
+        if (mSettings.getBoolean("isFirstNews", true)) {
+            mNewsViewModel.refresh();
+        } else {
+            mNewsViewModel.pullFromDB();
+            positionSave = mSettings.getInt("pos",0);
         }
     }
 
@@ -165,7 +153,7 @@ public class NewsFragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.refresh) {
-            mNewsViewModel.refresh(BASE_URL);
+            mNewsViewModel.refresh();
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -176,32 +164,18 @@ public class NewsFragment extends Fragment {
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState) {
+    public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
-        //   outState.putInt("pos", positionSave);
-//        Log.d("save", positionSave.toString());
+        //outState.putInt("pos", positionSave);
+        mEditor.putInt("pos", positionSave).commit();
     }
 
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        Log.d("save", "destroy");
-        onSaveInstanceState(new Bundle());
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        Log.d("save", "detach");
-    }
-
-
-    public void loadNextDataFromApi(String url) {
+    private void loadNextDataFromApi(String url) {
         final Executor executor = Executors.newSingleThreadExecutor();
         executor.execute(new Runnable() {
             @Override
             public void run() {
-                mNewsViewModel.setmNextNews(mUrl);
+                mNewsViewModel.setNextNews(mUrl);
             }
         });
     }
@@ -214,7 +188,6 @@ public class NewsFragment extends Fragment {
     private class NewsAdapter extends RecyclerView.Adapter<NewsViewHolder> {
 
         private List<UserNews.Result> mNews = new ArrayList<>();
-        //private SimpleDateFormat mFormat = new SimpleDateFormat("dd MMM", Locale.US);
 
         public void setNews(List<UserNews.Result> news) {
             mNews = news;
@@ -268,7 +241,7 @@ public class NewsFragment extends Fragment {
             holder.mContent.setAdapter(contentAdapter);
             holder.mContent.setLayoutManager(new LinearLayoutManager(getContext()));
 
-            Glide.with(getContext())
+            Glide.with(Objects.requireNonNull(getContext()))
                     .load(news.getAuthor().getAvatarUrl())
                     .placeholder(R.drawable.ic_launcher_foreground)
                     .apply(RequestOptions.circleCropTransform())
@@ -364,7 +337,7 @@ public class NewsFragment extends Fragment {
                 }
                 holder.mTextNews.setMovementMethod(LinkMovementMethod.getInstance());
             } else if (type.equals("img")) {
-                Glide.with(getContext())
+                Glide.with(Objects.requireNonNull(getContext()))
                         .load(text)
 /*rewrite*/.placeholder(R.drawable.ic_launcher_foreground)
                         .into(holder.mImageNews);

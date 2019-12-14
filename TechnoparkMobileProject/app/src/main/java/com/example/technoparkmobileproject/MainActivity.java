@@ -11,6 +11,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
@@ -20,12 +21,13 @@ import androidx.navigation.ui.NavigationUI;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity /*implements NewsFragment.OnItemSelectedListener*/ {
+public class MainActivity extends FragmentActivity /*implements NewsFragment.OnItemSelectedListener*/ {
 
     NavController navController;
 
-    private BottomNavigationView bottomNavigationView;
     private List<Fragment> fragments = new ArrayList<>(3);
+    Integer fragmentNumber;
+    String FRAGMENT_NUMBER = "fragment_number";
 
     private void buildFragmentsList() {
         NewsFragment newsFragment = new NewsFragment();
@@ -44,13 +46,12 @@ public class MainActivity extends AppCompatActivity /*implements NewsFragment.On
                 .commit();
     }
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-/*
-        bottomNavigationView = findViewById(R.id.nav_view);
+
+        BottomNavigationView bottomNavigationView = findViewById(R.id.nav_view);
 
         bottomNavigationView.setOnNavigationItemSelectedListener(
                 new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -58,23 +59,30 @@ public class MainActivity extends AppCompatActivity /*implements NewsFragment.On
                     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                         switch (item.getItemId()) {
                             case R.id.navigation_home:
-                                switchFragment(0);
+                                fragmentNumber = 0;
+                                switchFragment(fragmentNumber);
                                 return true;
                             case R.id.navigation_dashboard:
-                                switchFragment(1);
+                                fragmentNumber = 1;
+                                switchFragment(fragmentNumber);
                                 return true;
                             case R.id.navigation_notifications:
-
-                                switchFragment(2);
+                                fragmentNumber = 2;
+                                switchFragment(fragmentNumber);
                                 return true;
                         }
                         return false;
                     }
                 });
         buildFragmentsList();
-        switchFragment(0);*/
+        if (savedInstanceState != null) {
+            fragmentNumber = savedInstanceState.getInt(FRAGMENT_NUMBER, 0);
+        } else {
+            fragmentNumber = 0;
+        }
+        switchFragment(fragmentNumber);
 
-        BottomNavigationView navView = findViewById(R.id.nav_view);
+     /*   BottomNavigationView navView = findViewById(R.id.nav_view);
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
@@ -82,12 +90,17 @@ public class MainActivity extends AppCompatActivity /*implements NewsFragment.On
                 .build();
         navController = Navigation.findNavController(this, R.id.nav_host_fragment);
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
-        NavigationUI.setupWithNavController(navView, navController);
+        NavigationUI.setupWithNavController(navView, navController);*/
 
     }
 
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt(FRAGMENT_NUMBER, fragmentNumber);
+    }
 
- /*   public void onItemSelected(int id) {
+    /*   public void onItemSelected(int id) {
         navController.navigate(R.id.articleFragment);
         /*getSupportFragmentManager()
                 .beginTransaction()

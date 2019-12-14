@@ -29,7 +29,6 @@ import retrofit2.Response;
 
 
 class NewsRepo {
-    // private static SimpleDateFormat sSimpleDateFormat = new SimpleDateFormat("dd.MM.yyyy", Locale.US);
     private final static MutableLiveData<UserNews> mNews = new MutableLiveData<>();
     private final static MutableLiveData<UserNews> mNextNews = new MutableLiveData<>();
     private SharedPreferences mSettings;
@@ -46,6 +45,9 @@ class NewsRepo {
                 @Override
                 public void run() {
                     postList(allItems);
+                    if (allItems.isEmpty()) {
+                        refresh();
+                    }
                 }
             };
             Thread thread = new Thread(runnable);
@@ -66,7 +68,13 @@ class NewsRepo {
         return mNextNews;
     }
 
-    public void refresh(String url) {
+    public void refresh() {
+        SharedPreferences mSettings;
+        mSettings = mContext.getSharedPreferences("createFirst", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = mSettings.edit();
+        editor.putBoolean("isFirstNews", false);
+        editor.apply();
+
         final DbManager manager = DbManager.getInstance(mContext);
         mSettings = new SecretData().getSecretData(mContext);
         mNewsApi.getUserNews(" Token " + mSettings.getString(AUTH_TOKEN, "")).enqueue(new Callback<NewsApi.UserNewsPlain>() {
@@ -79,19 +87,26 @@ class NewsRepo {
                     manager.clean();
                     savedata(result);
                 } else {
-                    manager.readAll(readListener);
+                    //  manager.readAll(readListener);
                 }
             }
 
             @Override
             public void onFailure(Call<NewsApi.UserNewsPlain> call, Throwable t) {
-                manager.readAll(readListener);
+                //  manager.readAll(readListener);
             }
         });
     }
 
+    public void pullFromDB() {
 
-    public void setmNextNews(String url) {
+        DbManager manager = DbManager.getInstance(mContext);
+        manager.readAll(readListener);
+
+    }
+
+
+    public void setNextNews(String url) {
         mSettings = new SecretData().getSecretData(mContext);
         mNewsApi.getReUserNews(" Token " + mSettings.getString(AUTH_TOKEN, ""), url).enqueue(new Callback<NewsApi.UserNewsPlain>() {
             @Override

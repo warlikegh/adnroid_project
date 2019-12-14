@@ -21,7 +21,6 @@ public abstract class AppDataBase extends RoomDatabase {
         return instance;
     }
 
-
     private static AppDataBase create(final Context context) {
         return Room.databaseBuilder(
                 context,

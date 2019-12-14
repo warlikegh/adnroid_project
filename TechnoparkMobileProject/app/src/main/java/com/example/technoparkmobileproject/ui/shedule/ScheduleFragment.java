@@ -1,6 +1,7 @@
 package com.example.technoparkmobileproject.ui.shedule;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.os.Build;
 import android.os.Bundle;
@@ -30,13 +31,12 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.technoparkmobileproject.R;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-
+import java.util.Objects;
 
 public class ScheduleFragment extends Fragment {
 
@@ -48,28 +48,31 @@ public class ScheduleFragment extends Fragment {
     static Context context;
     RecyclerView recycler;
     final MyAdapter adapter = new MyAdapter();
+    Integer positionSave = 0;
+    SharedPreferences mSettings;
+    SharedPreferences.Editor mEditor;
 
-    private ScheduleViewModel scheduleViewModel;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         fragmentManager = getFragmentManager();
         context = getContext();
+        mScheduleViewModel = new ViewModelProvider(Objects.requireNonNull(getActivity()))
+                .get(ScheduleViewModel.class);
+
+        mSettings = Objects.requireNonNull(getContext()).getSharedPreferences("createFirst", Context.MODE_PRIVATE);
+        mEditor = mSettings.edit();
+        if (!mSettings.getBoolean("isFirstSchedule", true)) {
+            positionSave = mSettings.getInt("pos", 0);
+
+        }
+        mScheduleViewModel.pullFromDB();
     }
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_schedule_all, container, false);
-    }
-
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        recycler = view.findViewById(R.id.schedule);
-        recycler.setAdapter(adapter);
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
-        recycler.setLayoutManager(linearLayoutManager);
+        View view = inflater.inflate(R.layout.fragment_schedule_all, container, false);
         final String discipline;
         if (savedInstanceState == null) {
             discipline = null;
@@ -77,6 +80,10 @@ public class ScheduleFragment extends Fragment {
             discipline = savedInstanceState.getString("discipline");
             Log.e("saveCreate", discipline);
         }
+        recycler = view.findViewById(R.id.schedule);
+        recycler.setAdapter(adapter);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
+        recycler.setLayoutManager(linearLayoutManager);
 
 
         Observer<List<UserSchedule>> observer = new Observer<List<UserSchedule>>() {
@@ -92,20 +99,19 @@ public class ScheduleFragment extends Fragment {
             }
         };
 
-        mScheduleViewModel = new ViewModelProvider(getActivity())
-                .get(ScheduleViewModel.class);
         mScheduleViewModel
                 .getSchedule()
                 .observe(getViewLifecycleOwner(), observer);
-        mScheduleViewModel.refresh();
-
+        return view;
     }
 
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putString("discipline", adapter.disciplineText);
-        Log.e("saveState", adapter.disciplineText);
+        mEditor.putInt("pos", positionSave).commit();
+        mEditor.putString("discipline", adapter.disciplineText).commit();
+        Log.e("saveState", adapter.disciplineText + " " + positionSave.toString());
     }
 
     private class MyAdapter extends RecyclerView.Adapter<MyViewHolder> {
@@ -113,8 +119,9 @@ public class ScheduleFragment extends Fragment {
         private List<UserSchedule> mSchedule = new ArrayList<>();
         private List<UserSchedule> tempSchedule = new ArrayList<>();
         final ScheduleAdapter scheduleAdapter = new ScheduleAdapter();
-        String disciplineText;
         String ALL_DISCIPLINES = "Все дисциплины";
+        String disciplineText = ALL_DISCIPLINES;
+        final Boolean[] isDefault = {true};
 
         public void setSchedule(List<UserSchedule> schedule, String discipline) {
             mSchedule = schedule;
@@ -135,22 +142,29 @@ public class ScheduleFragment extends Fragment {
         @RequiresApi(api = Build.VERSION_CODES.O)
         @Override
         public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
-            final Button allSemester = holder.allSemestr;
+            Log.e("save", isDefault[0].toString());
+            final Button allSemesters = holder.allSemesters;
             final Button twoWeeks = holder.twoWeeks;
             twoWeeks.setClickable(false);
             twoWeeks.setBackgroundColor(getResources().getColor(R.color.colorWindow));
-            allSemester.setClickable(true);
-            allSemester.setBackgroundColor(getResources().getColor(R.color.colorAccent));
-            final boolean[] isDefault = {true};
+            allSemesters.setClickable(true);
+            allSemesters.setBackgroundColor(getResources().getColor(R.color.colorAccent));
+
             scheduleAdapter.setSchedule(tempSchedule);
             holder.mSchedule.setAdapter(scheduleAdapter);
-            holder.mSchedule.setLayoutManager(new LinearLayoutManager(getContext()));
+            LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
+            linearLayoutManager.scrollToPositionWithOffset(positionSave, 0);
+            holder.mSchedule.setLayoutManager(linearLayoutManager);
+
+
+            disciplineText = mSettings.getString("discipline", ALL_DISCIPLINES);
 
             Spinner spinner = holder.mFilter;
+
             List<String> disciplines = new ArrayList<>();
             disciplines.add(ALL_DISCIPLINES);
             for (int i = 0; i < mSchedule.size(); i++) {
-                Boolean isReplay = false;
+                boolean isReplay = false;
                 for (int j = 0; j < disciplines.size(); j++) {
                     if (mSchedule.get(i).getDiscipline().equals(disciplines.get(j))) {
                         isReplay = true;
@@ -160,14 +174,12 @@ public class ScheduleFragment extends Fragment {
                     disciplines.add(mSchedule.get(i).getDiscipline());
                 }
             }
-            if (disciplineText == null && disciplines.size() > 1) {
-                disciplineText = disciplines.get(0);
-                Log.e("saveFirst", disciplineText);
-            }
 
             ArrayAdapter<String> adapter = new ArrayAdapter<String>(context, android.R.layout.simple_spinner_item, disciplines);
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             spinner.setAdapter(adapter);
+            spinner.setSelection(adapter.getPosition(disciplineText));
+            isDefault[0] = mSettings.getBoolean("default", true);
             default_settings(isDefault[0]);
             AdapterView.OnItemSelectedListener itemSelectedListener = new AdapterView.OnItemSelectedListener() {
                 @Override
@@ -175,7 +187,6 @@ public class ScheduleFragment extends Fragment {
                     tempSchedule.clear();
                     String item = (String) parent.getItemAtPosition(position);
                     disciplineText = item;
-                    Log.e("saveChange", disciplineText);
 
                     for (int i = 0; i < mSchedule.size(); i++) {
                         if (mSchedule.get(i).getDiscipline().equals(item) ||
@@ -193,16 +204,16 @@ public class ScheduleFragment extends Fragment {
             };
             spinner.setOnItemSelectedListener(itemSelectedListener);
 
-            allSemester.setOnClickListener(new View.OnClickListener() {
+            allSemesters.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    tempSchedule.clear();
-                    allSemester.setClickable(false);
-                    allSemester.setBackgroundColor(getResources().getColor(R.color.colorWindow));
+                    allSemesters.setClickable(false);
+                    allSemesters.setBackgroundColor(getResources().getColor(R.color.colorWindow));
                     twoWeeks.setClickable(true);
                     twoWeeks.setBackgroundColor(getResources().getColor(R.color.colorAccent));
-                    isDefault[0]=false;
+                    isDefault[0] = false;
                     default_settings(isDefault[0]);
+                    Log.e("savefalse", isDefault[0].toString());
                 }
             });
 
@@ -212,36 +223,39 @@ public class ScheduleFragment extends Fragment {
                 public void onClick(View view) {
                     twoWeeks.setClickable(false);
                     twoWeeks.setBackgroundColor(getResources().getColor(R.color.colorWindow));
-                    allSemester.setClickable(true);
-                    allSemester.setBackgroundColor(getResources().getColor(R.color.colorAccent));
-                    isDefault[0] =true;
+                    allSemesters.setClickable(true);
+                    allSemesters.setBackgroundColor(getResources().getColor(R.color.colorAccent));
+                    isDefault[0] = true;
                     default_settings(isDefault[0]);
                 }
-
             });
-
-
+            if (isDefault[0]) {
+                twoWeeks.callOnClick();
+            } else {
+                allSemesters.callOnClick();
+            }
         }
 
         @RequiresApi(api = Build.VERSION_CODES.O)
         private void default_settings(boolean isDefault) {
             if (isDefault) {
-            List<UserSchedule> temp = new ArrayList<>();
-            for (int i = 0; i < tempSchedule.size(); i++) {
-                String date = tempSchedule.get(i).getDate().replace("T", " ").replace("Z", "");
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").withLocale(Locale.US);
-                LocalDateTime localDate = LocalDateTime.parse(date, formatter);
-                LocalDateTime today = LocalDateTime.now();
-                LocalDateTime daysBefore = today.plusDays(14);
+                List<UserSchedule> temp = new ArrayList<>();
+                for (int i = 0; i < tempSchedule.size(); i++) {
+                    String date = tempSchedule.get(i).getDate().replace("T", " ").replace("Z", "");
+                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").withLocale(Locale.US);
+                    LocalDateTime localDate = LocalDateTime.parse(date, formatter);
+                    LocalDateTime today = LocalDateTime.now()
+                            .minusHours(LocalDateTime.now().getHour())
+                            .minusMinutes(LocalDateTime.now().getMinute());
+                    LocalDateTime daysBefore = today.plusDays(14);
 
-                if (localDate.compareTo(today) > 0 && daysBefore.compareTo(localDate) > 0) {
-                    Log.d("date", "est");
-                    temp.add(tempSchedule.get(i));
+                    if (localDate.compareTo(today) >= 0 && daysBefore.compareTo(localDate) >= 0) {
+                        temp.add(tempSchedule.get(i));
+                    }
                 }
-            }
-            tempSchedule = temp;
-
+                tempSchedule = temp;
             } else {
+                tempSchedule.clear();
                 for (int i = 0; i < mSchedule.size(); i++) {
                     if (mSchedule.get(i).getDiscipline().equals(disciplineText) ||
                             (disciplineText.equals(ALL_DISCIPLINES))) {
@@ -250,8 +264,8 @@ public class ScheduleFragment extends Fragment {
                 }
             }
             scheduleAdapter.setSchedule(tempSchedule);
+            mEditor.putBoolean("default", isDefault);
         }
-
 
         @Override
         public int getItemCount() {
@@ -264,14 +278,14 @@ public class ScheduleFragment extends Fragment {
 
         protected RecyclerView mSchedule;
         protected Spinner mFilter;
-        protected Button allSemestr;
+        protected Button allSemesters;
         protected Button twoWeeks;
 
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
             mSchedule = itemView.findViewById(R.id.schedule);
             mFilter = itemView.findViewById(R.id.spinner_discipline);
-            allSemestr = itemView.findViewById(R.id.all_semestr);
+            allSemesters = itemView.findViewById(R.id.all_semestr);
             twoWeeks = itemView.findViewById(R.id.two_week);
         }
     }
@@ -280,7 +294,6 @@ public class ScheduleFragment extends Fragment {
     private class ScheduleAdapter extends RecyclerView.Adapter<ScheduleViewHolder> {
 
         private List<UserSchedule> mSchedule = new ArrayList<>();
-        //private SimpleDateFormat mFormat = new SimpleDateFormat("dd MMM", Locale.US);
 
         public void setSchedule(List<UserSchedule> schedule) {
             mSchedule = schedule;
@@ -298,6 +311,7 @@ public class ScheduleFragment extends Fragment {
         @Override
         public void onBindViewHolder(@NonNull ScheduleViewHolder holder, int position) {
             final UserSchedule schedule = mSchedule.get(position);
+            positionSave = position;
 
             String date = schedule.getDate().replace("T", " ").replace("Z", "");
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").withLocale(Locale.US);
