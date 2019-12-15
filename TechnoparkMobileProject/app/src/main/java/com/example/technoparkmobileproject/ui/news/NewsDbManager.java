@@ -11,12 +11,12 @@ import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
-class DbManager {
+class NewsDbManager {
 
     @SuppressLint("StaticFieldLeak")
-    private static final DbManager INSTANCE = new DbManager();
+    private static final NewsDbManager INSTANCE = new NewsDbManager();
 
-    static DbManager getInstance(Context context) {
+    static NewsDbManager getInstance(Context context) {
         INSTANCE.context = context.getApplicationContext();
         return INSTANCE;
     }
@@ -57,7 +57,7 @@ class DbManager {
     }
 
     private void cleanRoom() {
-        NewsDao newsDao = AppDataBase.getInstance(context).getNewsDao();
+        NewsDao newsDao = NewsDataBase.getInstance(context).getNewsDao();
         newsDao.deleteMany(newsDao.getAll().toArray(new News[0]));
     }
 
@@ -66,11 +66,11 @@ class DbManager {
                             List<NewsApi.UserNewsPlain.TextShort> mTypeShort, String mUrl, String mNext) {
         News news = new News(key, mTitle, mBlog, mAuthorName, mAuthorId, mAuthorAva, mCommentsCount,
                 mPublishDate, mRating, mText, mTypeShort, mUrl, mNext);
-        AppDataBase.getInstance(context).getNewsDao().insert(news);
+        NewsDataBase.getInstance(context).getNewsDao().insert(news);
     }
 
     private void readAllRoom(final ReadAllListener<News> listener) {
-        List<News> list = AppDataBase.getInstance(context).getNewsDao().getAll();
+        List<News> list = NewsDataBase.getInstance(context).getNewsDao().getAll();
         ArrayList<News> strings = new ArrayList<>();
         for (News news : list) {
               strings.add(news);

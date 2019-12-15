@@ -8,23 +8,23 @@ import androidx.room.Room;
 import androidx.room.RoomDatabase;
 
 @Database(entities = {News.class}, version = 1, exportSchema = false)
-public abstract class AppDataBase extends RoomDatabase {
+public abstract class NewsDataBase extends RoomDatabase {
 
     public abstract NewsDao getNewsDao();
 
-    private static AppDataBase instance;
+    private static NewsDataBase instance;
 
-    static synchronized AppDataBase getInstance(Context context) {
+    static synchronized NewsDataBase getInstance(Context context) {
         if (instance == null) {
             instance = create(context);
         }
         return instance;
     }
 
-    private static AppDataBase create(final Context context) {
+    private static NewsDataBase create(final Context context) {
         return Room.databaseBuilder(
                 context,
-                AppDataBase.class,
+                NewsDataBase.class,
                 "my_db_name").build();
     }
 }

@@ -6,20 +6,17 @@ import android.util.Log;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-import androidx.room.Room;
 
 import com.example.technoparkmobileproject.SecretData;
 import com.example.technoparkmobileproject.network.ApiRepo;
 import com.example.technoparkmobileproject.network.NewsApi;
 
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Locale;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
@@ -38,7 +35,7 @@ class NewsRepo {
     private static String SITE = "site";
     private final Executor executor = Executors.newSingleThreadExecutor();
 
-    private final DbManager.ReadAllListener<News> readListener = new DbManager.ReadAllListener<News>() {
+    private final NewsDbManager.ReadAllListener<News> readListener = new NewsDbManager.ReadAllListener<News>() {
         @Override
         public void onReadAll(final Collection<News> allItems) {
             Runnable runnable = new Runnable() {
@@ -75,7 +72,7 @@ class NewsRepo {
         editor.putBoolean("isFirstNews", false);
         editor.apply();
 
-        final DbManager manager = DbManager.getInstance(mContext);
+        final NewsDbManager manager = NewsDbManager.getInstance(mContext);
         mSettings = new SecretData().getSecretData(mContext);
         mNewsApi.getUserNews(" Token " + mSettings.getString(AUTH_TOKEN, "")).enqueue(new Callback<NewsApi.UserNewsPlain>() {
             @Override
@@ -100,7 +97,7 @@ class NewsRepo {
 
     public void pullFromDB() {
 
-        DbManager manager = DbManager.getInstance(mContext);
+        NewsDbManager manager = NewsDbManager.getInstance(mContext);
         manager.readAll(readListener);
 
     }
@@ -229,7 +226,7 @@ class NewsRepo {
 
     private void savedata(NewsApi.UserNewsPlain result) {
         for (int i = 0; i < result.results.size(); i++) {
-            DbManager.getInstance(mContext).insert(result.results.get(i).id, result.results.get(i).title, result.results.get(i).blog,
+            NewsDbManager.getInstance(mContext).insert(result.results.get(i).id, result.results.get(i).title, result.results.get(i).blog,
                     result.results.get(i).author.fullname, result.results.get(i).author.id,
                     result.results.get(i).author.avatarUrl, result.results.get(i).commentsCount,
                     result.results.get(i).publishDate, result.results.get(i).rating, result.results.get(i).text,

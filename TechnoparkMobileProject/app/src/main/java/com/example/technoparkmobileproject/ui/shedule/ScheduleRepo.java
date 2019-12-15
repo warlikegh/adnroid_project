@@ -32,7 +32,7 @@ public class ScheduleRepo {
     private static String SITE = "site";
     private final Executor executor = Executors.newSingleThreadExecutor();
 
-    private final DbManager.ReadAllListener<Schedule> readListener = new DbManager.ReadAllListener<Schedule>() {
+    private final ScheduleDbManager.ReadAllListener<Schedule> readListener = new ScheduleDbManager.ReadAllListener<Schedule>() {
         @Override
         public void onReadAll(final Collection<Schedule> allItems) {
             Runnable runnable = new Runnable() {
@@ -67,7 +67,7 @@ public class ScheduleRepo {
 
 
     public void refresh() {
-        final DbManager manager = DbManager.getInstance(mContext);
+        final ScheduleDbManager manager = ScheduleDbManager.getInstance(mContext);
         mSettings = new SecretData().getSecretData(mContext);
         mScheduleApi.getUserSchedule(" Token " + mSettings.getString(AUTH_TOKEN, "")).enqueue(new Callback<List<ScheduleApi.UserSchedulePlain>>() {
             @Override
@@ -92,7 +92,7 @@ public class ScheduleRepo {
 
     public void pullFromDB(){
 
-        DbManager manager = DbManager.getInstance(mContext);
+        ScheduleDbManager manager = ScheduleDbManager.getInstance(mContext);
         manager.readAll(readListener);
 
     }
@@ -153,7 +153,7 @@ public class ScheduleRepo {
 
     private void savedata(List<ScheduleApi.UserSchedulePlain> result) {
         for (int i = 0; i < result.size(); i++) {
-            DbManager.getInstance(mContext).insert(result.get(i).getId(), result.get(i).getTitle(), result.get(i).getDiscipline(),
+            ScheduleDbManager.getInstance(mContext).insert(result.get(i).getId(), result.get(i).getTitle(), result.get(i).getDiscipline(),
                     result.get(i).getShortTitle(), result.get(i).getSuperShortTitle(), result.get(i).getDate(), result.get(i).getStartTime(),
                     result.get(i).getEndTime(), result.get(i).getGroups(), result.get(i).getLocation());
         }
