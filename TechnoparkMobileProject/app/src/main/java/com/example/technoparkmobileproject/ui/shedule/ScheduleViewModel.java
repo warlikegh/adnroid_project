@@ -29,4 +29,8 @@ public class ScheduleViewModel extends AndroidViewModel {
         mRepo.refresh();
     }
 
+    public void pullFromDB() {
+        mRepo.pullFromDB();
+    }
+
 }

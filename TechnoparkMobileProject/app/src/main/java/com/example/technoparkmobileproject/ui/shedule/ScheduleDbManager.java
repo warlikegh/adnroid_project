@@ -12,12 +12,12 @@ import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
-class DbManager {
+class ScheduleDbManager {
 
     @SuppressLint("StaticFieldLeak")
-    private static final DbManager INSTANCE = new DbManager();
+    private static final ScheduleDbManager INSTANCE = new ScheduleDbManager();
 
-    static DbManager getInstance(Context context) {
+    static ScheduleDbManager getInstance(Context context) {
         INSTANCE.context = context.getApplicationContext();
         return INSTANCE;
     }
@@ -57,7 +57,7 @@ class DbManager {
     }
 
     private void cleanRoom() {
-        ScheduleDao ScheduleDao = AppDataBase.getInstance(context).getScheduleDao();
+        ScheduleDao ScheduleDao = ScheduleDataBase.getInstance(context).getScheduleDao();
         ScheduleDao.deleteMany(ScheduleDao.getAll().toArray(new Schedule[0]));
     }
 
@@ -65,11 +65,11 @@ class DbManager {
                             String mStartTime, String  mEndTime, List<ScheduleApi.UserSchedulePlain.Group> mGroups, String mLocation) {
         Schedule schedule = new Schedule(key, mTitle, mDiscipline, mShortTitle, mSuperShortTitle, mDate,
                 mStartTime, mEndTime, mGroups, mLocation);
-        AppDataBase.getInstance(context).getScheduleDao().insert(schedule);
+        ScheduleDataBase.getInstance(context).getScheduleDao().insert(schedule);
     }
 
     private void readAllRoom(final ReadAllListener<Schedule> listener) {
-        List<Schedule> list = AppDataBase.getInstance(context).getScheduleDao().getAll();
+        List<Schedule> list = ScheduleDataBase.getInstance(context).getScheduleDao().getAll();
         ArrayList<Schedule> strings = new ArrayList<>();
         for (Schedule schedule : list) {
             strings.add(schedule);

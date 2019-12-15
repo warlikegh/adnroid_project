@@ -24,7 +24,6 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class ScheduleRepo {
-    // private static SimpleDateFormat sSimpleDateFormat = new SimpleDateFormat("dd.MM.yyyy", Locale.US);
     private final static MutableLiveData<List<UserSchedule>> mSchedule = new MutableLiveData<>();
     private SharedPreferences mSettings;
     private final Context mContext;
@@ -33,13 +32,16 @@ public class ScheduleRepo {
     private static String SITE = "site";
     private final Executor executor = Executors.newSingleThreadExecutor();
 
-    private final DbManager.ReadAllListener<Schedule> readListener = new DbManager.ReadAllListener<Schedule>() {
+    private final ScheduleDbManager.ReadAllListener<Schedule> readListener = new ScheduleDbManager.ReadAllListener<Schedule>() {
         @Override
         public void onReadAll(final Collection<Schedule> allItems) {
             Runnable runnable = new Runnable() {
                 @Override
                 public void run() {
                     postList(allItems);
+                    if (allItems.isEmpty()){
+                        refresh();
+                    }
                 }
             };
             Thread thread = new Thread(runnable);
@@ -49,6 +51,13 @@ public class ScheduleRepo {
 
     ScheduleRepo(Context context) {
         mContext = context;
+
+        SharedPreferences mSettings;
+        mSettings = mContext.getSharedPreferences("createFirst",Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = mSettings.edit();
+        editor.putBoolean("isFirstSchedule", false);
+        editor.apply();
+
         mScheduleApi = ApiRepo.from(mContext).getScheduleApi(new SecretData().getSecretData(mContext).getInt(SITE, 0));
     }
 
@@ -58,7 +67,7 @@ public class ScheduleRepo {
 
 
     public void refresh() {
-           final DbManager manager = DbManager.getInstance(mContext);
+        final ScheduleDbManager manager = ScheduleDbManager.getInstance(mContext);
         mSettings = new SecretData().getSecretData(mContext);
         mScheduleApi.getUserSchedule(" Token " + mSettings.getString(AUTH_TOKEN, "")).enqueue(new Callback<List<ScheduleApi.UserSchedulePlain>>() {
             @Override
@@ -67,18 +76,25 @@ public class ScheduleRepo {
                 if (response.isSuccessful() && response.body() != null) {
                     List<ScheduleApi.UserSchedulePlain> result = response.body();
                     mSchedule.postValue(transform(result));
-                       manager.clean();
-                      savedata(result);
+                    manager.clean();
+                    savedata(result);
                 } else {
-                      manager.readAll(readListener);
+                  //  manager.readAll(readListener);
                 }
             }
 
             @Override
             public void onFailure(Call<List<ScheduleApi.UserSchedulePlain>> call, Throwable t) {
-                    manager.readAll(readListener);
+              //  manager.readAll(readListener);
             }
         });
+    }
+
+    public void pullFromDB(){
+
+        ScheduleDbManager manager = ScheduleDbManager.getInstance(mContext);
+        manager.readAll(readListener);
+
     }
 
 
@@ -137,9 +153,9 @@ public class ScheduleRepo {
 
     private void savedata(List<ScheduleApi.UserSchedulePlain> result) {
         for (int i = 0; i < result.size(); i++) {
-            DbManager.getInstance(mContext).insert(result.get(i).getId(),result.get(i).getTitle(),result.get(i).getDiscipline(),
-                    result.get(i).getShortTitle(),result.get(i).getSuperShortTitle(),result.get(i).getDate(),result.get(i).getStartTime(),
-                    result.get(i).getEndTime(),result.get(i).getGroups(),result.get(i).getLocation());
+            ScheduleDbManager.getInstance(mContext).insert(result.get(i).getId(), result.get(i).getTitle(), result.get(i).getDiscipline(),
+                    result.get(i).getShortTitle(), result.get(i).getSuperShortTitle(), result.get(i).getDate(), result.get(i).getStartTime(),
+                    result.get(i).getEndTime(), result.get(i).getGroups(), result.get(i).getLocation());
         }
 
     }
@@ -163,8 +179,8 @@ public class ScheduleRepo {
         List<ScheduleApi.UserSchedulePlain> tempResult = new ArrayList<>();
         for (int i = 0; i < data.size(); i++) {
             ScheduleApi.UserSchedulePlain temp = new ScheduleApi.UserSchedulePlain(data.get(i).id,
-                    data.get(i).discipline,data.get(i).title,data.get(i).shortTitle,data.get(i).superShortTitle,
-                    data.get(i).date,data.get(i).startTime,data.get(i).endTime,data.get(i).location,data.get(i).getGroup());
+                    data.get(i).discipline, data.get(i).title, data.get(i).shortTitle, data.get(i).superShortTitle,
+                    data.get(i).date, data.get(i).startTime, data.get(i).endTime, data.get(i).location, data.get(i).getGroup());
             tempResult.add(temp);
         }
         mSchedule.postValue(transform(tempResult));

@@ -6,20 +6,17 @@ import android.util.Log;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-import androidx.room.Room;
 
 import com.example.technoparkmobileproject.SecretData;
 import com.example.technoparkmobileproject.network.ApiRepo;
 import com.example.technoparkmobileproject.network.NewsApi;
 
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Locale;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
@@ -29,7 +26,6 @@ import retrofit2.Response;
 
 
 class NewsRepo {
-    // private static SimpleDateFormat sSimpleDateFormat = new SimpleDateFormat("dd.MM.yyyy", Locale.US);
     private final static MutableLiveData<UserNews> mNews = new MutableLiveData<>();
     private final static MutableLiveData<UserNews> mNextNews = new MutableLiveData<>();
     private SharedPreferences mSettings;
@@ -39,13 +35,16 @@ class NewsRepo {
     private static String SITE = "site";
     private final Executor executor = Executors.newSingleThreadExecutor();
 
-    private final DbManager.ReadAllListener<News> readListener = new DbManager.ReadAllListener<News>() {
+    private final NewsDbManager.ReadAllListener<News> readListener = new NewsDbManager.ReadAllListener<News>() {
         @Override
         public void onReadAll(final Collection<News> allItems) {
             Runnable runnable = new Runnable() {
                 @Override
                 public void run() {
                     postList(allItems);
+                    if (allItems.isEmpty()) {
+                        refresh();
+                    }
                 }
             };
             Thread thread = new Thread(runnable);
@@ -66,8 +65,14 @@ class NewsRepo {
         return mNextNews;
     }
 
-    public void refresh(String url) {
-        final DbManager manager = DbManager.getInstance(mContext);
+    public void refresh() {
+        SharedPreferences mSettings;
+        mSettings = mContext.getSharedPreferences("createFirst", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = mSettings.edit();
+        editor.putBoolean("isFirstNews", false);
+        editor.apply();
+
+        final NewsDbManager manager = NewsDbManager.getInstance(mContext);
         mSettings = new SecretData().getSecretData(mContext);
         mNewsApi.getUserNews(" Token " + mSettings.getString(AUTH_TOKEN, "")).enqueue(new Callback<NewsApi.UserNewsPlain>() {
             @Override
@@ -79,19 +84,26 @@ class NewsRepo {
                     manager.clean();
                     savedata(result);
                 } else {
-                    manager.readAll(readListener);
+                    //  manager.readAll(readListener);
                 }
             }
 
             @Override
             public void onFailure(Call<NewsApi.UserNewsPlain> call, Throwable t) {
-                manager.readAll(readListener);
+                //  manager.readAll(readListener);
             }
         });
     }
 
+    public void pullFromDB() {
 
-    public void setmNextNews(String url) {
+        NewsDbManager manager = NewsDbManager.getInstance(mContext);
+        manager.readAll(readListener);
+
+    }
+
+
+    public void setNextNews(String url) {
         mSettings = new SecretData().getSecretData(mContext);
         mNewsApi.getReUserNews(" Token " + mSettings.getString(AUTH_TOKEN, ""), url).enqueue(new Callback<NewsApi.UserNewsPlain>() {
             @Override
@@ -214,7 +226,7 @@ class NewsRepo {
 
     private void savedata(NewsApi.UserNewsPlain result) {
         for (int i = 0; i < result.results.size(); i++) {
-            DbManager.getInstance(mContext).insert(result.results.get(i).id, result.results.get(i).title, result.results.get(i).blog,
+            NewsDbManager.getInstance(mContext).insert(result.results.get(i).id, result.results.get(i).title, result.results.get(i).blog,
                     result.results.get(i).author.fullname, result.results.get(i).author.id,
                     result.results.get(i).author.avatarUrl, result.results.get(i).commentsCount,
                     result.results.get(i).publishDate, result.results.get(i).rating, result.results.get(i).text,

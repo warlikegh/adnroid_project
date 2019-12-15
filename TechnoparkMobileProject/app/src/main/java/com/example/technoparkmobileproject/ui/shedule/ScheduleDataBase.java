@@ -8,13 +8,13 @@ import androidx.room.Room;
 import androidx.room.RoomDatabase;
 
 @Database(entities = {Schedule.class}, version = 1, exportSchema = false)
-public abstract class AppDataBase extends RoomDatabase {
+public abstract class ScheduleDataBase extends RoomDatabase {
 
     public abstract ScheduleDao getScheduleDao();
 
-    private static AppDataBase instance;
+    private static ScheduleDataBase instance;
 
-    static synchronized AppDataBase getInstance(Context context) {
+    static synchronized ScheduleDataBase getInstance(Context context) {
         if (instance == null) {
             instance = create(context);
         }
@@ -22,10 +22,10 @@ public abstract class AppDataBase extends RoomDatabase {
     }
 
 
-    private static AppDataBase create(final Context context) {
+    private static ScheduleDataBase create(final Context context) {
         return Room.databaseBuilder(
                 context,
-                AppDataBase.class,
+                ScheduleDataBase.class,
                 "my_db_name_schedule").build();
     }
 }
