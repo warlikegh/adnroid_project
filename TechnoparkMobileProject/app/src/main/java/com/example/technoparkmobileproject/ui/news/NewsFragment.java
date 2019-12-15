@@ -52,7 +52,7 @@ public class NewsFragment extends Fragment {
     RecyclerView recycler;
     boolean isSaveState;
     static Context context;
-    Integer positionSave=0;
+    Integer positionSave = 0;
     SharedPreferences mSettings;
     SharedPreferences.Editor mEditor;
 
@@ -70,7 +70,7 @@ public class NewsFragment extends Fragment {
         adapter = new NewsAdapter();
         recycler.setAdapter(adapter);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
-        linearLayoutManager.scrollToPositionWithOffset(positionSave,0);
+        linearLayoutManager.scrollToPositionWithOffset(positionSave, 0);
         recycler.setLayoutManager(linearLayoutManager);
 
 
@@ -140,7 +140,7 @@ public class NewsFragment extends Fragment {
             mNewsViewModel.refresh();
         } else {
             mNewsViewModel.pullFromDB();
-            positionSave = mSettings.getInt("pos",0);
+            positionSave = mSettings.getInt("pos", 0);
         }
     }
 
