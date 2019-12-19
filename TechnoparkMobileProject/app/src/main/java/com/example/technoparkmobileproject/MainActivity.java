@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.MenuItem;
 
 import com.example.technoparkmobileproject.ui.news.NewsFragment;
+
 import com.example.technoparkmobileproject.ui.profile.ProfileFragment;
 import com.example.technoparkmobileproject.ui.shedule.ScheduleFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
