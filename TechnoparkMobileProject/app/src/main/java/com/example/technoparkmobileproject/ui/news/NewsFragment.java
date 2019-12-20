@@ -9,6 +9,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -72,7 +73,6 @@ public class NewsFragment extends Fragment {
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
         linearLayoutManager.scrollToPositionWithOffset(positionSave, 0);
         recycler.setLayoutManager(linearLayoutManager);
-
 
         scrollListener = new EndlessRecyclerViewScrollListener(linearLayoutManager) {
             @Override
@@ -140,9 +140,10 @@ public class NewsFragment extends Fragment {
             mNewsViewModel.refresh();
         } else {
             mNewsViewModel.pullFromDB();
-            positionSave = mSettings.getInt("pos", 0);
+            positionSave = mSettings.getInt("pos_news", 0);
         }
     }
+
 
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
@@ -167,7 +168,13 @@ public class NewsFragment extends Fragment {
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         //outState.putInt("pos", positionSave);
-        mEditor.putInt("pos", positionSave).commit();
+        mEditor.putInt("pos_news", positionSave).commit();
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mEditor.putInt("pos_news", positionSave).commit();
     }
 
     private void loadNextDataFromApi(String url) {
@@ -180,8 +187,8 @@ public class NewsFragment extends Fragment {
         });
     }
 
-    public interface OnItemSelectedListener {
-        public void onItemSelected(int id);
+    public interface OnProfileSelectedListener {
+        public void onProfileSelected(int id, String username);
     }
 
 
@@ -229,7 +236,7 @@ public class NewsFragment extends Fragment {
             if (news.getText().size() > 1 ||
                     (!(news.getText().get(0).getContent().equals(news.getTextShort().get(0).getContent())))) {
                 holder.mNext.setText("Показать полностью...");
-                holder.mNext.setTextColor(getResources().getColor(android.R.color.holo_blue_light));
+                holder.mNext.setTextColor(getResources().getColor(R.color.colorAccent));
                 holder.mNext.setTextSize(17);
                 buttonIsActive = true;
             }
@@ -279,6 +286,17 @@ public class NewsFragment extends Fragment {
             mBlog = itemView.findViewById(R.id.blog);
             mContent = itemView.findViewById(R.id.content);
             mAuthor = itemView.findViewById(R.id.author);
+
+            mAuthor.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    int pos = NewsViewHolder.this.getAdapterPosition();
+                    String username = adapter.mNews.get(pos).getAuthor().getUsername();
+                    int id = adapter.mNews.get(pos).getAuthor().getId();
+                    ((OnProfileSelectedListener) context).onProfileSelected(id, username);
+                }
+            });
+
             mDate = itemView.findViewById(R.id.date_news_author);
             mRating = itemView.findViewById(R.id.rating_news_author);
             mCommentsCount = itemView.findViewById(R.id.comments_news);

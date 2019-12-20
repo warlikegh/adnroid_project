@@ -7,6 +7,7 @@ import androidx.room.Embedded;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
+import com.example.technoparkmobileproject.SecretData;
 import com.example.technoparkmobileproject.network.ScheduleApi;
 
 import java.util.ArrayList;
@@ -34,14 +35,12 @@ public class Schedule {
     Integer textSize;
     public int textShortSize;
 
-    String DIVIDER = "AHoP8";
-
 
     public Schedule() {
     }
 
     public Schedule(int key, String mTitle, String mDiscipline, String mShortTitle, String mSuperShortTitle, String mDate,
-                 String mStartTime, String  mEndTime, List<ScheduleApi.UserSchedulePlain.Group> mGroups, String mLocation) {
+                    String mStartTime, String mEndTime, List<ScheduleApi.UserSchedulePlain.Group> mGroups, String mLocation) {
         this.id = key;
         this.discipline = mDiscipline;
         this.title = mTitle;
@@ -59,16 +58,16 @@ public class Schedule {
             tempName.add(mGroups.get(j).getName());
             tempId.add(mGroups.get(j).getId().toString());
         }
-        groups = parseListToString(tempName, mGroups.size());
-        groupid = parseListToString(tempId, mGroups.size());
+        groups = new SecretData().parseListToString(tempName, mGroups.size());
+        groupid = new SecretData().parseListToString(tempId, mGroups.size());
 
         textSize = mGroups.size();
 
     }
 
     public List<ScheduleApi.UserSchedulePlain.Group> getGroup() {
-        List<String> listName = parseStringToList(groups, textSize);
-        List<String> listId = parseStringToList(groupid, textSize);
+        List<String> listName = new SecretData().parseStringToList(groups);
+        List<String> listId = new SecretData().parseStringToList(groupid);
         ScheduleApi.UserSchedulePlain temp = new ScheduleApi.UserSchedulePlain();
         List<ScheduleApi.UserSchedulePlain.Group> groups = new ArrayList<>();
         /*Log.d("database", textSize.toString());
@@ -84,37 +83,6 @@ public class Schedule {
             groups.add(temp.new Group(Integer.parseInt(listId.get(i)), listName.get(i)));
         }
         return groups;
-    }
-
-
-
-    private String parseListToString(List<String> list, int textSize) {
-        String string = "";
-        for (int i = 0; i < textSize; i++) {
-            if (list.get(i) != null) {
-                string = string.concat(list.get(i));
-            }
-            else {
-                string = string.concat(" ");
-            }
-            string = string.concat(DIVIDER);
-
-        }
-        return string;
-    }
-
-    private List<String> parseStringToList(String string, int textSize) {
-        List<String> list = new ArrayList<>();
-        Integer index = string.indexOf(DIVIDER);
-        ;
-        //int j = 0;
-
-        while ((index > 0)) {
-            list.add(string.substring(0, index));
-            string = string.substring(index + DIVIDER.length());
-            index = string.indexOf(DIVIDER);
-        }
-        return list;
     }
 
 }

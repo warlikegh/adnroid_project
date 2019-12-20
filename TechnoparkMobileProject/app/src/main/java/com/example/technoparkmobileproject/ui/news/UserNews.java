@@ -209,6 +209,10 @@ class UserNews {
         @Expose
         private String url;
 
+        public Result() {
+
+        }
+
         public Integer getId() {
             return id;
         }

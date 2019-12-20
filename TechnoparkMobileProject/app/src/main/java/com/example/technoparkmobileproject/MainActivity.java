@@ -1,6 +1,7 @@
 package com.example.technoparkmobileproject;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 
 import com.example.technoparkmobileproject.ui.news.NewsFragment;
@@ -22,18 +23,23 @@ import androidx.navigation.ui.NavigationUI;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends FragmentActivity /*implements NewsFragment.OnItemSelectedListener*/ {
-
-    NavController navController;
+public class MainActivity extends FragmentActivity implements NewsFragment.OnProfileSelectedListener {
 
     private List<Fragment> fragments = new ArrayList<>(3);
     Integer fragmentNumber;
     String FRAGMENT_NUMBER = "fragment_number";
+    BottomNavigationView bottomNavigationView;
+    String USERNAME = "username";
+    String ID = "id";
+    String IS_OTHER = "is_other";
+    Integer lastId;
+    String lastUsername;
+    Boolean isOther;
 
     private void buildFragmentsList() {
         NewsFragment newsFragment = new NewsFragment();
         ScheduleFragment scheduleFragment = new ScheduleFragment();
-        ProfileFragment profileFragment = new ProfileFragment();
+        ProfileFragment profileFragment = ProfileFragment.newInstance(-1, "my");
 
         fragments.add(newsFragment);
         fragments.add(scheduleFragment);
@@ -41,6 +47,7 @@ public class MainActivity extends FragmentActivity /*implements NewsFragment.OnI
     }
 
     private void switchFragment(int pos) {
+        fragmentNumber = pos;
         getSupportFragmentManager()
                 .beginTransaction()
                 .replace(R.id.nav_host_fragment, fragments.get(pos))
@@ -52,8 +59,10 @@ public class MainActivity extends FragmentActivity /*implements NewsFragment.OnI
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        BottomNavigationView bottomNavigationView = findViewById(R.id.nav_view);
+        //   isOther=false;
 
+
+        bottomNavigationView = findViewById(R.id.nav_view);
         bottomNavigationView.setOnNavigationItemSelectedListener(
                 new BottomNavigationView.OnNavigationItemSelectedListener() {
                     @Override
@@ -61,6 +70,7 @@ public class MainActivity extends FragmentActivity /*implements NewsFragment.OnI
                         switch (item.getItemId()) {
                             case R.id.navigation_home:
                                 fragmentNumber = 0;
+                                isOther = false;
                                 switchFragment(fragmentNumber);
                                 return true;
                             case R.id.navigation_dashboard:
@@ -69,6 +79,8 @@ public class MainActivity extends FragmentActivity /*implements NewsFragment.OnI
                                 return true;
                             case R.id.navigation_notifications:
                                 fragmentNumber = 2;
+                                //      lastId = -1;
+                                //      lastUsername = "my";
                                 switchFragment(fragmentNumber);
                                 return true;
                         }
@@ -77,37 +89,65 @@ public class MainActivity extends FragmentActivity /*implements NewsFragment.OnI
                 });
         buildFragmentsList();
         if (savedInstanceState != null) {
+            isOther = savedInstanceState.getBoolean(IS_OTHER);
             fragmentNumber = savedInstanceState.getInt(FRAGMENT_NUMBER, 0);
+            lastId = savedInstanceState.getInt(ID);
+            lastUsername = savedInstanceState.getString(USERNAME);
         } else {
             fragmentNumber = 0;
+            isOther = false;
         }
-        switchFragment(fragmentNumber);
-
-     /*   BottomNavigationView navView = findViewById(R.id.nav_view);
-        // Passing each menu ID as a set of Ids because each
-        // menu should be considered as top level destinations.
-        AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.navigation_home, R.id.navigation_dashboard, R.id.navigation_notifications)
-                .build();
-        navController = Navigation.findNavController(this, R.id.nav_host_fragment);
-        NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
-        NavigationUI.setupWithNavController(navView, navController);*/
-
+        if (fragmentNumber == 4) {
+            //   lastId = savedInstanceState.getInt(ID);
+            //   lastUsername = savedInstanceState.getString(USERNAME);
+            onProfileSelected(lastId, lastUsername);
+        } else {
+            switchFragment(fragmentNumber);
+        }
     }
 
     @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putInt(FRAGMENT_NUMBER, fragmentNumber);
+        if (lastId == null) {
+            outState.putInt(ID, -1);
+            outState.putString(USERNAME, "my");
+        } else {
+            outState.putInt(ID, lastId);
+            outState.putString(USERNAME, lastUsername);
+        }
+        outState.putBoolean(IS_OTHER, isOther);
     }
 
-    /*   public void onItemSelected(int id) {
-        navController.navigate(R.id.articleFragment);
-        /*getSupportFragmentManager()
+    @Override
+    public void onBackPressed() {
+        if (fragmentNumber == 0) {
+            finish();
+        } else {
+            if (isOther && fragmentNumber != 4) {
+                bottomNavigationView.setSelectedItemId(R.id.navigation_home);
+                onProfileSelected(lastId, lastUsername);
+
+            } else {
+                bottomNavigationView.setSelectedItemId(R.id.navigation_home);
+                fragmentNumber = 0;
+            }
+        }
+    }
+
+    @Override
+    public void onProfileSelected(int id, String username) {
+        lastId = id;
+        lastUsername = username;
+      //    Log.d("profile",lastUsername);
+        isOther = true;
+        fragmentNumber = 4;
+        getSupportFragmentManager()
                 .beginTransaction()
-                .replace(R.id.nav_host_fragment,  ArticleFragment.newInstance(result))
+                .replace(R.id.nav_host_fragment, ProfileFragment.newInstance(id, username))
                 .addToBackStack(null)
                 .commit();
-    }*/
+    }
 }
 

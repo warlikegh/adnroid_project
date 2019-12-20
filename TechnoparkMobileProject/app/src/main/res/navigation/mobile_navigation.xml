@@ -28,7 +28,7 @@
         android:id="@+id/navigation_notifications"
         android:name="com.example.technoparkmobileproject.ui.profile.ProfileFragment"
         android:label="@string/title_notifications"
-        tools:layout="@layout/fragment_profile" />
+        tools:layout="@layout/item_profile" />
 
     <fragment
         android:id="@+id/articleFragment"

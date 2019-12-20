@@ -6,6 +6,8 @@
     android:layout_height="wrap_content"
     android:layout_margin="8dp"
     android:orientation="vertical"
+    android:background="@drawable/shape_grey_round"
+    android:padding="8dp"
     >
 
     <TextView
@@ -13,8 +15,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-
         android:text="Date"
+        android:textColor="@color/black"
         android:textSize="16sp" />
 
     <TextView
@@ -52,7 +54,7 @@
         android:layout_marginTop="8dp"
         android:layout_toRightOf="@+id/loc"
         android:text="Location"
-        android:textSize="16sp" />
+        android:textSize="20sp" />
 
     <TextView
         android:id="@+id/time"
@@ -61,6 +63,7 @@
         android:layout_alignParentEnd="true"
         android:layout_marginTop="8dp"
         android:text="Time"
+        android:textColor="@color/black"
         android:textSize="16sp" />
 
     <TextView
@@ -70,12 +73,13 @@
         android:layout_below="@id/discipline"
         android:layout_marginTop="8dp"
         android:text="Title"
-        android:textSize="16sp" />
+        android:textColor="@color/colorAccent"
+        android:textSize="20sp" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/groups"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/title"
+        android:layout_below="@id/short_title"
         android:layout_alignParentEnd="true" />
 </RelativeLayout>

@@ -8,13 +8,18 @@ import java.util.List;
 import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
+import retrofit2.http.Query;
+import retrofit2.http.Url;
 
 public interface ProfileApi {
 
     @GET("profile/")
-    Call<UserProfile> getUserProfile(@Header("Authorization") String auth_token);
+    Call<UserProfilePlain> getUserProfile(@Header("Authorization") String auth_token);
 
-    class UserProfile {
+    @GET
+    Call<UserProfilePlain> getOtherUserProfile(@Header("Authorization") String auth_token, @Url String url);
+
+    class UserProfilePlain {
 
 
         @SerializedName("id")

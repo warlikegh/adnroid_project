@@ -34,6 +34,7 @@ public class TechnoparkApplication extends Application {
         SharedPreferences.Editor editor = mSettings.edit();
         editor.putBoolean("isFirstNews", true);
         editor.putBoolean("isFirstSchedule", true);
+        editor.putBoolean("isFirstProfile", true);
         editor.apply();
     }
 

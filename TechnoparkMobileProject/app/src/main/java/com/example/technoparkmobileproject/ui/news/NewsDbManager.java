@@ -27,7 +27,7 @@ class NewsDbManager {
 
     void insert(final int key, final String mTitle, final String mBlog, final String mAuthorName, final Integer mAuthorId, final String mAuthorAva,
                 final Integer mCommentsCount, final String mPublishDate, final Double mRating,
-                final List<NewsApi.UserNewsPlain.Text> mText, final List<NewsApi.UserNewsPlain.TextShort> mTextShort,
+                final List<UserNews.Text> mText, final List<UserNews.TextShort> mTextShort,
                 final String mUrl, final String mNext) {
         executor.execute(new Runnable() {
             @Override
@@ -62,8 +62,8 @@ class NewsDbManager {
     }
 
     private void insertRoom(int key, String mTitle, String mBlog, String mAuthorName, Integer mAuthorId, String mAuthorAva,
-                            Integer mCommentsCount, String mPublishDate, Double mRating, List<NewsApi.UserNewsPlain.Text> mText,
-                            List<NewsApi.UserNewsPlain.TextShort> mTypeShort, String mUrl, String mNext) {
+                            Integer mCommentsCount, String mPublishDate, Double mRating, List<UserNews.Text> mText,
+                            List<UserNews.TextShort> mTypeShort, String mUrl, String mNext) {
         News news = new News(key, mTitle, mBlog, mAuthorName, mAuthorId, mAuthorAva, mCommentsCount,
                 mPublishDate, mRating, mText, mTypeShort, mUrl, mNext);
         NewsDataBase.getInstance(context).getNewsDao().insert(news);
@@ -73,7 +73,7 @@ class NewsDbManager {
         List<News> list = NewsDataBase.getInstance(context).getNewsDao().getAll();
         ArrayList<News> strings = new ArrayList<>();
         for (News news : list) {
-              strings.add(news);
+            strings.add(news);
         }
         listener.onReadAll(strings);
     }

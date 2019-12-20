@@ -65,7 +65,6 @@ public class ScheduleFragment extends Fragment {
         mEditor = mSettings.edit();
         if (!mSettings.getBoolean("isFirstSchedule", true)) {
             positionSave = mSettings.getInt("pos", 0);
-
         }
         mScheduleViewModel.pullFromDB();
     }
@@ -105,13 +104,23 @@ public class ScheduleFragment extends Fragment {
         return view;
     }
 
+    public void setSaveState() {
+        mEditor.putInt("pos", positionSave).commit();
+        mEditor.putString("discipline", adapter.disciplineText).commit();
+        Log.e("saveState", adapter.disciplineText + " " + positionSave.toString());
+    }
+
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putString("discipline", adapter.disciplineText);
-        mEditor.putInt("pos", positionSave).commit();
-        mEditor.putString("discipline", adapter.disciplineText).commit();
-        Log.e("saveState", adapter.disciplineText + " " + positionSave.toString());
+        setSaveState();
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        setSaveState();
     }
 
     private class MyAdapter extends RecyclerView.Adapter<MyViewHolder> {
@@ -146,9 +155,11 @@ public class ScheduleFragment extends Fragment {
             final Button allSemesters = holder.allSemesters;
             final Button twoWeeks = holder.twoWeeks;
             twoWeeks.setClickable(false);
-            twoWeeks.setBackgroundColor(getResources().getColor(R.color.colorWindow));
+            twoWeeks.setBackgroundColor(getResources().getColor(R.color.colorAccent));
+            twoWeeks.setTextColor(getResources().getColor(R.color.colorGrey));
             allSemesters.setClickable(true);
-            allSemesters.setBackgroundColor(getResources().getColor(R.color.colorAccent));
+            allSemesters.setBackgroundColor(getResources().getColor(R.color.colorGrey));
+            allSemesters.setTextColor(getResources().getColor(R.color.colorAccent));
 
             scheduleAdapter.setSchedule(tempSchedule);
             holder.mSchedule.setAdapter(scheduleAdapter);
@@ -208,9 +219,11 @@ public class ScheduleFragment extends Fragment {
                 @Override
                 public void onClick(View view) {
                     allSemesters.setClickable(false);
-                    allSemesters.setBackgroundColor(getResources().getColor(R.color.colorWindow));
+                    allSemesters.setBackgroundColor(getResources().getColor(R.color.colorAccent));
+                    allSemesters.setTextColor(getResources().getColor(R.color.colorGrey));
                     twoWeeks.setClickable(true);
-                    twoWeeks.setBackgroundColor(getResources().getColor(R.color.colorAccent));
+                    twoWeeks.setBackgroundColor(getResources().getColor(R.color.colorGrey));
+                    twoWeeks.setTextColor(getResources().getColor(R.color.colorAccent));
                     isDefault[0] = false;
                     default_settings(isDefault[0]);
                     Log.e("savefalse", isDefault[0].toString());
@@ -222,9 +235,11 @@ public class ScheduleFragment extends Fragment {
                 @Override
                 public void onClick(View view) {
                     twoWeeks.setClickable(false);
-                    twoWeeks.setBackgroundColor(getResources().getColor(R.color.colorWindow));
+                    twoWeeks.setBackgroundColor(getResources().getColor(R.color.colorAccent));
+                    twoWeeks.setTextColor(getResources().getColor(R.color.colorGrey));
                     allSemesters.setClickable(true);
-                    allSemesters.setBackgroundColor(getResources().getColor(R.color.colorAccent));
+                    allSemesters.setBackgroundColor(getResources().getColor(R.color.colorGrey));
+                    allSemesters.setTextColor(getResources().getColor(R.color.colorAccent));
                     isDefault[0] = true;
                     default_settings(isDefault[0]);
                 }
@@ -401,7 +416,7 @@ public class ScheduleFragment extends Fragment {
 
         public GroupViewHolder(@NonNull View itemView) {
             super(itemView);
-            mGroup = itemView.findViewById(R.id.group);
+            mGroup = itemView.findViewById(R.id.group_schedule);
         }
     }
 

@@ -13,38 +13,50 @@
         android:id="@+id/text_discipline"
         android:text="Дисциплины"
         android:gravity="center_vertical"
-        android:textAlignment="center">
+        android:textAlignment="center"
+        android:background="@drawable/shape_blue_round"
+        android:textColor="@color/colorWindow"
+        android:textSize="16sp"
+        android:layout_margin="8dp">
     </TextView>
+
     <Spinner
         android:layout_width="match_parent"
-        android:layout_height="48dp"
+        android:layout_height="40dp"
         android:layout_below="@+id/text_discipline"
         android:id="@+id/spinner_discipline"
+        android:background="@drawable/shape_grey_round"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginBottom="8dp"
+        android:outlineAmbientShadowColor="@color/colorWindow"
         >
     </Spinner>
     <Button
 
         android:layout_width="128dp"
-        android:layout_height="wrap_content"
+        android:layout_height="40dp"
         android:layout_below="@+id/spinner_discipline"
         android:layout_alignParentLeft="true"
-        android:layout_marginLeft="16dp"
+        android:layout_marginLeft="8dp"
         android:paddingTop="8dp"
         android:id="@+id/all_semestr"
         android:text="Весь семестр"
-        android:textSize="12sp">
+        android:textSize="12sp"
+        style="@style/RoundedCornerButton">
     </Button>
     <Button
         android:layout_width="200dp"
-        android:layout_height="wrap_content"
+        android:layout_height="40dp"
         android:layout_below="@+id/spinner_discipline"
         android:paddingTop="8dp"
         android:id="@+id/two_week"
         android:layout_toRightOf="@id/all_semestr"
         android:layout_alignParentEnd="true"
-        android:layout_marginEnd="16dp"
+        android:layout_marginRight="8dp"
         android:textSize="12sp"
         android:text="Ближайшие две недели"
+        style="@style/RoundedCornerButton"
         >
     </Button>
 

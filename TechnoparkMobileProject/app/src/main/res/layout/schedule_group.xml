@@ -3,10 +3,11 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="wrap_content">
     <TextView
-        android:id="@+id/group"
+        android:id="@+id/group_schedule"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:text="Group"
+        android:textColor="@color/colorAccent"
         android:textSize="16sp" />
 </LinearLayout>

@@ -4,4 +4,9 @@
     <string name="title_home">News</string>
     <string name="title_dashboard">Schedule</string>
     <string name="title_notifications">Profile</string>
+    <string name="Groups">Группы</string>
+    <string name="about_string">О себе</string>
+    <string name="contacts_string">Контакты</string>
+    <string name="accounts_string">Аккаунты</string>
+    <string name="Out_of_account">Выйти</string>
 </resources>

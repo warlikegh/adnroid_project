@@ -14,6 +14,10 @@
     <style name="AuthTheme" parent="Theme.AppCompat.NoActionBar">
         <item name="android:windowBackground">@drawable/auth_screen</item>
     </style>
-
+    <style name="RoundedCornerButton" parent="@style/Widget.AppCompat.Button.Colored">
+        <item name="background">@drawable/btn_rounded_corner</item>
+        <item name="colorButtonNormal">@color/colorAccent</item>
+        <item name="colorControlHighlight">@color/colorWindow</item>
+    </style>
 
 </resources>

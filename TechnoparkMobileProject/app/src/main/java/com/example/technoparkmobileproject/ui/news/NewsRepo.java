@@ -34,6 +34,7 @@ class NewsRepo {
     private static String AUTH_TOKEN = "auth_token";
     private static String SITE = "site";
     private final Executor executor = Executors.newSingleThreadExecutor();
+    private int key = 0;
 
     private final NewsDbManager.ReadAllListener<News> readListener = new NewsDbManager.ReadAllListener<News>() {
         @Override
@@ -82,7 +83,7 @@ class NewsRepo {
                     NewsApi.UserNewsPlain result = response.body();
                     mNews.postValue(transform(result));
                     manager.clean();
-                    savedata(result);
+                    savedata(transform(result));
                 } else {
                     //  manager.readAll(readListener);
                 }
@@ -90,16 +91,17 @@ class NewsRepo {
 
             @Override
             public void onFailure(Call<NewsApi.UserNewsPlain> call, Throwable t) {
-                //  manager.readAll(readListener);
+                if (key == 0) {
+                    manager.readAll(readListener);
+                    key++;
+                }
             }
         });
     }
 
     public void pullFromDB() {
-
         NewsDbManager manager = NewsDbManager.getInstance(mContext);
         manager.readAll(readListener);
-
     }
 
 
@@ -112,7 +114,7 @@ class NewsRepo {
                 if (response.isSuccessful() && response.body() != null) {
                     NewsApi.UserNewsPlain result = response.body();
                     mNextNews.postValue(transform(result));
-                    savedata(result);
+                    savedata(transform(result));
                 } else {
 
                 }
@@ -184,7 +186,6 @@ class NewsRepo {
         UserNews.Author author = transformAuthor(resultPlain.author);
         List<UserNews.Text> text = transformText(resultPlain.text);
         List<UserNews.TextShort> textShort = transformTextShort(resultPlain.textShort);
-        // sSimpleDateFormat.parse(lessonPlain.date)
         return temp.new Result(
                 author,
                 resultPlain.blog,
@@ -224,13 +225,26 @@ class NewsRepo {
         );
     }
 
-    private void savedata(NewsApi.UserNewsPlain result) {
-        for (int i = 0; i < result.results.size(); i++) {
-            NewsDbManager.getInstance(mContext).insert(result.results.get(i).id, result.results.get(i).title, result.results.get(i).blog,
-                    result.results.get(i).author.fullname, result.results.get(i).author.id,
-                    result.results.get(i).author.avatarUrl, result.results.get(i).commentsCount,
-                    result.results.get(i).publishDate, result.results.get(i).rating, result.results.get(i).text,
-                    result.results.get(i).textShort, result.results.get(i).url, result.next);
+    private void savedata(UserNews result) {
+        UserNews temp = new UserNews();
+
+        for (int i = 0; i < result.getResults().size(); i++) {
+            UserNews.Result result1 = temp.new Result();
+            result1 = result.getResults().get(i);
+            NewsDbManager.getInstance(mContext).insert(
+                    result1.getId(),
+                    result1.getTitle(),
+                    result1.getBlog(),
+                    result1.getAuthor().getFullname(),
+                    result1.getAuthor().getId(),
+                    result1.getAuthor().getAvatarUrl(),
+                    result1.getCommentsCount(),
+                    result1.getPublishDate(),
+                    result1.getRating(),
+                    result1.getText(),
+                    result1.getTextShort(),
+                    result1.getUrl(),
+                    result.getNext());
         }
 
     }
@@ -252,11 +266,11 @@ class NewsRepo {
         data.addAll(list);
         Collections.sort(data, comp);
 
-        List<NewsApi.UserNewsPlain.Result> tempResult = new ArrayList<>();
+        List<UserNews.Result> tempResult = new ArrayList<>();
 
         for (int i = 0; i < data.size(); i++) {
-            NewsApi.UserNewsPlain temp = new NewsApi.UserNewsPlain();
-            NewsApi.UserNewsPlain.Author tempAuthor = temp.new Author(data.get(i).authorName,
+            UserNews temp = new UserNews();
+            UserNews.Author tempAuthor = temp.new Author(data.get(i).authorName,
                     data.get(i).authorAva,
                     null,
                     data.get(i).authorId);
@@ -264,9 +278,9 @@ class NewsRepo {
                     data.get(i).publishDate, data.get(i).getText(), data.get(i).commentsCount, data.get(i).id,
                     data.get(i).getTextShort(), data.get(i).url));
         }
-        NewsApi.UserNewsPlain temp = new NewsApi.UserNewsPlain(null, data.get(data.size() - 1).next,
+        UserNews temp = new UserNews(null, data.get(data.size() - 1).next,
                 null, tempResult);
-        mNews.postValue(transform(temp));
+        mNews.postValue(temp);
 
     }
 
