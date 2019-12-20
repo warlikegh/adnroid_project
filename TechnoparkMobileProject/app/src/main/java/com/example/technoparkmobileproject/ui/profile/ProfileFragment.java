@@ -3,7 +3,11 @@ package com.example.technoparkmobileproject.ui.profile;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.BitmapFactory;
+import android.os.Build;
 import android.os.Bundle;
+import android.text.Html;
+import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -73,7 +77,7 @@ public class ProfileFragment extends Fragment {
             isOther = false;
         } else {
             mProfileViewModel.refresh(username, id);
-            isOther=true;
+            isOther = true;
         }
     }
 
@@ -276,8 +280,53 @@ public class ProfileFragment extends Fragment {
         @Override
         public void onBindViewHolder(@NonNull AccountViewHolder holder, int position) {
             final UserProfile.Account group = mAccount.get(position);
-            String string = group.getName() + " " + group.getValue();
-            holder.mAccount.setText(string);
+            String string;
+            if (group.getName().equals("vkontakte")) {
+                holder.mImage.setImageBitmap(BitmapFactory.decodeResource(context.getResources(), R.mipmap.vk_logo));
+                string = "<a href=\"" + group.getValue() + "\" target=\"_blank\">" + group.getValue() + "</a>";
+            }
+            if (group.getName().equals("odnoklassniki")) {
+                holder.mImage.setImageBitmap(BitmapFactory.decodeResource(context.getResources(), R.mipmap.ok_logo));
+                string = "<a href=\"" + group.getValue() + "\" target=\"_blank\">" + group.getValue() + "</a>";
+            }
+            if (group.getName().equals("github")) {
+                holder.mImage.setImageBitmap(BitmapFactory.decodeResource(context.getResources(), R.mipmap.github_logo));
+                string = "<a href=\"" + group.getValue() + "\" target=\"_blank\">" + group.getValue() + "</a>";
+            }
+            if (group.getName().equals("facebook")) {
+                holder.mImage.setImageBitmap(BitmapFactory.decodeResource(context.getResources(), R.mipmap.facebook_logo));
+                string = "<a href=\"" + group.getValue() + "\" target=\"_blank\">" + group.getValue() + "</a>";
+            }
+            if (group.getName().equals("agent")) {
+                holder.mImage.setImageBitmap(BitmapFactory.decodeResource(context.getResources(), R.mipmap.mailru_agent_logo));
+                string = "<a href=\"" + group.getValue() + "\" target=\"_blank\">" + group.getValue() + "</a>";
+            }
+            if (group.getName().equals("telegram")) {
+                holder.mImage.setImageBitmap(BitmapFactory.decodeResource(context.getResources(), R.mipmap.telegram_logo));
+                string = group.getValue();
+            }
+            if (group.getName().equals("tamtam")) {
+                holder.mImage.setImageBitmap(BitmapFactory.decodeResource(context.getResources(), R.mipmap.tam_tam_logo));
+                string = group.getValue();
+            }
+            if (group.getName().equals("skype")) {
+                holder.mImage.setImageBitmap(BitmapFactory.decodeResource(context.getResources(), R.mipmap.skype_logo));
+                string = group.getValue();
+            }
+            if (group.getName().equals("bitbucket")) {
+                holder.mImage.setImageBitmap(BitmapFactory.decodeResource(context.getResources(), R.mipmap.bitbucket_logo));
+                string = group.getValue();
+            } else {
+                string = group.getValue();
+            }
+
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                holder.mAccount.setText(Html.fromHtml(string, Html.FROM_HTML_MODE_COMPACT));
+            } else {
+                holder.mAccount.setText(Html.fromHtml(string));
+            }
+            holder.mAccount.setMovementMethod(LinkMovementMethod.getInstance());
         }
 
         @Override
