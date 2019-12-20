@@ -220,7 +220,7 @@ public class NewsFragment extends Fragment {
                 holder.mTitle.setText(Html.fromHtml(url));
             }
             holder.mTitle.setMovementMethod(LinkMovementMethod.getInstance());
-            holder.mTitle.setTextColor(getResources().getColor(android.R.color.black));                                   //       overthink
+         //   holder.mTitle.setTextColor(getResources().getColor(android.R.color.black));                                   //       overthink
             holder.mBlog.setText(news.getBlog());
             holder.mAuthor.setText(news.getAuthor().getFullname());
 

@@ -2,6 +2,7 @@ package com.example.technoparkmobileproject.ui.profile;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Log;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -26,6 +27,7 @@ class ProfileRepo {
 
     private final static MutableLiveData<UserProfile> mProfile = new MutableLiveData<>();
     private SharedPreferences mSettings;
+    private SharedPreferences mSecretSettings;
     SharedPreferences.Editor mEditor;
     private final Context mContext;
     private ProfileApi mProfileApi;
@@ -33,8 +35,8 @@ class ProfileRepo {
     private static String SITE = "site";
     private final Executor executor = Executors.newSingleThreadExecutor();
     private int key = 0;
-  //  private final Integer myId;
-  //  private static String username_repo;
+    //  private final Integer myId;
+    //  private static String username_repo;
 
     private final ProfileDbManager.ReadListener<Profile> readListener = new ProfileDbManager.ReadListener<Profile>() {
         @Override
@@ -42,11 +44,11 @@ class ProfileRepo {
             Runnable runnable = new Runnable() {
                 @Override
                 public void run() {
-               //     if (item != null) {
-                        post(item);
-                //    } else {
-                //         refresh(username_repo, (int) id);
-                 //   }
+                    //     if (item != null) {
+                    post(item);
+                    //    } else {
+                    //         refresh(username_repo, (int) id);
+                    //   }
                 }
             };
             Thread thread = new Thread(runnable);
@@ -61,7 +63,7 @@ class ProfileRepo {
 
         mSettings = mContext.getSharedPreferences("createFirst", Context.MODE_PRIVATE);
         mEditor = mSettings.edit();
-      //  myId = mSettings.getInt("my_id", -1);
+        //  myId = mSettings.getInt("my_id", -1);
     }
 
     public LiveData<UserProfile> getProfile() {
@@ -69,32 +71,32 @@ class ProfileRepo {
     }
 
     public void refreshMe() {
-      //  mEditor.putBoolean("isFirstProfile", false);
-      //  mEditor.apply();
+        //  mEditor.putBoolean("isFirstProfile", false);
+        //  mEditor.apply();
 
         final ProfileDbManager manager = ProfileDbManager.getInstance(mContext);
-        mSettings = new SecretData().getSecretData(mContext);
-        mProfileApi.getUserProfile(" Token " + mSettings.getString(AUTH_TOKEN, "")).enqueue(new Callback<ProfileApi.UserProfilePlain>() {
+        mSecretSettings = new SecretData().getSecretData(mContext);
+        mProfileApi.getUserProfile(" Token " + mSecretSettings.getString(AUTH_TOKEN, "")).enqueue(new Callback<ProfileApi.UserProfilePlain>() {
             @Override
             public void onResponse(Call<ProfileApi.UserProfilePlain> call,
                                    Response<ProfileApi.UserProfilePlain> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     ProfileApi.UserProfilePlain result = response.body();
                     mProfile.postValue(transform(result));
-                  //  if (mSettings.getInt("my_id", -1) == result.getId()) {
+                    //  if (mSettings.getInt("my_id", -1) == result.getId()) {
                     manager.clean(result.getId());
-                 //   }
+                    //   }
                     saveData(transform(result));
-                    mEditor.putInt("my_id", result.getId());
+                    mEditor.putInt("my_id", result.getId()).commit();
 
                 } else {
-                  //  manager.read(readListener, mSettings.getInt("my_id", -1));
+                    //  manager.read(readListener, mSettings.getInt("my_id", -1));
                 }
             }
 
             @Override
             public void onFailure(Call<ProfileApi.UserProfilePlain> call, Throwable t) {
-               //     manager.read(readListener, mSettings.getInt("my_id", -1));
+                //     manager.read(readListener, mSettings.getInt("my_id", -1));
                 pullMeFromDB();
              /*   if (key == 1) {
 
@@ -106,9 +108,9 @@ class ProfileRepo {
 
     public void refresh(String username, final int id) {
         final ProfileDbManager manager = ProfileDbManager.getInstance(mContext);
-        mSettings = new SecretData().getSecretData(mContext);
-      //  username_repo = username;
-        mProfileApi.getOtherUserProfile(" Token " + mSettings.getString(AUTH_TOKEN, ""),"profile/"+username).enqueue(new Callback<ProfileApi.UserProfilePlain>() {
+        mSecretSettings = new SecretData().getSecretData(mContext);
+        //  username_repo = username;
+        mProfileApi.getOtherUserProfile(" Token " + mSecretSettings.getString(AUTH_TOKEN, ""), "profile/" + username).enqueue(new Callback<ProfileApi.UserProfilePlain>() {
             @Override
             public void onResponse(Call<ProfileApi.UserProfilePlain> call,
                                    Response<ProfileApi.UserProfilePlain> response) {
@@ -116,19 +118,14 @@ class ProfileRepo {
                     ProfileApi.UserProfilePlain result = response.body();
                     mProfile.postValue(transform(result));
                     saveData(transform(result));
-
                 } else {
-                    // manager.readAll(readListener);
-                //    manager.read(readListener, id);
+
                 }
             }
 
             @Override
             public void onFailure(Call<ProfileApi.UserProfilePlain> call, Throwable t) {
-               // if (key == 0) {
-                 //   manager.read(readListener, id);
-             //       key++;
-              //  }
+
             }
         });
     }
@@ -136,13 +133,12 @@ class ProfileRepo {
     public void pullMeFromDB() {
         ProfileDbManager manager = ProfileDbManager.getInstance(mContext);
         long id = mSettings.getInt("my_id", -1);
+        Log.e("save", ((Integer) (int) id).toString());
         manager.read(readListener, id);
     }
 
     public void pullFromDB() {
         ProfileDbManager manager = ProfileDbManager.getInstance(mContext);
-       /* long id = mSettings.getInt("my_id", -1);
-        manager.read(readListener, id);*/
     }
 
     private static UserProfile transform(ProfileApi.UserProfilePlain plain) {

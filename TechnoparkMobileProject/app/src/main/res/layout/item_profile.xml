@@ -7,15 +7,19 @@
         android:id="@+id/photo"
         android:layout_height="136dp"
         android:layout_width="136dp"
+        android:layout_marginTop="@dimen/margin_ava"
+        android:layout_marginStart="@dimen/margin_ava"
         />
     <TextView
         android:id="@+id/full_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/margin_ava"
         android:layout_toEndOf="@+id/photo"
         android:text="fullName"
         android:textColor="@color/colorAccent"
         android:layout_marginStart="@dimen/margin_ava"
+        android:layout_marginEnd="@dimen/margin_ava"
         android:textSize="20sp" />
     <TextView
         android:id="@+id/main_group"
@@ -25,7 +29,8 @@
         android:layout_toEndOf="@+id/photo"
         android:layout_below="@+id/full_name"
         android:text="mainGroup"
-        android:textSize="16sp" />
+        android:textSize="16sp"
+        android:layout_marginEnd="@dimen/margin_ava"/>
     <ImageView
         android:id="@+id/birthday_image"
         android:layout_width="24dp"
@@ -43,6 +48,7 @@
         android:layout_marginTop="8dp"
         android:layout_toEndOf="@+id/birthday_image"
         android:layout_marginStart="8dp"
+        android:layout_marginEnd="@dimen/margin_ava"
         android:text="Birthday"
         android:textSize="20sp" />
 
@@ -54,7 +60,8 @@
         android:layout_below="@+id/photo"
         android:text="@string/about_string"
         android:textColor="@color/colorAccent"
-        android:textSize="20sp"/>
+        android:textSize="20sp"
+        android:layout_marginStart="@dimen/margin_ava"/>
     <TextView
         android:id="@+id/about"
         android:layout_width="match_parent"
@@ -63,9 +70,11 @@
         android:layout_below="@+id/about_string"
         android:text="text_about"
         android:padding="8dp"
-        android:textColor="@color/black"
+
         android:background="@drawable/shape_grey_round"
-        android:textSize="16sp"/>
+        android:textSize="16sp"
+        android:layout_marginStart="@dimen/margin_ava"
+        android:layout_marginEnd="@dimen/margin_ava"/>
     <TextView
         android:id="@+id/groups"
         android:layout_width="wrap_content"
@@ -74,13 +83,16 @@
         android:layout_below="@+id/about"
         android:text="@string/Groups"
         android:textColor="@color/colorAccent"
-        android:textSize="20sp" />
+        android:textSize="20sp"
+        android:layout_marginStart="@dimen/margin_ava"/>
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/subgroups"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:layout_below="@id/groups" />
+        android:layout_below="@id/groups"
+        android:layout_marginStart="@dimen/margin_ava"
+        android:layout_marginEnd="@dimen/margin_ava"/>
 
     <TextView
         android:id="@+id/contacts_string"
@@ -90,14 +102,16 @@
         android:layout_below="@+id/subgroups"
         android:text="@string/contacts_string"
         android:textColor="@color/colorAccent"
-        android:textSize="20sp"/>
+        android:textSize="20sp"
+        android:layout_marginStart="@dimen/margin_ava"/>
     <ImageView
         android:id="@+id/phone_image"
         android:layout_width="24dp"
         android:layout_height="24dp"
         android:layout_below="@id/contacts_string"
         android:layout_marginTop="8dp"
-        android:background="@drawable/ic_phone_black_24dp" />
+        android:background="@drawable/ic_phone_black_24dp"
+        android:layout_marginStart="@dimen/margin_ava"/>
     <TextView
         android:id="@+id/phone"
         android:layout_width="wrap_content"
@@ -107,14 +121,16 @@
         android:layout_marginStart="8dp"
         android:layout_toEndOf="@+id/phone_image"
         android:text="Phone"
-        android:textSize="20sp" />
+        android:textSize="20sp"
+        android:layout_marginEnd="@dimen/margin_ava"/>
     <ImageView
         android:id="@+id/mail_image"
         android:layout_width="24dp"
         android:layout_height="24dp"
         android:layout_below="@id/phone"
         android:layout_marginTop="8dp"
-        android:background="@drawable/ic_mail_outline_black_24dp" />
+        android:background="@drawable/ic_mail_outline_black_24dp"
+        android:layout_marginStart="@dimen/margin_ava"/>
     <TextView
         android:id="@+id/mail"
         android:layout_width="wrap_content"
@@ -124,7 +140,8 @@
         android:layout_marginStart="8dp"
         android:layout_toEndOf="@+id/mail_image"
         android:text="Mail"
-        android:textSize="20sp" />
+        android:textSize="20sp"
+        android:layout_marginEnd="@dimen/margin_ava"/>
     <TextView
         android:id="@+id/accounts_string"
         android:layout_width="wrap_content"
@@ -133,22 +150,26 @@
         android:layout_below="@+id/mail"
         android:text="@string/accounts_string"
         android:textColor="@color/colorAccent"
-        android:textSize="20sp"/>
+        android:textSize="20sp"
+        android:layout_marginStart="@dimen/margin_ava"/>
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/accounts_recycler"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/accounts_string"
-        android:layout_marginTop="8dp" />
+        android:layout_marginTop="8dp"
+        android:layout_marginStart="@dimen/margin_ava"
+        android:layout_marginEnd="@dimen/margin_ava"
+        android:layout_marginBottom="8dp"/>
 
     <Button
-        android:layout_width="100dp"
-        android:layout_height="50dp"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
         android:layout_below="@+id/accounts_recycler"
-        android:layout_marginTop="@dimen/margin_ava"
         android:layout_centerHorizontal="true"
         android:text="@string/Out_of_account"
         android:id="@+id/logOut"
         android:textColor="@color/colorRed"
-        style="@style/Widget.AppCompat.Button.Borderless.Colored"/>
+        style="@style/Widget.AppCompat.Button.Borderless.Colored"
+        android:layout_marginStart="@dimen/margin_ava" />
 </RelativeLayout>
