@@ -44,6 +44,8 @@ import java.util.concurrent.Executors;
 public class NewsFragment extends Fragment {
 
     private UserNews mNews;
+    private static List<String> usernames = new ArrayList<>();
+    private static List<Integer> ids = new ArrayList<>();
     private static NewsAdapter adapter;
     private NewsViewModel mNewsViewModel;
     private static FragmentManager fragmentManager = null;
@@ -66,6 +68,13 @@ public class NewsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
+
+        if (savedInstanceState != null) {
+            usernames = savedInstanceState.getStringArrayList("usernames");
+            ids = savedInstanceState.getIntegerArrayList("ids");
+            mNewsViewModel.pullFromDB();
+        }
+
 
         recycler = view.findViewById(R.id.news);
         adapter = new NewsAdapter();
@@ -93,6 +102,11 @@ public class NewsFragment extends Fragment {
                 if (news != null) {
                     adapter.setNews(news.getResults());
                     mNews = news;
+
+                    for (int i = 0; i < news.getResults().size(); i++) {
+                        usernames.add(news.getResults().get(i).getAuthor().getUsername());
+                        ids.add(news.getResults().get(i).getAuthor().getId());
+                    }
                 }
             }
         };
@@ -112,6 +126,11 @@ public class NewsFragment extends Fragment {
                         mNews = news;
                     }
                     adapter.setNews(mNews.getResults());
+
+                    for (int i = 0; i < news.getResults().size(); i++) {
+                        usernames.add(news.getResults().get(i).getAuthor().getUsername());
+                        ids.add(news.getResults().get(i).getAuthor().getId());
+                    }
                 }
             }
         };
@@ -142,6 +161,11 @@ public class NewsFragment extends Fragment {
             mNewsViewModel.pullFromDB();
             positionSave = mSettings.getInt("pos_news", 0);
         }
+        if (savedInstanceState != null) {
+            usernames = savedInstanceState.getStringArrayList("usernames");
+            ids = savedInstanceState.getIntegerArrayList("ids");
+            mNewsViewModel.pullFromDB();
+        }
     }
 
 
@@ -169,6 +193,8 @@ public class NewsFragment extends Fragment {
         super.onSaveInstanceState(outState);
         //outState.putInt("pos", positionSave);
         mEditor.putInt("pos_news", positionSave).commit();
+        outState.putStringArrayList("usernames", (ArrayList<String>) usernames);
+        outState.putIntegerArrayList("ids", (ArrayList<Integer>) ids);
     }
 
     @Override
@@ -176,6 +202,7 @@ public class NewsFragment extends Fragment {
         super.onDetach();
         mEditor.putInt("pos_news", positionSave).commit();
     }
+
 
     private void loadNextDataFromApi(String url) {
         final Executor executor = Executors.newSingleThreadExecutor();
@@ -188,7 +215,7 @@ public class NewsFragment extends Fragment {
     }
 
     public interface OnProfileSelectedListener {
-        public void onProfileSelected(int id, String username);
+        void onProfileSelected(int id, String username);
     }
 
 
@@ -220,7 +247,7 @@ public class NewsFragment extends Fragment {
                 holder.mTitle.setText(Html.fromHtml(url));
             }
             holder.mTitle.setMovementMethod(LinkMovementMethod.getInstance());
-         //   holder.mTitle.setTextColor(getResources().getColor(android.R.color.black));                                   //       overthink
+            //   holder.mTitle.setTextColor(getResources().getColor(android.R.color.black));                                   //       overthink
             holder.mBlog.setText(news.getBlog());
             holder.mAuthor.setText(news.getAuthor().getFullname());
 
@@ -237,7 +264,7 @@ public class NewsFragment extends Fragment {
                     (!(news.getText().get(0).getContent().equals(news.getTextShort().get(0).getContent())))) {
                 holder.mNext.setText("Показать полностью...");
                 holder.mNext.setTextColor(getResources().getColor(R.color.colorAccent));
-                holder.mNext.setTextSize(17);
+                holder.mNext.setTextSize(16);
                 buttonIsActive = true;
             }
 
@@ -291,8 +318,8 @@ public class NewsFragment extends Fragment {
                 @Override
                 public void onClick(View view) {
                     int pos = NewsViewHolder.this.getAdapterPosition();
-                    String username = adapter.mNews.get(pos).getAuthor().getUsername();
-                    int id = adapter.mNews.get(pos).getAuthor().getId();
+                    String username = usernames.get(pos);        // adapter.mNews.get(pos).getAuthor().getUsername();
+                    int id = ids.get(pos);                             //adapter.mNews.get(pos).getAuthor().getId();
                     ((OnProfileSelectedListener) context).onProfileSelected(id, username);
                 }
             });
@@ -347,7 +374,8 @@ public class NewsFragment extends Fragment {
                 text = mText.get(position).getContent();
                 type = mText.get(position).getType();
             }
-            if (type.equals("p") || type.equals("ul") || type.equals("code")) {
+            if (type.equals("p") || type.equals("ul") || type.equals("code") || type.equals("ol") || type.equals("blockquote")
+                    || type.equals("h4") || type.equals("h5") || type.equals("h6") || type.equals("pre")/* || type.equals("iframe")*/) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                     holder.mTextNews.setText(Html.fromHtml(text, Html.FROM_HTML_MODE_COMPACT));
                 } else {

@@ -313,6 +313,10 @@ public class ProfileFragment extends Fragment {
                 holder.mImage.setImageBitmap(BitmapFactory.decodeResource(context.getResources(), R.mipmap.skype_logo));
                 string = group.getValue();
             }
+            if (group.getName().equals("icq")) {
+                holder.mImage.setImageBitmap(BitmapFactory.decodeResource(context.getResources(), R.mipmap.icq_logo));
+                string = group.getValue();
+            }
             if (group.getName().equals("bitbucket")) {
                 holder.mImage.setImageBitmap(BitmapFactory.decodeResource(context.getResources(), R.mipmap.bitbucket_logo));
                 string = group.getValue();
