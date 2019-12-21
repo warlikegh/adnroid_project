@@ -84,7 +84,10 @@ public class ScheduleRepo {
                     manager.clean();
                     savedata(transform(result));
                 } else {
-                    //  manager.readAll(readListener);
+                    if (key == 0) {
+                        manager.readAll(readListener);
+                        key++;
+                    }
                 }
             }
 
@@ -99,10 +102,8 @@ public class ScheduleRepo {
     }
 
     public void pullFromDB() {
-
         ScheduleDbManager manager = ScheduleDbManager.getInstance(mContext);
         manager.readAll(readListener);
-
     }
 
 

@@ -4,8 +4,6 @@ package com.example.technoparkmobileproject.ui.shedule;
 import android.annotation.SuppressLint;
 import android.content.Context;
 
-import com.example.technoparkmobileproject.network.ScheduleApi;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -27,7 +25,7 @@ class ScheduleDbManager {
     private Context context;
 
     void insert(final int key, final String mTitle, final String mDiscipline, final String mShortTitle,
-                final String mSuperShortTitle, final String mDate, final String mStartTime, final String  mEndTime,
+                final String mSuperShortTitle, final String mDate, final String mStartTime, final String mEndTime,
                 final List<UserSchedule.Group> mGroups, final String mLocation) {
         executor.execute(new Runnable() {
             @Override
@@ -62,7 +60,7 @@ class ScheduleDbManager {
     }
 
     private void insertRoom(int key, String mTitle, String mDiscipline, String mShortTitle, String mSuperShortTitle, String mDate,
-                            String mStartTime, String  mEndTime, List<UserSchedule.Group> mGroups, String mLocation) {
+                            String mStartTime, String mEndTime, List<UserSchedule.Group> mGroups, String mLocation) {
         Schedule schedule = new Schedule(key, mTitle, mDiscipline, mShortTitle, mSuperShortTitle, mDate,
                 mStartTime, mEndTime, mGroups, mLocation);
         ScheduleDataBase.getInstance(context).getScheduleDao().insert(schedule);

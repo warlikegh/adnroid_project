@@ -50,16 +50,11 @@ public class NewsFragment extends Fragment {
 
     private UserNews mNews;
     static UserNews mExtraNews;
-    private static List<String> usernames = new ArrayList<>();
-    private static List<Integer> ids = new ArrayList<>();
     private static NewsAdapter adapter;
     private static NewsViewModel mNewsViewModel;
-    private static FragmentManager fragmentManager = null;
-    public static final String STATE = "change";
     public static String mUrl = "";
     public static String BASE_URL = "topics/subscribed/";
     RecyclerView recycler;
-    boolean isSaveState;
     static Context context;
     Integer positionSave = 0;
     SharedPreferences mSettings;
@@ -79,7 +74,6 @@ public class NewsFragment extends Fragment {
         adapter = new NewsAdapter();
         recycler.setAdapter(adapter);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
-        // linearLayoutManager.scrollToPositionWithOffset(positionSave, 0);
         recycler.setLayoutManager(linearLayoutManager);
 
         scrollListener = new EndlessRecyclerViewScrollListener(linearLayoutManager) {
@@ -111,13 +105,6 @@ public class NewsFragment extends Fragment {
                     adapter.setNews(news.getResults());
                     mNews = news;
                     mExtraNews = mNews;
-
-                    usernames.clear();
-                    ids.clear();
-                    for (int i = 0; i < mNews.getResults().size(); i++) {
-                        usernames.add(mNews.getResults().get(i).getAuthor().getUsername());
-                        ids.add(mNews.getResults().get(i).getAuthor().getId());
-                    }
                 }
             }
         };
@@ -139,13 +126,6 @@ public class NewsFragment extends Fragment {
                         mExtraNews = mNews;
                     }
                     adapter.setNews(mNews.getResults());
-
-                    usernames.clear();
-                    ids.clear();
-                    for (int i = 0; i < mNews.getResults().size(); i++) {
-                        usernames.add(mNews.getResults().get(i).getAuthor().getUsername());
-                        ids.add(mNews.getResults().get(i).getAuthor().getId());
-                    }
                 }
             }
         };
@@ -163,7 +143,6 @@ public class NewsFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-        fragmentManager = getFragmentManager();
         context = getContext();
         mNewsViewModel = new ViewModelProvider(Objects.requireNonNull(getActivity()))
                 .get(NewsViewModel.class);
@@ -177,8 +156,6 @@ public class NewsFragment extends Fragment {
             positionSave = mSettings.getInt("pos_news", 0);
         }
         if (savedInstanceState != null) {
-            usernames = savedInstanceState.getStringArrayList("usernames");
-            ids = savedInstanceState.getIntegerArrayList("ids");
             mNewsViewModel.pullFromDB();
         }
     }

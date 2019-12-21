@@ -19,7 +19,6 @@ import androidx.annotation.Nullable;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
 
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
@@ -41,13 +40,9 @@ public class ScheduleFragment extends Fragment {
 
     private List<UserSchedule> mSchedule;
     private ScheduleViewModel mScheduleViewModel;
-    private static FragmentManager fragmentManager = null;
-    public static final String STATE = "change";
-    boolean isSaveState;
     static Context context;
     RecyclerView recycler;
     final MyAdapter adapter = new MyAdapter();
-    Integer positionSave = 0;
     SharedPreferences mSettings;
     SharedPreferences.Editor mEditor;
 
@@ -55,16 +50,13 @@ public class ScheduleFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        fragmentManager = getFragmentManager();
         context = getContext();
         mScheduleViewModel = new ViewModelProvider(Objects.requireNonNull(getActivity()))
                 .get(ScheduleViewModel.class);
 
         mSettings = Objects.requireNonNull(getContext()).getSharedPreferences("createFirst", Context.MODE_PRIVATE);
         mEditor = mSettings.edit();
-        if (!mSettings.getBoolean("isFirstSchedule", true)) {
-            positionSave = mSettings.getInt("pos", 0);
-        }
+
         mScheduleViewModel.pullFromDB();
     }
 
@@ -114,9 +106,7 @@ public class ScheduleFragment extends Fragment {
     }
 
     public void setSaveState() {
-        mEditor.putInt("pos", positionSave).commit();
         mEditor.putString("discipline", adapter.disciplineText).commit();
-        Log.e("saveState", adapter.disciplineText + " " + positionSave.toString());
     }
 
     @Override
@@ -144,9 +134,6 @@ public class ScheduleFragment extends Fragment {
         public void setSchedule(List<UserSchedule> schedule, String discipline) {
             mSchedule = schedule;
             disciplineText = discipline;
-            if (disciplineText != null) {
-                Log.e("saveSet", disciplineText);
-            }
             notifyDataSetChanged();
         }
 
@@ -157,10 +144,9 @@ public class ScheduleFragment extends Fragment {
                     .inflate(R.layout.fragment_schedule, parent, false));
         }
 
-        @RequiresApi(api = Build.VERSION_CODES.O)
+      //  @RequiresApi(api = Build.VERSION_CODES.O)
         @Override
         public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
-            Log.e("save", isDefault[0].toString());
             final Button allSemesters = holder.allSemesters;
             final Button twoWeeks = holder.twoWeeks;
             twoWeeks.setClickable(false);
@@ -173,9 +159,7 @@ public class ScheduleFragment extends Fragment {
             scheduleAdapter.setSchedule(tempSchedule);
             holder.mSchedule.setAdapter(scheduleAdapter);
             LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
-            linearLayoutManager.scrollToPositionWithOffset(positionSave, 0);
             holder.mSchedule.setLayoutManager(linearLayoutManager);
-
 
             disciplineText = mSettings.getString("discipline", ALL_DISCIPLINES);
 
@@ -235,7 +219,6 @@ public class ScheduleFragment extends Fragment {
                     twoWeeks.setTextColor(getResources().getColor(R.color.colorAccent));
                     isDefault[0] = false;
                     default_settings(isDefault[0]);
-                    Log.e("savefalse", isDefault[0].toString());
                 }
             });
 
@@ -260,7 +243,7 @@ public class ScheduleFragment extends Fragment {
             }
         }
 
-        @RequiresApi(api = Build.VERSION_CODES.O)
+     //   @RequiresApi(api = Build.VERSION_CODES.O)
         private void default_settings(boolean isDefault) {
             if (isDefault) {
                 List<UserSchedule> temp = new ArrayList<>();

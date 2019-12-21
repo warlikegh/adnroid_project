@@ -3,8 +3,6 @@ package com.example.technoparkmobileproject.ui.profile;
 import android.annotation.SuppressLint;
 import android.content.Context;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -39,15 +37,6 @@ public class ProfileDbManager {
         });
     }
 
-  /*  void readAll(final ReadAllListener<Profile> listener) {
-        executor.execute(new Runnable() {
-            @Override
-            public void run() {
-                readAllRoom(listener);
-            }
-        });
-    }*/
-
     void clean(final long id) {
         executor.execute(new Runnable() {
             @Override
@@ -74,20 +63,6 @@ public class ProfileDbManager {
         ProfileDataBase.getInstance(context).getProfileDao().insert(profile);
     }
 
-   /* private void readAllRoom(final ReadAllListener<Profile> listener) {
-        List<Profile> list = ProfileDataBase.getInstance(context).getNewsDao().getAll();
-        ArrayList<Profile> strings = new ArrayList<>();
-        for (Profile profile : list) {
-            strings.add(profile);
-        }
-        listener.onRead(strings);
-    }
-
-    public interface ReadAllListener<T> {
-        void onRead(final Collection<T> allItems);
-    }
-
-*/
     void read(final ReadListener<Profile> listener, final long id) {
         executor.execute(new Runnable() {
             @Override

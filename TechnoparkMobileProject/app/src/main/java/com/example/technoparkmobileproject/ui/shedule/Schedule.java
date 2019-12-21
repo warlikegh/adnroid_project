@@ -1,18 +1,12 @@
 package com.example.technoparkmobileproject.ui.shedule;
 
-
-import android.util.Log;
-
-import androidx.room.Embedded;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
 import com.example.technoparkmobileproject.SecretData;
-import com.example.technoparkmobileproject.network.ScheduleApi;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 @Entity(tableName = "Schedule")
 public class Schedule {
@@ -31,10 +25,8 @@ public class Schedule {
     String groups;
     String groupid;
 
-
     Integer textSize;
     public int textShortSize;
-
 
     public Schedule() {
     }
@@ -50,7 +42,6 @@ public class Schedule {
         this.startTime = mStartTime;
         this.endTime = mEndTime;
         this.location = mLocation;
-
 
         List<String> tempName = new ArrayList<>();
         List<String> tempId = new ArrayList<>();
@@ -70,15 +61,6 @@ public class Schedule {
         List<String> listId = new SecretData().parseStringToList(groupid);
         UserSchedule temp = new UserSchedule();
         List<UserSchedule.Group> groups = new ArrayList<>();
-        /*Log.d("database", textSize.toString());
-        Log.d("database", url);
-        Log.d("database", title);
-        for (int k = 0; k < listContent.size(); k++) {
-            Log.d("database", listContent.get(k));
-        }
-        for (int k = 0; k < listType.size(); k++) {
-            Log.d("database", listType.get(k));
-        }*/
         for (int i = 0; i < textSize; i++) {
             groups.add(temp.new Group(Integer.parseInt(listId.get(i)), listName.get(i)));
         }

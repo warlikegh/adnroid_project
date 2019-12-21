@@ -402,7 +402,6 @@ public class ProfileFragment extends Fragment {
                 string = group.getValue();
             }
 
-
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                 holder.mAccount.setText(Html.fromHtml(string, Html.FROM_HTML_MODE_COMPACT));
             } else {

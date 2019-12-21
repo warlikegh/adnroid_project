@@ -17,8 +17,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -33,7 +31,6 @@ class NewsRepo {
     private NewsApi mNewsApi;
     private static String AUTH_TOKEN = "auth_token";
     private static String SITE = "site";
-    private final Executor executor = Executors.newSingleThreadExecutor();
     private int key = 0;
 
     private final NewsDbManager.ReadAllListener<News> readListener = new NewsDbManager.ReadAllListener<News>() {
@@ -85,7 +82,10 @@ class NewsRepo {
                     manager.clean();
                     savedata(transform(result));
                 } else {
-                    //  manager.readAll(readListener);
+                    if (key == 0) {
+                        manager.readAll(readListener);
+                        key++;
+                    }
                 }
             }
 
