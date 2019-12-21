@@ -26,17 +26,22 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.technoparkmobileproject.R;
+import com.example.technoparkmobileproject.SecretData;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
@@ -44,10 +49,11 @@ import java.util.concurrent.Executors;
 public class NewsFragment extends Fragment {
 
     private UserNews mNews;
+    static UserNews mExtraNews;
     private static List<String> usernames = new ArrayList<>();
     private static List<Integer> ids = new ArrayList<>();
     private static NewsAdapter adapter;
-    private NewsViewModel mNewsViewModel;
+    private static NewsViewModel mNewsViewModel;
     private static FragmentManager fragmentManager = null;
     public static final String STATE = "change";
     public static String mUrl = "";
@@ -69,18 +75,11 @@ public class NewsFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
 
-        if (savedInstanceState != null) {
-            usernames = savedInstanceState.getStringArrayList("usernames");
-            ids = savedInstanceState.getIntegerArrayList("ids");
-            mNewsViewModel.pullFromDB();
-        }
-
-
         recycler = view.findViewById(R.id.news);
         adapter = new NewsAdapter();
         recycler.setAdapter(adapter);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
-        linearLayoutManager.scrollToPositionWithOffset(positionSave, 0);
+        // linearLayoutManager.scrollToPositionWithOffset(positionSave, 0);
         recycler.setLayoutManager(linearLayoutManager);
 
         scrollListener = new EndlessRecyclerViewScrollListener(linearLayoutManager) {
@@ -93,6 +92,15 @@ public class NewsFragment extends Fragment {
             }
         };
 
+        final SwipeRefreshLayout pullToRefresh = view.findViewById(R.id.pullToRefresh);
+        pullToRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                mNewsViewModel.refresh(); // your code
+                pullToRefresh.setRefreshing(false);
+            }
+        });
+
         recycler.addOnScrollListener(scrollListener);
 
 
@@ -102,10 +110,13 @@ public class NewsFragment extends Fragment {
                 if (news != null) {
                     adapter.setNews(news.getResults());
                     mNews = news;
+                    mExtraNews = mNews;
 
-                    for (int i = 0; i < news.getResults().size(); i++) {
-                        usernames.add(news.getResults().get(i).getAuthor().getUsername());
-                        ids.add(news.getResults().get(i).getAuthor().getId());
+                    usernames.clear();
+                    ids.clear();
+                    for (int i = 0; i < mNews.getResults().size(); i++) {
+                        usernames.add(mNews.getResults().get(i).getAuthor().getUsername());
+                        ids.add(mNews.getResults().get(i).getAuthor().getId());
                     }
                 }
             }
@@ -122,14 +133,18 @@ public class NewsFragment extends Fragment {
                     if (mNews != null) {
                         UserNews temp = new UserNews(news.getCount(), news.getNext(), news.getPrevious(), tempResult);
                         mNews = temp;
+                        mExtraNews = mNews;
                     } else {
                         mNews = news;
+                        mExtraNews = mNews;
                     }
                     adapter.setNews(mNews.getResults());
 
-                    for (int i = 0; i < news.getResults().size(); i++) {
-                        usernames.add(news.getResults().get(i).getAuthor().getUsername());
-                        ids.add(news.getResults().get(i).getAuthor().getId());
+                    usernames.clear();
+                    ids.clear();
+                    for (int i = 0; i < mNews.getResults().size(); i++) {
+                        usernames.add(mNews.getResults().get(i).getAuthor().getUsername());
+                        ids.add(mNews.getResults().get(i).getAuthor().getId());
                     }
                 }
             }
@@ -175,35 +190,6 @@ public class NewsFragment extends Fragment {
         super.onCreateOptionsMenu(menu, inflater);
     }
 
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if (item.getItemId() == R.id.refresh) {
-            mNewsViewModel.refresh();
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-    private boolean restoreState(Bundle savedInstanceState) {
-        return savedInstanceState != null;
-    }
-
-    @Override
-    public void onSaveInstanceState(@NonNull Bundle outState) {
-        super.onSaveInstanceState(outState);
-        //outState.putInt("pos", positionSave);
-        mEditor.putInt("pos_news", positionSave).commit();
-        outState.putStringArrayList("usernames", (ArrayList<String>) usernames);
-        outState.putIntegerArrayList("ids", (ArrayList<Integer>) ids);
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        mEditor.putInt("pos_news", positionSave).commit();
-    }
-
-
     private void loadNextDataFromApi(String url) {
         final Executor executor = Executors.newSingleThreadExecutor();
         executor.execute(new Runnable() {
@@ -217,7 +203,6 @@ public class NewsFragment extends Fragment {
     public interface OnProfileSelectedListener {
         void onProfileSelected(int id, String username);
     }
-
 
     private class NewsAdapter extends RecyclerView.Adapter<NewsViewHolder> {
 
@@ -247,24 +232,18 @@ public class NewsFragment extends Fragment {
                 holder.mTitle.setText(Html.fromHtml(url));
             }
             holder.mTitle.setMovementMethod(LinkMovementMethod.getInstance());
-            //   holder.mTitle.setTextColor(getResources().getColor(android.R.color.black));                                   //       overthink
             holder.mBlog.setText(news.getBlog());
             holder.mAuthor.setText(news.getAuthor().getFullname());
 
-            String data = news.getPublishDate().replace("T", " ").replace("Z", "");
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").withLocale(Locale.US);
-            LocalDateTime localDateTime = LocalDateTime.parse(data, formatter);
-
-            holder.mDate.setText(localDateTime.format(formatter));
+            String date = new SecretData().getDateString(news.getPublishDate());
+            holder.mDate.setText(date);
             holder.mRating.setText(news.getRating().toString());
 
             boolean buttonIsActive = false;
             holder.mCommentsCount.setText(news.getCommentsCount().toString());
             if (news.getText().size() > 1 ||
                     (!(news.getText().get(0).getContent().equals(news.getTextShort().get(0).getContent())))) {
-                holder.mNext.setText("Показать полностью...");
-                holder.mNext.setTextColor(getResources().getColor(R.color.colorAccent));
-                holder.mNext.setTextSize(16);
+                holder.mNext.setVisibility(View.VISIBLE);
                 buttonIsActive = true;
             }
 
@@ -307,6 +286,7 @@ public class NewsFragment extends Fragment {
         private final TextView mNext;
         protected ImageView mAvatar;
 
+
         public NewsViewHolder(@NonNull View itemView) {
             super(itemView);
             mTitle = itemView.findViewById(R.id.title);
@@ -318,8 +298,8 @@ public class NewsFragment extends Fragment {
                 @Override
                 public void onClick(View view) {
                     int pos = NewsViewHolder.this.getAdapterPosition();
-                    String username = usernames.get(pos);        // adapter.mNews.get(pos).getAuthor().getUsername();
-                    int id = ids.get(pos);                             //adapter.mNews.get(pos).getAuthor().getId();
+                    String username = mExtraNews.getResults().get(pos).getAuthor().getUsername();
+                    int id = mExtraNews.getResults().get(pos).getAuthor().getId();
                     ((OnProfileSelectedListener) context).onProfileSelected(id, username);
                 }
             });
@@ -333,7 +313,7 @@ public class NewsFragment extends Fragment {
             mNext.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    mNext.setTextSize(0);
+                    mNext.setVisibility(View.GONE);
                     int pos = NewsViewHolder.this.getAdapterPosition();
                     adapter.setDisactive(NewsViewHolder.this, pos);
                 }

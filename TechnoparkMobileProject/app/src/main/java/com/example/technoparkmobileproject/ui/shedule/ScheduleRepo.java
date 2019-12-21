@@ -10,12 +10,16 @@ import com.example.technoparkmobileproject.SecretData;
 import com.example.technoparkmobileproject.network.ApiRepo;
 import com.example.technoparkmobileproject.network.ScheduleApi;
 
+import java.text.DateFormat;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
@@ -30,6 +34,7 @@ public class ScheduleRepo {
     private ScheduleApi mScheduleApi;
     private static String AUTH_TOKEN = "auth_token";
     private static String SITE = "site";
+    private int key = 0;
     private final Executor executor = Executors.newSingleThreadExecutor();
 
     private final ScheduleDbManager.ReadAllListener<Schedule> readListener = new ScheduleDbManager.ReadAllListener<Schedule>() {
@@ -39,7 +44,7 @@ public class ScheduleRepo {
                 @Override
                 public void run() {
                     postList(allItems);
-                    if (allItems.isEmpty()){
+                    if (allItems.isEmpty()) {
                         refresh();
                     }
                 }
@@ -53,7 +58,7 @@ public class ScheduleRepo {
         mContext = context;
 
         SharedPreferences mSettings;
-        mSettings = mContext.getSharedPreferences("createFirst",Context.MODE_PRIVATE);
+        mSettings = mContext.getSharedPreferences("createFirst", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = mSettings.edit();
         editor.putBoolean("isFirstSchedule", false);
         editor.apply();
@@ -79,18 +84,21 @@ public class ScheduleRepo {
                     manager.clean();
                     savedata(result);
                 } else {
-                  //  manager.readAll(readListener);
+                    //  manager.readAll(readListener);
                 }
             }
 
             @Override
             public void onFailure(Call<List<ScheduleApi.UserSchedulePlain>> call, Throwable t) {
-              //  manager.readAll(readListener);
+                if (key == 0) {
+                    manager.readAll(readListener);
+                    key++;
+                }
             }
         });
     }
 
-    public void pullFromDB(){
+    public void pullFromDB() {
 
         ScheduleDbManager manager = ScheduleDbManager.getInstance(mContext);
         manager.readAll(readListener);
@@ -165,12 +173,13 @@ public class ScheduleRepo {
         Comparator<Schedule> comp = new Comparator<Schedule>() {
             @Override
             public int compare(Schedule a, Schedule b) {
-                if (b.id > a.id) {
-                    return -1;
-                } else if (b.id == a.id) {
-                    return 0;
+                Date resultB =  new SecretData().getDate(b.startTime);
+                Date resultA = new SecretData().getDate(a.startTime);
+
+                if (resultA != null) {
+                    return resultA.compareTo(resultB);
                 } else {
-                    return 1;
+                    return Integer.compare(a.id, b.id);
                 }
             }
         };

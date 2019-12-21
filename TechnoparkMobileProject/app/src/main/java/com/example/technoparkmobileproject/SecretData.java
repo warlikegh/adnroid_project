@@ -9,8 +9,13 @@ import androidx.security.crypto.MasterKeys;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.GeneralSecurityException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Random;
 
 public class SecretData {
@@ -51,8 +56,7 @@ public class SecretData {
         for (int i = 0; i < list.size(); i++) {
             if (list.get(i) != null) {
                 string = string.concat(list.get(i));
-            }
-            else {
+            } else {
                 string = string.concat(" ");
             }
             string = string.concat(DIVIDER);
@@ -70,5 +74,51 @@ public class SecretData {
         }
         return list;
     }
+
+    public Date getDate(String stringDate) {
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH);
+        Date date = null;
+        try {
+            date = df.parse(stringDate.replace("T", " ").replace("Z", ""));
+
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return date;
+    }
+
+    public String getDateString(String stringDate) {
+        Date date = getDate(stringDate);
+        String day = "";
+        if (date.getDate() < 10) {
+            day = "0";
+        }
+        day = day + ((Integer) date.getDate()).toString();
+        String month = "";
+        if ((date.getMonth() + 1) < 10) {
+            month = "0";
+        }
+        month = month + ((Integer) (date.getMonth() + 1)).toString();
+        String year = ((Integer) (date.getYear() + 1900)).toString();
+        return day + "." + month + "." + year;
+    }
+
+    public String getTimeString(String stringDate) {
+        Date date = getDate(stringDate);
+
+        String hour = "";
+        if (date.getHours() < 10) {
+            hour = "0";
+        }
+        hour = hour + ((Integer) date.getHours()).toString();
+
+        String minute = "";
+        if (date.getMinutes() < 10) {
+            minute = "0";
+        }
+        minute = minute + ((Integer) date.getMinutes()).toString();
+        return hour + ":" + minute;
+    }
+
 
 }

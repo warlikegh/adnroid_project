@@ -237,6 +237,7 @@ class NewsRepo {
                     result1.getBlog(),
                     result1.getAuthor().getFullname(),
                     result1.getAuthor().getId(),
+                    result1.getAuthor().getUsername(),
                     result1.getAuthor().getAvatarUrl(),
                     result1.getCommentsCount(),
                     result1.getPublishDate(),
@@ -272,7 +273,7 @@ class NewsRepo {
             UserNews temp = new UserNews();
             UserNews.Author tempAuthor = temp.new Author(data.get(i).authorName,
                     data.get(i).authorAva,
-                    null,
+                    data.get(i).authorUsername,
                     data.get(i).authorId);
             tempResult.add(temp.new Result(tempAuthor, data.get(i).blog, data.get(i).title, data.get(i).rating,
                     data.get(i).publishDate, data.get(i).getText(), data.get(i).commentsCount, data.get(i).id,

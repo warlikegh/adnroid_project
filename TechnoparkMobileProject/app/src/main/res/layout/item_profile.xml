@@ -20,7 +20,8 @@
         android:textColor="@color/colorAccent"
         android:layout_marginStart="@dimen/margin_ava"
         android:layout_marginEnd="@dimen/margin_ava"
-        android:textSize="20sp" />
+        android:textSize="20sp"
+        android:visibility="invisible"/>
     <TextView
         android:id="@+id/main_group"
         android:layout_width="wrap_content"
@@ -30,7 +31,8 @@
         android:layout_below="@+id/full_name"
         android:text="mainGroup"
         android:textSize="16sp"
-        android:layout_marginEnd="@dimen/margin_ava"/>
+        android:layout_marginEnd="@dimen/margin_ava"
+        android:visibility="invisible"/>
     <ImageView
         android:id="@+id/birthday_image"
         android:layout_width="24dp"
@@ -50,7 +52,8 @@
         android:layout_marginStart="8dp"
         android:layout_marginEnd="@dimen/margin_ava"
         android:text="Birthday"
-        android:textSize="20sp" />
+        android:textSize="20sp"
+        android:visibility="invisible"/>
 
     <TextView
         android:id="@+id/about_string"
@@ -70,11 +73,11 @@
         android:layout_below="@+id/about_string"
         android:text="text_about"
         android:padding="8dp"
-
         android:background="@drawable/shape_grey_round"
         android:textSize="16sp"
         android:layout_marginStart="@dimen/margin_ava"
-        android:layout_marginEnd="@dimen/margin_ava"/>
+        android:layout_marginEnd="@dimen/margin_ava"
+        android:visibility="invisible"/>
     <TextView
         android:id="@+id/groups"
         android:layout_width="wrap_content"
@@ -122,7 +125,8 @@
         android:layout_toEndOf="@+id/phone_image"
         android:text="Phone"
         android:textSize="20sp"
-        android:layout_marginEnd="@dimen/margin_ava"/>
+        android:layout_marginEnd="@dimen/margin_ava"
+        android:visibility="invisible"/>
     <ImageView
         android:id="@+id/mail_image"
         android:layout_width="24dp"
@@ -141,7 +145,8 @@
         android:layout_toEndOf="@+id/mail_image"
         android:text="Mail"
         android:textSize="20sp"
-        android:layout_marginEnd="@dimen/margin_ava"/>
+        android:layout_marginEnd="@dimen/margin_ava"
+        android:visibility="invisible"/>
     <TextView
         android:id="@+id/accounts_string"
         android:layout_width="wrap_content"
@@ -171,5 +176,6 @@
         android:id="@+id/logOut"
         android:textColor="@color/colorRed"
         style="@style/Widget.AppCompat.Button.Borderless.Colored"
-        android:layout_marginStart="@dimen/margin_ava" />
+        android:layout_marginStart="@dimen/margin_ava"
+        android:visibility="gone"/>
 </RelativeLayout>

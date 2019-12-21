@@ -71,8 +71,8 @@ class ProfileRepo {
     }
 
     public void refreshMe() {
-        //  mEditor.putBoolean("isFirstProfile", false);
-        //  mEditor.apply();
+        mEditor.putBoolean("isFirstProfile", false);
+        mEditor.apply();
 
         final ProfileDbManager manager = ProfileDbManager.getInstance(mContext);
         mSecretSettings = new SecretData().getSecretData(mContext);
@@ -125,7 +125,7 @@ class ProfileRepo {
 
             @Override
             public void onFailure(Call<ProfileApi.UserProfilePlain> call, Throwable t) {
-
+                    mProfile.postValue(null);
             }
         });
     }

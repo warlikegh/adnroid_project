@@ -24,6 +24,7 @@ public class News {
     public String authorName;
     public Integer authorId;
     public String authorAva;
+    public String authorUsername;
     public Integer commentsCount;
     public String publishDate;
     public Double rating;
@@ -41,15 +42,16 @@ public class News {
     public News() {
     }
 
-    public News(int key, String mTitle, String mBlog, String mAuthorName, Integer mAuthorId, String mAuthorAva,
-            /*qu*/            Integer mCommentsCount, String mPublishDate, Double mRating, List<UserNews.Text> mText,
-            /*qu*/              List<UserNews.TextShort> mTextShort, String mUrl, String mNext) {
+    public News(int key, String mTitle, String mBlog, String mAuthorName, Integer mAuthorId, String mAuthorUsername,
+                String mAuthorAva, Integer mCommentsCount, String mPublishDate, Double mRating, List<UserNews.Text> mText,
+                List<UserNews.TextShort> mTextShort, String mUrl, String mNext) {
         id = key;
         title = mTitle;
         blog = mBlog;
         authorName = mAuthorName;
         authorId = mAuthorId;
         authorAva = mAuthorAva;
+        authorUsername = mAuthorUsername;
         commentsCount = mCommentsCount;
         publishDate = mPublishDate;
         rating = mRating;

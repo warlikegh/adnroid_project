@@ -2,7 +2,6 @@ package com.example.technoparkmobileproject.ui.shedule;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.content.res.Resources;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -20,7 +19,6 @@ import androidx.annotation.Nullable;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentContainerView;
 import androidx.fragment.app.FragmentManager;
 
 import androidx.lifecycle.Observer;
@@ -28,14 +26,15 @@ import androidx.lifecycle.ViewModelProvider;
 
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.technoparkmobileproject.R;
+import com.example.technoparkmobileproject.SecretData;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 import java.util.Objects;
 
 public class ScheduleFragment extends Fragment {
@@ -72,6 +71,16 @@ public class ScheduleFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_schedule_all, container, false);
+
+        final SwipeRefreshLayout pullToRefresh = view.findViewById(R.id.pullToRefresh);
+        pullToRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                mScheduleViewModel.refresh();
+                pullToRefresh.setRefreshing(false);
+            }
+        });
+
         final String discipline;
         if (savedInstanceState == null) {
             discipline = null;
@@ -256,13 +265,12 @@ public class ScheduleFragment extends Fragment {
             if (isDefault) {
                 List<UserSchedule> temp = new ArrayList<>();
                 for (int i = 0; i < tempSchedule.size(); i++) {
-                    String date = tempSchedule.get(i).getDate().replace("T", " ").replace("Z", "");
-                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").withLocale(Locale.US);
-                    LocalDateTime localDate = LocalDateTime.parse(date, formatter);
-                    LocalDateTime today = LocalDateTime.now()
-                            .minusHours(LocalDateTime.now().getHour())
-                            .minusMinutes(LocalDateTime.now().getMinute());
-                    LocalDateTime daysBefore = today.plusDays(14);
+                    Date localDate = new SecretData().getDate(tempSchedule.get(i).getEndTime());
+                    Date today = new Date();
+                    Calendar instance = Calendar.getInstance();
+                    instance.setTime(today);
+                    instance.add(Calendar.DAY_OF_MONTH, 14);
+                    Date daysBefore = instance.getTime();
 
                     if (localDate.compareTo(today) >= 0 && daysBefore.compareTo(localDate) >= 0) {
                         temp.add(tempSchedule.get(i));
@@ -305,7 +313,6 @@ public class ScheduleFragment extends Fragment {
         }
     }
 
-
     private class ScheduleAdapter extends RecyclerView.Adapter<ScheduleViewHolder> {
 
         private List<UserSchedule> mSchedule = new ArrayList<>();
@@ -326,21 +333,15 @@ public class ScheduleFragment extends Fragment {
         @Override
         public void onBindViewHolder(@NonNull ScheduleViewHolder holder, int position) {
             final UserSchedule schedule = mSchedule.get(position);
-            positionSave = position;
 
-            String date = schedule.getDate().replace("T", " ").replace("Z", "");
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").withLocale(Locale.US);
-            LocalDateTime localDate = LocalDateTime.parse(date, formatter);
-
-            holder.mDateSchedule.setText(localDate.format(formatter));
+            String date = new SecretData().getDateString(schedule.getDate());
+            holder.mDateSchedule.setText(date);
             holder.mDiscipline.setText(schedule.getDiscipline());
             holder.mShortTitle.setText(schedule.getShortTitle());
             holder.mLocation.setText(schedule.getLocation());
 
-            String time = schedule.getStartTime().replace("T", " ").replace("Z", "");
-            LocalDateTime localTime = LocalDateTime.parse(time, formatter);
-
-            holder.mTime.setText(localTime.format(formatter));
+            String time = new SecretData().getTimeString(schedule.getStartTime());
+            holder.mTime.setText(time);
             holder.mTitle.setText(schedule.getTitle());
             holder.mDiscipline.setText(schedule.getDiscipline());
 
@@ -366,7 +367,6 @@ public class ScheduleFragment extends Fragment {
         protected TextView mLocation;
         protected TextView mTime;
         protected TextView mTitle;
-        //protected ImageView mTitle
 
         public ScheduleViewHolder(@NonNull View itemView) {
             super(itemView);

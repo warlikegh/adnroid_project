@@ -25,14 +25,14 @@ class NewsDbManager {
 
     private Context context;
 
-    void insert(final int key, final String mTitle, final String mBlog, final String mAuthorName, final Integer mAuthorId, final String mAuthorAva,
-                final Integer mCommentsCount, final String mPublishDate, final Double mRating,
-                final List<UserNews.Text> mText, final List<UserNews.TextShort> mTextShort,
+    void insert(final int key, final String mTitle, final String mBlog, final String mAuthorName, final Integer mAuthorId,
+                final String mAuthorUsername, final String mAuthorAva, final Integer mCommentsCount, final String mPublishDate,
+                final Double mRating, final List<UserNews.Text> mText, final List<UserNews.TextShort> mTextShort,
                 final String mUrl, final String mNext) {
         executor.execute(new Runnable() {
             @Override
             public void run() {
-                insertRoom(key, mTitle, mBlog, mAuthorName, mAuthorId, mAuthorAva,
+                insertRoom(key, mTitle, mBlog, mAuthorName, mAuthorId, mAuthorUsername, mAuthorAva,
                         mCommentsCount, mPublishDate, mRating, mText, mTextShort, mUrl, mNext);
             }
         });
@@ -61,10 +61,10 @@ class NewsDbManager {
         newsDao.deleteMany(newsDao.getAll().toArray(new News[0]));
     }
 
-    private void insertRoom(int key, String mTitle, String mBlog, String mAuthorName, Integer mAuthorId, String mAuthorAva,
-                            Integer mCommentsCount, String mPublishDate, Double mRating, List<UserNews.Text> mText,
-                            List<UserNews.TextShort> mTypeShort, String mUrl, String mNext) {
-        News news = new News(key, mTitle, mBlog, mAuthorName, mAuthorId, mAuthorAva, mCommentsCount,
+    private void insertRoom(int key, String mTitle, String mBlog, String mAuthorName, Integer mAuthorId, String mAuthorUsername,
+                            String mAuthorAva, Integer mCommentsCount, String mPublishDate, Double mRating,
+                            List<UserNews.Text> mText, List<UserNews.TextShort> mTypeShort, String mUrl, String mNext) {
+        News news = new News(key, mTitle, mBlog, mAuthorName, mAuthorId, mAuthorUsername, mAuthorAva, mCommentsCount,
                 mPublishDate, mRating, mText, mTypeShort, mUrl, mNext);
         NewsDataBase.getInstance(context).getNewsDao().insert(news);
     }

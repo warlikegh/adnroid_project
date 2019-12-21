@@ -43,8 +43,10 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/content"
         android:layout_centerHorizontal="true"
-        android:text=""
-        android:textSize="0sp" />
+        android:text="Показать полностью..."
+        android:textColor="@color/colorAccent"
+        android:textSize="16sp"
+        android:visibility="gone"/>
 
     <ImageView
         android:id="@+id/photo"

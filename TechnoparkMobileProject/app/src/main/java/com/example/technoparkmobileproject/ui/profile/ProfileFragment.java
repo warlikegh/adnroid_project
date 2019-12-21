@@ -26,7 +26,9 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.security.crypto.EncryptedSharedPreferences;
 import androidx.security.crypto.MasterKeys;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import com.bumptech.glide.GenericTransitionOptions;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.technoparkmobileproject.R;
@@ -46,13 +48,13 @@ public class ProfileFragment extends Fragment {
 
     private UserProfile mProfile;
     private ProfileViewModel mProfileViewModel;
-    private static FragmentManager fragmentManager = null;
     static SharedPreferences mSettings;
     static Context context;
     static SharedPreferences.Editor mEditor;
     static String AUTH_TOKEN = "auth_token";
     static String LOGIN = "login";
     static String PASSWORD = "password";
+    private static String SITE = "site";
     RecyclerView recycler;
     final MyAdapter adapter = new MyAdapter();
     int id;
@@ -62,7 +64,6 @@ public class ProfileFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        fragmentManager = getFragmentManager();
         context = getContext();
         mProfileViewModel = new ViewModelProvider(Objects.requireNonNull(getActivity()))
                 .get(ProfileViewModel.class);
@@ -73,29 +74,42 @@ public class ProfileFragment extends Fragment {
         id = getArguments().getInt("id");
         username = getArguments().getString("username");
         if (id == -1) {
-            mProfileViewModel.refreshMe();
+            if (mSettings.getBoolean("isFirstProfile", true)) {
+                mProfileViewModel.refreshMe();
+            } else {
+                mProfileViewModel.pullMeFromDB();
+            }
             isOther = false;
         } else {
-            mProfileViewModel.refresh(username, id);
             isOther = true;
+            mProfileViewModel.refresh(username, id);
         }
     }
 
     public ProfileFragment() {
     }
 
-    public static ProfileFragment newInstance(Integer id, String username) {
-        ProfileFragment fragment = new ProfileFragment();
-        Bundle bundle = new Bundle();
-        bundle.putInt("id", id);
-        bundle.putString("username", username);
-        fragment.setArguments(bundle);
-        return fragment;
-    }
-
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
+
+        final SwipeRefreshLayout pullToRefresh = view.findViewById(R.id.pullToRefresh);
+        pullToRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                assert getArguments() != null;
+                id = getArguments().getInt("id");
+                username = getArguments().getString("username");
+                if (id == -1) {
+                    mProfileViewModel.refreshMe();
+                    isOther = false;
+                } else {
+                    isOther = true;
+                    mProfileViewModel.refresh(username, id);
+                }
+                pullToRefresh.setRefreshing(false);
+            }
+        });
         recycler = view.findViewById(R.id.profile);
         recycler.setAdapter(adapter);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
@@ -105,10 +119,8 @@ public class ProfileFragment extends Fragment {
         Observer<UserProfile> observer = new Observer<UserProfile>() {
             @Override
             public void onChanged(UserProfile profile) {
-                if (profile != null) {
-                    adapter.setProfile(profile);
-                    mProfile = profile;
-                }
+                adapter.setProfile(profile);
+                mProfile = profile;
             }
         };
 
@@ -143,29 +155,71 @@ public class ProfileFragment extends Fragment {
                         .placeholder(R.drawable.ic_launcher_foreground)
                         .apply(RequestOptions.circleCropTransform())
                         .into(holder.mAva);
+                holder.mAva.setVisibility(View.VISIBLE);
                 holder.mFullName.setText(mProfile.getFullname());
+                holder.mFullName.setVisibility(View.VISIBLE);
                 holder.mMainGroup.setText(mProfile.getMainGroup());
+                holder.mMainGroup.setVisibility(View.VISIBLE);
 
                 final GroupAdapter groupAdapter = new GroupAdapter();
                 groupAdapter.setGroup(mProfile.getSubgroups());
                 holder.mGroups.setAdapter(groupAdapter);
                 holder.mGroups.setLayoutManager(new LinearLayoutManager(getContext()));
+                holder.mGroups.setVisibility(View.VISIBLE);
 
                 holder.mAbout.setText(mProfile.getAbout());
+                holder.mAbout.setTextSize(16);
+                holder.mAbout.setTextAlignment(View.TEXT_ALIGNMENT_VIEW_START);
+                holder.mAbout.setVisibility(View.VISIBLE);
                 holder.mBirthday.setText(mProfile.getBirthdate());
+                holder.mBirthday.setVisibility(View.VISIBLE);
                 holder.mPhone.setText(mProfile.getContacts().get(0).getValue());
+                holder.mPhone.setVisibility(View.VISIBLE);
                 holder.mMail.setText(mProfile.getContacts().get(1).getValue());
+                holder.mMail.setVisibility(View.VISIBLE);
 
                 final AccountAdapter accountAdapter = new AccountAdapter();
                 accountAdapter.setGroup(mProfile.getAccounts());
                 holder.mAccounts.setAdapter(accountAdapter);
                 holder.mAccounts.setLayoutManager(new LinearLayoutManager(getContext()));
+                holder.mAccounts.setVisibility(View.VISIBLE);
 
                 if (isOther) {
                     holder.mButton.setVisibility(GONE);
                 } else {
                     holder.mButton.setVisibility(View.VISIBLE);
                 }
+
+                holder.mBirthdayImage.setVisibility(View.VISIBLE);
+                holder.mPhoneImage.setVisibility(View.VISIBLE);
+                holder.mMailImage.setVisibility(View.VISIBLE);
+                holder.mAboutString.setVisibility(View.VISIBLE);
+                holder.mContactsString.setVisibility(View.VISIBLE);
+                holder.mGroupsString.setVisibility(View.VISIBLE);
+                holder.mAccountsString.setVisibility(View.VISIBLE);
+
+            } else {
+                holder.mAva.setVisibility(View.INVISIBLE);
+                holder.mFullName.setVisibility(GONE);
+                holder.mMainGroup.setVisibility(GONE);
+                holder.mBirthday.setVisibility(GONE);
+                holder.mGroups.setVisibility(GONE);
+                holder.mPhone.setVisibility(GONE);
+                holder.mMail.setVisibility(GONE);
+                holder.mAccounts.setVisibility(GONE);
+
+                holder.mBirthdayImage.setVisibility(GONE);
+                holder.mPhoneImage.setVisibility(GONE);
+                holder.mMailImage.setVisibility(GONE);
+                holder.mAboutString.setVisibility(GONE);
+                holder.mContactsString.setVisibility(GONE);
+                holder.mGroupsString.setVisibility(GONE);
+                holder.mAccountsString.setVisibility(GONE);
+
+                holder.mAbout.setVisibility(View.VISIBLE);
+                holder.mAbout.setText("Нет соединения");
+                holder.mAbout.setTextSize(20);
+                holder.mAbout.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
             }
         }
 
@@ -188,6 +242,13 @@ public class ProfileFragment extends Fragment {
         protected RecyclerView mAccounts;
         protected Button mButton;
 
+        protected ImageView mBirthdayImage;
+        protected ImageView mPhoneImage;
+        protected ImageView mMailImage;
+        protected TextView mAboutString;
+        protected TextView mGroupsString;
+        protected TextView mContactsString;
+        protected TextView mAccountsString;
 
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -210,12 +271,29 @@ public class ProfileFragment extends Fragment {
                     mSecretEditor.remove(LOGIN)
                             .remove(PASSWORD)
                             .remove(AUTH_TOKEN)
+                            .remove(SITE)
                             .apply();
+
+                    SharedPreferences mSettings = context.getSharedPreferences("createFirst", Context.MODE_PRIVATE);
+                    SharedPreferences.Editor mEditor = mSettings.edit();
+                    mEditor.putBoolean("isFirstNews", true)
+                            .putBoolean("isFirstSchedule", true)
+                            .putBoolean("isFirstProfile", true)
+                            .apply();
+
                     context.startActivity(new Intent(context, AuthActivity.class)
                             .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
                             .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
                 }
             }));
+
+            mBirthdayImage = itemView.findViewById(R.id.birthday_image);
+            mPhoneImage = itemView.findViewById(R.id.phone_image);
+            mMailImage = itemView.findViewById(R.id.mail_image);
+            mAboutString = itemView.findViewById(R.id.about_string);
+            mGroupsString = itemView.findViewById(R.id.groups);
+            mContactsString = itemView.findViewById(R.id.contacts_string);
+            mAccountsString = itemView.findViewById(R.id.accounts_string);
         }
 
     }
