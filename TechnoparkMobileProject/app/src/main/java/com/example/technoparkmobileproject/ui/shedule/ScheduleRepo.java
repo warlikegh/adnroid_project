@@ -82,7 +82,7 @@ public class ScheduleRepo {
                     List<ScheduleApi.UserSchedulePlain> result = response.body();
                     mSchedule.postValue(transform(result));
                     manager.clean();
-                    savedata(result);
+                    savedata(transform(result));
                 } else {
                     //  manager.readAll(readListener);
                 }
@@ -159,7 +159,7 @@ public class ScheduleRepo {
     }
 
 
-    private void savedata(List<ScheduleApi.UserSchedulePlain> result) {
+    private void savedata(List<UserSchedule> result) {
         for (int i = 0; i < result.size(); i++) {
             ScheduleDbManager.getInstance(mContext).insert(result.get(i).getId(), result.get(i).getTitle(), result.get(i).getDiscipline(),
                     result.get(i).getShortTitle(), result.get(i).getSuperShortTitle(), result.get(i).getDate(), result.get(i).getStartTime(),
@@ -185,14 +185,14 @@ public class ScheduleRepo {
         };
         data.addAll(list);
         Collections.sort(data, comp);
-        List<ScheduleApi.UserSchedulePlain> tempResult = new ArrayList<>();
+        List<UserSchedule> tempResult = new ArrayList<>();
         for (int i = 0; i < data.size(); i++) {
-            ScheduleApi.UserSchedulePlain temp = new ScheduleApi.UserSchedulePlain(data.get(i).id,
+            UserSchedule temp = new UserSchedule(data.get(i).id,
                     data.get(i).discipline, data.get(i).title, data.get(i).shortTitle, data.get(i).superShortTitle,
                     data.get(i).date, data.get(i).startTime, data.get(i).endTime, data.get(i).location, data.get(i).getGroup());
             tempResult.add(temp);
         }
-        mSchedule.postValue(transform(tempResult));
+        mSchedule.postValue(tempResult);
 
     }
 }

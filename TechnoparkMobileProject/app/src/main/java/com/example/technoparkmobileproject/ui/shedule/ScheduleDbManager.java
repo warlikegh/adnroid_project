@@ -28,7 +28,7 @@ class ScheduleDbManager {
 
     void insert(final int key, final String mTitle, final String mDiscipline, final String mShortTitle,
                 final String mSuperShortTitle, final String mDate, final String mStartTime, final String  mEndTime,
-                final List<ScheduleApi.UserSchedulePlain.Group> mGroups, final String mLocation) {
+                final List<UserSchedule.Group> mGroups, final String mLocation) {
         executor.execute(new Runnable() {
             @Override
             public void run() {
@@ -62,7 +62,7 @@ class ScheduleDbManager {
     }
 
     private void insertRoom(int key, String mTitle, String mDiscipline, String mShortTitle, String mSuperShortTitle, String mDate,
-                            String mStartTime, String  mEndTime, List<ScheduleApi.UserSchedulePlain.Group> mGroups, String mLocation) {
+                            String mStartTime, String  mEndTime, List<UserSchedule.Group> mGroups, String mLocation) {
         Schedule schedule = new Schedule(key, mTitle, mDiscipline, mShortTitle, mSuperShortTitle, mDate,
                 mStartTime, mEndTime, mGroups, mLocation);
         ScheduleDataBase.getInstance(context).getScheduleDao().insert(schedule);

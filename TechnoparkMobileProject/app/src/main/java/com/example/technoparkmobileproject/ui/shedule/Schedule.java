@@ -40,7 +40,7 @@ public class Schedule {
     }
 
     public Schedule(int key, String mTitle, String mDiscipline, String mShortTitle, String mSuperShortTitle, String mDate,
-                    String mStartTime, String mEndTime, List<ScheduleApi.UserSchedulePlain.Group> mGroups, String mLocation) {
+                    String mStartTime, String mEndTime, List<UserSchedule.Group> mGroups, String mLocation) {
         this.id = key;
         this.discipline = mDiscipline;
         this.title = mTitle;
@@ -65,11 +65,11 @@ public class Schedule {
 
     }
 
-    public List<ScheduleApi.UserSchedulePlain.Group> getGroup() {
+    public List<UserSchedule.Group> getGroup() {
         List<String> listName = new SecretData().parseStringToList(groups);
         List<String> listId = new SecretData().parseStringToList(groupid);
-        ScheduleApi.UserSchedulePlain temp = new ScheduleApi.UserSchedulePlain();
-        List<ScheduleApi.UserSchedulePlain.Group> groups = new ArrayList<>();
+        UserSchedule temp = new UserSchedule();
+        List<UserSchedule.Group> groups = new ArrayList<>();
         /*Log.d("database", textSize.toString());
         Log.d("database", url);
         Log.d("database", title);
