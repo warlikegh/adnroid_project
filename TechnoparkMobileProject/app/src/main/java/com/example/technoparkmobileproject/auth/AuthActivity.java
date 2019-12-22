@@ -1,19 +1,20 @@
 package com.example.technoparkmobileproject.auth;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentActivity;
 
 import com.example.technoparkmobileproject.MainActivity;
 import com.example.technoparkmobileproject.R;
 
 
-public class AuthActivity extends AppCompatActivity implements Router {
+public class AuthActivity extends FragmentActivity implements Router {
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
-        setTheme(R.style.AuthTheme);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.auth_main);
 

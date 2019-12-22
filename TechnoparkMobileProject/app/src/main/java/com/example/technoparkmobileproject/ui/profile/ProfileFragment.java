@@ -158,9 +158,10 @@ public class ProfileFragment extends Fragment {
                 holder.mAva.setVisibility(View.VISIBLE);
                 holder.mFullName.setText(mProfile.getFullname());
                 holder.mFullName.setVisibility(View.VISIBLE);
+                holder.mFullName.setTextIsSelectable(true);
                 holder.mMainGroup.setText(mProfile.getMainGroup());
                 holder.mMainGroup.setVisibility(View.VISIBLE);
-
+                holder.mMainGroup.setTextIsSelectable(true);
                 final GroupAdapter groupAdapter = new GroupAdapter();
                 groupAdapter.setGroup(mProfile.getSubgroups());
                 holder.mGroups.setAdapter(groupAdapter);
@@ -171,12 +172,20 @@ public class ProfileFragment extends Fragment {
                 holder.mAbout.setTextSize(16);
                 holder.mAbout.setTextAlignment(View.TEXT_ALIGNMENT_VIEW_START);
                 holder.mAbout.setVisibility(View.VISIBLE);
+                holder.mAbout.setTextIsSelectable(true);
+
                 holder.mBirthday.setText(mProfile.getBirthdate());
                 holder.mBirthday.setVisibility(View.VISIBLE);
+                holder.mBirthday.setTextIsSelectable(true);
+
                 holder.mPhone.setText(mProfile.getContacts().get(0).getValue());
                 holder.mPhone.setVisibility(View.VISIBLE);
+                holder.mPhone.setTextIsSelectable(true);
+
                 holder.mMail.setText(mProfile.getContacts().get(1).getValue());
                 holder.mMail.setVisibility(View.VISIBLE);
+                holder.mMail.setTextIsSelectable(true);
+
 
                 final AccountAdapter accountAdapter = new AccountAdapter();
                 accountAdapter.setGroup(mProfile.getAccounts());
@@ -319,6 +328,8 @@ public class ProfileFragment extends Fragment {
         public void onBindViewHolder(@NonNull GroupViewHolder holder, int position) {
             final UserProfile.Subgroup group = mGroup.get(position);
             holder.mGroup.setText(group.getName());
+            holder.mGroup.setTextIsSelectable(true);
+
         }
 
         @Override
@@ -408,6 +419,8 @@ public class ProfileFragment extends Fragment {
                 holder.mAccount.setText(Html.fromHtml(string));
             }
             holder.mAccount.setMovementMethod(LinkMovementMethod.getInstance());
+            holder.mAccount.setTextIsSelectable(true);
+
         }
 
         @Override

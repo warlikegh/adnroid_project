@@ -10,4 +10,6 @@
     <color name="colorRed">#c0474e</color>
     <color name="colorDarkGrey">#929294</color>
     <color name="colorOrange">#ffb500</color>
+    <color name="colorWindowSplashScreen">#e7e7e7</color>
+
 </resources>

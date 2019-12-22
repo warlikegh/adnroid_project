@@ -83,9 +83,9 @@ class ProfileRepo {
                 if (response.isSuccessful() && response.body() != null) {
                     ProfileApi.UserProfilePlain result = response.body();
                     mProfile.postValue(transform(result));
-                    //  if (mSettings.getInt("my_id", -1) == result.getId()) {
-                    manager.clean(result.getId());
-                    //   }
+
+                   // manager.clean(result.getId());
+
                     saveData(transform(result));
                     mEditor.putInt("my_id", result.getId()).commit();
 

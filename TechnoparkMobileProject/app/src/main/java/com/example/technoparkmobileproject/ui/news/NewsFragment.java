@@ -9,6 +9,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
+import android.text.util.Linkify;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -208,6 +209,7 @@ public class NewsFragment extends Fragment {
             } else {
                 holder.mTitle.setText(Html.fromHtml(url));
             }
+
             holder.mTitle.setMovementMethod(LinkMovementMethod.getInstance());
             holder.mBlog.setText(news.getBlog());
             holder.mAuthor.setText(news.getAuthor().getFullname());

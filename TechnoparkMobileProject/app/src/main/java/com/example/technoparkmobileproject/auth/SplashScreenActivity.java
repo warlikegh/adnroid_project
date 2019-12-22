@@ -10,6 +10,7 @@ import android.os.Bundle;
 
 import com.example.technoparkmobileproject.MainActivity;
 import com.example.technoparkmobileproject.R;
+import com.example.technoparkmobileproject.SecretData;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
@@ -24,28 +25,7 @@ public class SplashScreenActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash_screen);
-        String masterKeyAlias = null;
-        try {
-            masterKeyAlias = MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC);
-        } catch (GeneralSecurityException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        try {
-            mSettings = EncryptedSharedPreferences.create(
-                    "secret_shared_prefs",
-                    masterKeyAlias,
-                    this,
-                    EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-                    EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
-            );
-        } catch (GeneralSecurityException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        mSettings = new SecretData().getSecretData(this);
 
         if (!mSettings.getString(AUTH_TOKEN, "").isEmpty()) {
             startActivity(new Intent(getApplicationContext(), MainActivity.class)

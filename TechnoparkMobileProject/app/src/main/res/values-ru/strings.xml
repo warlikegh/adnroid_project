@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">TechnoparkMobileProject</string>
+    <string name="title_activity_main">MainActivity</string>
+    <string name="title_home">Новости</string>
+    <string name="title_dashboard">Расписание</string>
+    <string name="title_notifications">Профиль</string>
+    <string name="Groups">Группы</string>
+    <string name="about_string">О себе</string>
+    <string name="contacts_string">Контакты</string>
+    <string name="accounts_string">Аккаунты</string>
+    <string name="Out_of_account">Выйти</string>
+    <string name="log_in">Войти</string>
+</resources>

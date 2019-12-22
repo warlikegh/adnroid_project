@@ -17,5 +17,8 @@
         android:layout_toEndOf="@+id/account_image"
         android:textSize="20sp"
         android:padding="8dp"
-        android:background="@drawable/shape_grey_round"/>
+        android:background="@drawable/shape_grey_round"
+        android:autoLink="web"
+        android:textIsSelectable="true"
+        android:linksClickable="true"/>
 </RelativeLayout>

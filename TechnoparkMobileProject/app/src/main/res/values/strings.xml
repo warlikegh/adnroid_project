@@ -1,12 +1,14 @@
+
 <resources>
     <string name="app_name">TechnoparkMobileProject</string>
     <string name="title_activity_main">MainActivity</string>
     <string name="title_home">News</string>
     <string name="title_dashboard">Schedule</string>
     <string name="title_notifications">Profile</string>
-    <string name="Groups">Группы</string>
-    <string name="about_string">О себе</string>
-    <string name="contacts_string">Контакты</string>
-    <string name="accounts_string">Аккаунты</string>
-    <string name="Out_of_account">Выйти</string>
+    <string name="Groups">Groups</string>
+    <string name="about_string">About</string>
+    <string name="contacts_string">Contacts</string>
+    <string name="accounts_string">Accounts</string>
+    <string name="Out_of_account">Log out</string>
+    <string name="log_in">Log in</string>
 </resources>

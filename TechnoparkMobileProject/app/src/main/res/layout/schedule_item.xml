@@ -17,7 +17,8 @@
         android:layout_marginTop="8dp"
         android:text="Date"
         android:textColor="@color/black"
-        android:textSize="16sp" />
+        android:textSize="16sp"
+        android:textIsSelectable="true"/>
 
     <TextView
         android:id="@+id/discipline"
@@ -26,7 +27,8 @@
         android:layout_below="@id/date_schedule"
         android:layout_marginTop="8dp"
         android:text="Discipline"
-        android:textSize="16sp" />
+        android:textSize="16sp"
+        android:textIsSelectable="true"/>
 
     <TextView
         android:id="@+id/short_title"
@@ -35,7 +37,8 @@
         android:layout_below="@id/title"
         android:layout_marginTop="8dp"
         android:text="Short title"
-        android:textSize="16sp" />
+        android:textSize="16sp"
+        android:textIsSelectable="true"/>
 
     <ImageView
         android:id="@+id/loc"
@@ -55,7 +58,8 @@
         android:layout_toEndOf="@+id/loc"
         android:text="Location"
         android:textSize="20sp"
-        android:layout_toStartOf="@+id/groups"/>
+        android:layout_toStartOf="@+id/groups"
+        android:textIsSelectable="true"/>
 
     <TextView
         android:id="@+id/time"
@@ -65,7 +69,8 @@
         android:layout_marginTop="8dp"
         android:text="Time"
         android:textColor="@color/black"
-        android:textSize="16sp" />
+        android:textSize="16sp"
+        android:textIsSelectable="true"/>
 
     <TextView
         android:id="@+id/title"
@@ -75,7 +80,8 @@
         android:layout_marginTop="8dp"
         android:text="Title"
         android:textColor="@color/colorAccent"
-        android:textSize="20sp" />
+        android:textSize="20sp"
+        android:textIsSelectable="true"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/groups"

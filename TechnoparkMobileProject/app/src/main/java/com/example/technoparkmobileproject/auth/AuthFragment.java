@@ -4,6 +4,7 @@ import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -27,14 +28,20 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.technoparkmobileproject.R;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.tabs.TabLayout;
 import com.imbryk.viewPager.LoopViewPager;
 
+import static com.example.technoparkmobileproject.R.color.colorAccent;
+import static com.example.technoparkmobileproject.R.color.colorGrey;
+import static com.example.technoparkmobileproject.R.color.colorOrange;
+import static com.example.technoparkmobileproject.R.color.colorRed;
+import static com.example.technoparkmobileproject.R.color.colorWindow;
+
 
 public class AuthFragment extends Fragment {
-    private static final String TAG = "MY tag";
+
     Button enter;
-    TextView result;
     EditText mLogin;
     EditText mPassword;
     ProgressBar mProgressBar;
@@ -44,61 +51,32 @@ public class AuthFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.auth_fragment, container, false);
-
-    }
-
-    @SuppressWarnings("ConstantConditions")
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-
-        result = view.findViewById(R.id.result);
+        final View view = inflater.inflate(R.layout.auth_fragment, container, false);
         mLogin = view.findViewById(R.id.login);
         mPassword = view.findViewById(R.id.password);
         enter = view.findViewById(R.id.getBtn);
         mProgressBar = view.findViewById(R.id.progress);
 
         int[] pictureIds = new int[]{
-                R.drawable.tech_park,
-                R.drawable.tech_sfera,
-                R.drawable.tech_track,
-                R.drawable.tech_polis,
-                R.drawable.tech_atom,
-                R.drawable.voronezsch,
-                R.drawable.pensa,
-                R.drawable.p_manager,
-                R.drawable.big_data
+                R.mipmap.tech_park,
+                R.mipmap.tech_sfera,
+                R.mipmap.tech_track,
+                R.mipmap.tech_polis,
+                R.mipmap.tech_atom,
+                R.mipmap.voronezsch,
+                R.mipmap.pensa,
+                R.mipmap.p_manager,
+                R.mipmap.big_data
         };
 
-
         final LoopViewPager viewpager = view.findViewById(R.id.viewpager);
-        viewpager.setBackgroundColor(getResources().getColor(R.color.colorWindow));
+        viewpager.setBackgroundColor(getResources().getColor(colorWindow));
         ViewPagerAdapter adapter = new ViewPagerAdapter(getContext(), pictureIds);
         viewpager.setAdapter(adapter);
 
         TabLayout tabLayout = (TabLayout) view.findViewById(R.id.tab_layout);
         tabLayout.setupWithViewPager(viewpager, true);
 
-       /* viewpager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-
-            @Override
-            public void onPageSelected(int position) {
-                Log.d(TAG, "onPageSelected, position = " + position);
-
-            }
-
-            @Override
-            public void onPageScrolled(int position, float positionOffset,
-                                       int positionOffsetPixels) {
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int state) {
-            }
-        });*/
-
-////////////////////////////////////
         mAuthViewModel = new ViewModelProvider(getActivity()).get(AuthViewModel.class);
 
         mAuthViewModel.getProgress().observe(getViewLifecycleOwner(), new Observer<AuthViewModel.AuthState>() {
@@ -106,18 +84,21 @@ public class AuthFragment extends Fragment {
             public void onChanged(AuthViewModel.AuthState authState) {
                 if (authState == AuthViewModel.AuthState.FAILED) {
                     enter.setEnabled(true);
-                    enter.setBackgroundColor(getResources().getColor(android.R.color.holo_red_dark));
-                    result.setText("Что-то не так! Вероятно, неправильно указаны данные");
+                    enter.setBackgroundColor(getResources().getColor(colorRed));
+                    Snackbar.make(view, "Что-то не так! Вероятно, неправильно указаны данные", Snackbar.LENGTH_LONG)
+                            .show();
                     mProgressBar.setVisibility(View.GONE);
                 } else if (authState == AuthViewModel.AuthState.FAILED_NET) {
                     enter.setEnabled(true);
-                    enter.setBackgroundColor(getResources().getColor(android.R.color.holo_orange_light));
-                    result.setText("Нет соединения!");
+                    enter.setBackgroundColor(getResources().getColor(colorOrange));
+                    Snackbar.make(view, "Нет соединения!", Snackbar.LENGTH_LONG)
+                            .show();
                     mProgressBar.setVisibility(View.GONE);
                 } else if (authState == AuthViewModel.AuthState.IN_PROGRESS) {
-                    enter.setBackgroundColor(getResources().getColor(android.R.color.holo_blue_light));
+                    enter.setBackgroundColor(getResources().getColor(colorAccent));
                     enter.setEnabled(false);
-                    result.setText("Загружаю...");
+                    Snackbar.make(view, "Загружаю...", Snackbar.LENGTH_LONG)
+                            .show();
                     mProgressBar.setVisibility(View.VISIBLE);
                 } else if (authState == AuthViewModel.AuthState.SUCCESS) {
                     mProgressBar.setVisibility(View.GONE);
@@ -125,7 +106,6 @@ public class AuthFragment extends Fragment {
                     if (router != null) {
                         router.openMain();
                     }
-
 
                 } else {
                     enter.setBackground(getContext().getDrawable(android.R.drawable.btn_default));
@@ -141,6 +121,16 @@ public class AuthFragment extends Fragment {
             }
         });
 
+        return view;
+
+    }
+
+    @SuppressWarnings("ConstantConditions")
+    @Override
+    public void onViewCreated(@NonNull final View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+
     }
 
     public class ViewPagerAdapter extends PagerAdapter {
@@ -151,7 +141,6 @@ public class AuthFragment extends Fragment {
             this.mContext = context;
             this.mPictureIDs = resids;
         }
-
 
         @Override
         public int getCount() {
@@ -174,6 +163,8 @@ public class AuthFragment extends Fragment {
                     false);
             avatarImageView = itemView.findViewById(R.id.imageViewAvatar);
             avatarImageView.setImageResource(mPictureIDs[position]);
+            avatarImageView.setBackgroundColor(getResources().getColor(colorWindow));
+            avatarImageView.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
             container.addView(itemView);
             return itemView;
         }

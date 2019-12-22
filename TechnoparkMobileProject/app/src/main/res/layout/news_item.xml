@@ -24,7 +24,8 @@
         android:layout_below="@id/title"
         android:layout_centerHorizontal="true"
         android:text="Blog"
-        android:textSize="16sp" />
+        android:textSize="16sp"
+        android:textIsSelectable="true"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/content"
@@ -44,6 +45,8 @@
         android:layout_below="@id/content"
         android:layout_centerHorizontal="true"
         android:text="Показать полностью..."
+        android:background="@drawable/ripple"
+        android:padding="8dp"
         android:textColor="@color/colorAccent"
         android:textSize="16sp"
         android:visibility="gone"/>
@@ -64,7 +67,8 @@
         android:layout_marginTop="8dp"
         android:layout_toEndOf="@+id/photo"
         android:text="Author"
-        android:textSize="16sp" />
+        android:textSize="16sp"
+        android:textIsSelectable="true"/>
 
     <TextView
         android:id="@+id/rating_news_author"
@@ -94,7 +98,8 @@
         android:layout_below="@id/author"
         android:layout_marginTop="8dp"
         android:text="Date"
-        android:textSize="16sp" />
+        android:textSize="16sp"
+        android:textIsSelectable="true"/>
 
     <TextView
         android:id="@+id/comments_news"

@@ -12,11 +12,13 @@
         android:layout_marginTop="8dp"
         android:text=""
         android:textSize="16sp"
+        android:textIsSelectable="true"
         />
     <ImageView
         android:id="@+id/photo"
         android:layout_height="match_parent"
         android:scaleType="center"
         android:layout_marginTop="8dp"
-        android:layout_width="match_parent" />
+        android:layout_width="match_parent"
+        />
 </LinearLayout>
