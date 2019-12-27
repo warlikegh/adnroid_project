@@ -67,8 +67,7 @@
         android:layout_marginTop="8dp"
         android:layout_toEndOf="@+id/photo"
         android:text="Author"
-        android:textSize="16sp"
-        android:textIsSelectable="true"/>
+        android:textSize="16sp" />
 
     <TextView
         android:id="@+id/rating_news_author"

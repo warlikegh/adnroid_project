@@ -1,11 +1,18 @@
 package com.example.technoparkmobileproject.ui.profile;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
@@ -21,45 +28,40 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.security.crypto.EncryptedSharedPreferences;
-import androidx.security.crypto.MasterKeys;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import com.bumptech.glide.GenericTransitionOptions;
+import com.example.technoparkmobileproject.R;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
-import com.example.technoparkmobileproject.R;
 import com.example.technoparkmobileproject.SecretData;
 import com.example.technoparkmobileproject.auth.AuthActivity;
-import com.example.technoparkmobileproject.ui.shedule.ScheduleFragment;
+import com.example.technoparkmobileproject.ui.shedule.ScheduleViewModel;
+import com.google.android.material.snackbar.Snackbar;
 
-import java.io.IOException;
-import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import static android.content.Context.VIBRATOR_SERVICE;
 import static android.view.View.GONE;
 
 public class ProfileFragment extends Fragment {
 
     private UserProfile mProfile;
-    private ProfileViewModel mProfileViewModel;
+    private static ProfileViewModel mProfileViewModel;
+    private static ScheduleViewModel mScheduleViewModel;
     static SharedPreferences mSettings;
     static Context context;
     static SharedPreferences.Editor mEditor;
-    static String AUTH_TOKEN = "auth_token";
-    static String LOGIN = "login";
-    static String PASSWORD = "password";
-    private static String SITE = "site";
+
     RecyclerView recycler;
     final MyAdapter adapter = new MyAdapter();
     int id;
     String username;
     Boolean isOther;
+    static FragmentManager fragmentManager;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -67,7 +69,9 @@ public class ProfileFragment extends Fragment {
         context = getContext();
         mProfileViewModel = new ViewModelProvider(Objects.requireNonNull(getActivity()))
                 .get(ProfileViewModel.class);
-
+        mScheduleViewModel = new ViewModelProvider(Objects.requireNonNull(getActivity()))
+                .get(ScheduleViewModel.class);
+        fragmentManager = getChildFragmentManager();
         mSettings = Objects.requireNonNull(getContext()).getSharedPreferences("createFirst", Context.MODE_PRIVATE);
         mEditor = mSettings.edit();
 
@@ -180,12 +184,9 @@ public class ProfileFragment extends Fragment {
 
                 holder.mPhone.setText(mProfile.getContacts().get(0).getValue());
                 holder.mPhone.setVisibility(View.VISIBLE);
-                holder.mPhone.setTextIsSelectable(true);
 
                 holder.mMail.setText(mProfile.getContacts().get(1).getValue());
                 holder.mMail.setVisibility(View.VISIBLE);
-                holder.mMail.setTextIsSelectable(true);
-
 
                 final AccountAdapter accountAdapter = new AccountAdapter();
                 accountAdapter.setGroup(mProfile.getAccounts());
@@ -229,6 +230,12 @@ public class ProfileFragment extends Fragment {
                 holder.mAbout.setText("Нет соединения");
                 holder.mAbout.setTextSize(20);
                 holder.mAbout.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+
+                if (isOther) {
+                    holder.mButton.setVisibility(GONE);
+                } else {
+                    holder.mButton.setVisibility(View.VISIBLE);
+                }
             }
         }
 
@@ -259,7 +266,7 @@ public class ProfileFragment extends Fragment {
         protected TextView mContactsString;
         protected TextView mAccountsString;
 
-        public MyViewHolder(@NonNull View itemView) {
+        public MyViewHolder(@NonNull final View itemView) {
             super(itemView);
             mAva = itemView.findViewById(R.id.photo);
             mFullName = itemView.findViewById(R.id.full_name);
@@ -275,6 +282,23 @@ public class ProfileFragment extends Fragment {
             mButton.setOnClickListener((new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
+                   /* AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                    builder.setTitle(R.string.answer_log_out);
+                    builder.setMessage("yes");
+                    builder.setCancelable(true);
+                    builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() { // Кнопка ОК
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    });
+                    AlertDialog dialog = builder.create();
+                    dialog.show();*/
+                    AlertDialog dialog = new DialogLogOut().getDialog(context);
+                    dialog.show();
+
+
+/*
                     SharedPreferences mSecretSettings = new SecretData().getSecretData(context);
                     SharedPreferences.Editor mSecretEditor = mSecretSettings.edit();
                     mSecretEditor.remove(LOGIN)
@@ -290,9 +314,52 @@ public class ProfileFragment extends Fragment {
                             .putBoolean("isFirstProfile", true)
                             .apply();
 
+                   // mProfileViewModel.cleanDB();
+                    mScheduleViewModel.cleanDB();
+
                     context.startActivity(new Intent(context, AuthActivity.class)
                             .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
-                            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+                            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));*/
+                }
+            }));
+
+            mPhone.setOnLongClickListener((new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    Vibrator vibrator = (Vibrator) context.getSystemService(VIBRATOR_SERVICE);
+                    if (Build.VERSION.SDK_INT >= 26) {
+                        vibrator.vibrate(VibrationEffect.createOneShot(150, VibrationEffect.DEFAULT_AMPLITUDE));
+                    } else {
+                        vibrator.vibrate(150);
+                    }
+
+                    ClipboardManager clipboard = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
+                    ClipData clip = ClipData.newPlainText("", MyViewHolder.this.mPhone.getText());
+                    clipboard.setPrimaryClip(clip);
+
+                    Snackbar.make(itemView, R.string.copied, Snackbar.LENGTH_LONG)
+                            .show();
+                    return false;
+                }
+            }));
+
+            mMail.setOnLongClickListener((new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    Vibrator vibrator = (Vibrator) context.getSystemService(VIBRATOR_SERVICE);
+                    if (Build.VERSION.SDK_INT >= 26) {
+                        vibrator.vibrate(VibrationEffect.createOneShot(150, VibrationEffect.DEFAULT_AMPLITUDE));
+                    } else {
+                        vibrator.vibrate(150);
+                    }
+
+                    ClipboardManager clipboard = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
+                    ClipData clip = ClipData.newPlainText("", MyViewHolder.this.mMail.getText());
+                    clipboard.setPrimaryClip(clip);
+
+                    Snackbar.make(itemView, "Текст скопирован в буфер обмена", Snackbar.LENGTH_LONG)
+                            .show();
+                    return false;
                 }
             }));
 

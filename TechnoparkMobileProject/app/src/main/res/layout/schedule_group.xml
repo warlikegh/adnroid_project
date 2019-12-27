@@ -9,6 +9,5 @@
         android:layout_marginTop="8dp"
         android:text="Group"
         android:textColor="@color/colorAccent"
-        android:textSize="16sp"
-        android:textIsSelectable="true"/>
+        android:textSize="16sp" />
 </LinearLayout>

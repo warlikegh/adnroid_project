@@ -44,8 +44,9 @@ class ProfileRepo {
             Runnable runnable = new Runnable() {
                 @Override
                 public void run() {
-                    //     if (item != null) {
-                    post(item);
+                         if (item != null) {
+                             post(item);
+                         }
                     //    } else {
                     //         refresh(username_repo, (int) id);
                     //   }
@@ -73,8 +74,6 @@ class ProfileRepo {
     public void refreshMe() {
         mEditor.putBoolean("isFirstProfile", false);
         mEditor.apply();
-
-        final ProfileDbManager manager = ProfileDbManager.getInstance(mContext);
         mSecretSettings = new SecretData().getSecretData(mContext);
         mProfileApi.getUserProfile(" Token " + mSecretSettings.getString(AUTH_TOKEN, "")).enqueue(new Callback<ProfileApi.UserProfilePlain>() {
             @Override
@@ -84,23 +83,17 @@ class ProfileRepo {
                     ProfileApi.UserProfilePlain result = response.body();
                     mProfile.postValue(transform(result));
 
-                   // manager.clean(result.getId());
-
                     saveData(transform(result));
                     mEditor.putInt("my_id", result.getId()).commit();
 
                 } else {
-                    //  manager.read(readListener, mSettings.getInt("my_id", -1));
+                    pullMeFromDB();
                 }
             }
 
             @Override
             public void onFailure(Call<ProfileApi.UserProfilePlain> call, Throwable t) {
-                //     manager.read(readListener, mSettings.getInt("my_id", -1));
                 pullMeFromDB();
-             /*   if (key == 1) {
-
-                }*/
             }
         });
     }
@@ -109,7 +102,6 @@ class ProfileRepo {
     public void refresh(String username, final int id) {
         final ProfileDbManager manager = ProfileDbManager.getInstance(mContext);
         mSecretSettings = new SecretData().getSecretData(mContext);
-        //  username_repo = username;
         mProfileApi.getOtherUserProfile(" Token " + mSecretSettings.getString(AUTH_TOKEN, ""), "profile/" + username).enqueue(new Callback<ProfileApi.UserProfilePlain>() {
             @Override
             public void onResponse(Call<ProfileApi.UserProfilePlain> call,
@@ -133,8 +125,13 @@ class ProfileRepo {
     public void pullMeFromDB() {
         ProfileDbManager manager = ProfileDbManager.getInstance(mContext);
         long id = mSettings.getInt("my_id", -1);
-        Log.e("save", ((Integer) (int) id).toString());
         manager.read(readListener, id);
+    }
+
+    public void cleanDB() {
+        final ProfileDbManager manager = ProfileDbManager.getInstance(mContext);
+        long id = mSettings.getInt("my_id", -1);
+        manager.clean(id);
     }
 
     public void pullFromDB() {

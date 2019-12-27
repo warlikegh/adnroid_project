@@ -106,6 +106,10 @@ public class ScheduleRepo {
         manager.readAll(readListener);
     }
 
+    public void cleanDB() {
+        final ScheduleDbManager manager = ScheduleDbManager.getInstance(mContext);
+        manager.clean();
+    }
 
     private static List<UserSchedule> transform(List<ScheduleApi.UserSchedulePlain> plains) {
         List<UserSchedule> result = new ArrayList<>();
