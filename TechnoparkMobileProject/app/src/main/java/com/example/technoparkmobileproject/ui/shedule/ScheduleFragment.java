@@ -27,6 +27,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.technoparkmobileproject.R;
+import com.example.technoparkmobileproject.Router;
 import com.example.technoparkmobileproject.SecretData;
 
 import java.util.ArrayList;
@@ -38,6 +39,7 @@ import java.util.Objects;
 public class ScheduleFragment extends Fragment {
     private List<UserSchedule> mSchedule = new ArrayList<>();
     private List<UserSchedule> tempSchedule = new ArrayList<>();
+    static GroupAdapter groupAdapter;
     final ScheduleAdapter scheduleAdapter = new ScheduleAdapter();
     String ALL_DISCIPLINES = "Все дисциплины";
     String disciplineText = ALL_DISCIPLINES;
@@ -274,7 +276,7 @@ public class ScheduleFragment extends Fragment {
             holder.mTitle.setText(schedule.getTitle());
             holder.mDiscipline.setText(schedule.getDiscipline());
 
-            final GroupAdapter groupAdapter = new GroupAdapter();
+            groupAdapter = new GroupAdapter();
             groupAdapter.setGroup(schedule.getGroups());
             holder.mGroups.setAdapter(groupAdapter);
             holder.mGroups.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -346,6 +348,14 @@ public class ScheduleFragment extends Fragment {
         public GroupViewHolder(@NonNull View itemView) {
             super(itemView);
             mGroup = itemView.findViewById(R.id.group_schedule);
+            mGroup.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    int pos = GroupViewHolder.this.getAdapterPosition();
+                    Integer id = groupAdapter.mGroup.get(pos).getId();
+                    ((Router) context).onGroupSelected(id);
+                }
+            });
         }
     }
 

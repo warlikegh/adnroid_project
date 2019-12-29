@@ -32,6 +32,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.technoparkmobileproject.R;
+import com.example.technoparkmobileproject.Router;
 import com.example.technoparkmobileproject.SecretData;
 
 import java.time.LocalDateTime;
@@ -178,10 +179,6 @@ public class NewsFragment extends Fragment {
         });
     }
 
-    public interface OnProfileSelectedListener {
-        void onProfileSelected(int id, String username);
-    }
-
     private class NewsAdapter extends RecyclerView.Adapter<NewsViewHolder> {
 
         private List<UserNews.Result> mNews = new ArrayList<>();
@@ -279,7 +276,7 @@ public class NewsFragment extends Fragment {
                     int pos = NewsViewHolder.this.getAdapterPosition();
                     String username = mExtraNews.getResults().get(pos).getAuthor().getUsername();
                     int id = mExtraNews.getResults().get(pos).getAuthor().getId();
-                    ((OnProfileSelectedListener) context).onProfileSelected(id, username);
+                    ((Router) context).onProfileSelected(id, username);
                 }
             });
 
@@ -344,11 +341,11 @@ public class NewsFragment extends Fragment {
             } else if (type.equals("img")) {
                 Glide.with(Objects.requireNonNull(getContext()))
                         .load(text)
-/*rewrite*/.placeholder(R.drawable.ic_launcher_foreground)
+                        .placeholder(R.mipmap.profile)
                         .into(holder.mImageNews);
                 holder.mTextNews.setEnabled(true);
             } else {
-                holder.mTextNews.setText("Here must be "+type);
+                holder.mTextNews.setText("Here must be " + type);
             }
         }
 

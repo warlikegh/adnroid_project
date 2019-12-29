@@ -74,6 +74,10 @@ public class ApiRepo {
         return retrofits[index].create(PushApi.class);
     }
 
+    public GroupApi getGroupApi(int index) {
+        return retrofits[index].create(GroupApi.class);
+    }
+
     public static ApiRepo from(Context context) {
         return TechnoparkApplication.from(context).getApis();
     }
