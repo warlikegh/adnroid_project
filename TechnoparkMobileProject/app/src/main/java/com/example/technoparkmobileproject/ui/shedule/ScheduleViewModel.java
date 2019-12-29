@@ -33,4 +33,8 @@ public class ScheduleViewModel extends AndroidViewModel {
         mRepo.pullFromDB();
     }
 
+    public void cleanDB() {
+        mRepo.cleanDB();
+    }
+
 }

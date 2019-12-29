@@ -1,22 +1,17 @@
 package com.example.technoparkmobileproject.auth;
 
-import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
-import android.graphics.Color;
+
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager.widget.PagerAdapter;
-import androidx.viewpager.widget.ViewPager;
 
-import android.util.Log;
-import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,7 +20,6 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 
 import com.example.technoparkmobileproject.R;
 import com.google.android.material.snackbar.Snackbar;
@@ -33,7 +27,6 @@ import com.google.android.material.tabs.TabLayout;
 import com.imbryk.viewPager.LoopViewPager;
 
 import static com.example.technoparkmobileproject.R.color.colorAccent;
-import static com.example.technoparkmobileproject.R.color.colorGrey;
 import static com.example.technoparkmobileproject.R.color.colorOrange;
 import static com.example.technoparkmobileproject.R.color.colorRed;
 import static com.example.technoparkmobileproject.R.color.colorWindow;

@@ -11,4 +11,8 @@
     <string name="accounts_string">Accounts</string>
     <string name="Out_of_account">Log out</string>
     <string name="log_in">Log in</string>
+    <string name="copied">"Text is copied"</string>
+    <string name="answer_log_out">"Are you sure, you want log out?"</string>
+    <string name="yes">"Yes"</string>
+    <string name="no">"No"</string>
 </resources>

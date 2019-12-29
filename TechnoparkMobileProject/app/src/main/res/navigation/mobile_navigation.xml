@@ -21,7 +21,7 @@
         android:id="@+id/navigation_dashboard"
         android:name="com.example.technoparkmobileproject.ui.shedule.ScheduleFragment"
         android:label="@string/title_dashboard"
-        tools:layout="@layout/fragment_schedule_all" >
+        tools:layout="@layout/fragment_schedule" >
         <action
             android:id="@+id/action_navigation_dashboard_to_navigation_notifications"
             app:destination="@id/navigation_notifications"

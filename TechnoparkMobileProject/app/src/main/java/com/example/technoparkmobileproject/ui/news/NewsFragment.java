@@ -91,7 +91,7 @@ public class NewsFragment extends Fragment {
         pullToRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                mNewsViewModel.refresh(); // your code
+                mNewsViewModel.refresh();
                 pullToRefresh.setRefreshing(false);
             }
         });
@@ -348,7 +348,7 @@ public class NewsFragment extends Fragment {
                         .into(holder.mImageNews);
                 holder.mTextNews.setEnabled(true);
             } else {
-                holder.mTextNews.setText(type);
+                holder.mTextNews.setText("Here must be "+type);
             }
         }
 

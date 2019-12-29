@@ -29,8 +29,9 @@ public class ProfileViewModel extends AndroidViewModel {
     public void refresh(String username, long id) {
         mRepo.refresh(username, (int) id);
     }
-/*
-    public void pullFromDB(long id) {
-        mRepo.pullFromDB(id);
-    }*/
+
+    public void cleanDB() {
+        mRepo.cleanDB();
+    }
+
 }

@@ -25,7 +25,6 @@ public class MainActivity extends FragmentActivity implements NewsFragment.OnPro
         NavigationUI.setupWithNavController(navView, navController);
     }
 
-
     @Override
     public void onProfileSelected(int id, String username) {
         Bundle bundle = new Bundle();
@@ -36,24 +35,4 @@ public class MainActivity extends FragmentActivity implements NewsFragment.OnPro
         navController.navigate(R.id.navigation_notifications, bundle, navOptions);
     }
 
-
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

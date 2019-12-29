@@ -10,4 +10,8 @@
     <string name="accounts_string">Аккаунты</string>
     <string name="Out_of_account">Выйти</string>
     <string name="log_in">Войти</string>
+    <string name="copied">"Текст скопирован в буфер обмена"</string>
+    <string name="answer_log_out">"Вы уверены,что хотите выйти?"</string>
+    <string name="yes">"Да"</string>
+    <string name="no">"Нет"</string>
 </resources>
