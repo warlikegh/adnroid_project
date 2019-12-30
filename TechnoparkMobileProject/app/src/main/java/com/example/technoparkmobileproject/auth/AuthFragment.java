@@ -19,7 +19,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ProgressBar;
 
 import com.example.technoparkmobileproject.R;
 import com.google.android.material.snackbar.Snackbar;
@@ -37,7 +36,6 @@ public class AuthFragment extends Fragment {
     Button enter;
     EditText mLogin;
     EditText mPassword;
-    ProgressBar mProgressBar;
 
     private AuthViewModel mAuthViewModel;
 
@@ -48,7 +46,6 @@ public class AuthFragment extends Fragment {
         mLogin = view.findViewById(R.id.login);
         mPassword = view.findViewById(R.id.password);
         enter = view.findViewById(R.id.getBtn);
-        mProgressBar = view.findViewById(R.id.progress);
 
         int[] pictureIds = new int[]{
                 R.mipmap.tech_park,
@@ -80,21 +77,17 @@ public class AuthFragment extends Fragment {
                     enter.setBackgroundColor(getResources().getColor(colorRed));
                     Snackbar.make(view, "Что-то не так! Вероятно, неправильно указаны данные", Snackbar.LENGTH_LONG)
                             .show();
-                    mProgressBar.setVisibility(View.GONE);
                 } else if (authState == AuthViewModel.AuthState.FAILED_NET) {
                     enter.setEnabled(true);
                     enter.setBackgroundColor(getResources().getColor(colorOrange));
                     Snackbar.make(view, "Нет соединения!", Snackbar.LENGTH_LONG)
                             .show();
-                    mProgressBar.setVisibility(View.GONE);
                 } else if (authState == AuthViewModel.AuthState.IN_PROGRESS) {
                     enter.setBackgroundColor(getResources().getColor(colorAccent));
                     enter.setEnabled(false);
                     Snackbar.make(view, "Загружаю...", Snackbar.LENGTH_LONG)
                             .show();
-                    mProgressBar.setVisibility(View.VISIBLE);
                 } else if (authState == AuthViewModel.AuthState.SUCCESS) {
-                    mProgressBar.setVisibility(View.GONE);
                     Router router = (Router) getActivity();
                     if (router != null) {
                         router.openMain();

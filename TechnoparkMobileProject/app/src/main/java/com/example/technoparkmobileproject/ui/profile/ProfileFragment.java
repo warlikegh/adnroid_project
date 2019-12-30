@@ -35,6 +35,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.example.technoparkmobileproject.R;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.example.technoparkmobileproject.Router;
 import com.example.technoparkmobileproject.SecretData;
 import com.example.technoparkmobileproject.auth.AuthActivity;
 import com.example.technoparkmobileproject.ui.shedule.ScheduleViewModel;
@@ -48,7 +49,7 @@ import static android.content.Context.VIBRATOR_SERVICE;
 import static android.view.View.GONE;
 
 public class ProfileFragment extends Fragment {
-
+    static GroupAdapter groupAdapter;
     private UserProfile mProfile;
     private static ProfileViewModel mProfileViewModel;
     private static ScheduleViewModel mScheduleViewModel;
@@ -72,6 +73,12 @@ public class ProfileFragment extends Fragment {
         mScheduleViewModel = new ViewModelProvider(Objects.requireNonNull(getActivity()))
                 .get(ScheduleViewModel.class);
         fragmentManager = getChildFragmentManager();
+
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
         mSettings = Objects.requireNonNull(getContext()).getSharedPreferences("createFirst", Context.MODE_PRIVATE);
         mEditor = mSettings.edit();
 
@@ -156,7 +163,7 @@ public class ProfileFragment extends Fragment {
             if (mProfile != null) {
                 Glide.with(Objects.requireNonNull(getContext()))
                         .load(mProfile.getAvatarUrl())
-                        .placeholder(R.drawable.ic_launcher_foreground)
+                        .placeholder(R.mipmap.profile)
                         .apply(RequestOptions.circleCropTransform())
                         .into(holder.mAva);
                 holder.mAva.setVisibility(View.VISIBLE);
@@ -166,7 +173,7 @@ public class ProfileFragment extends Fragment {
                 holder.mMainGroup.setText(mProfile.getMainGroup());
                 holder.mMainGroup.setVisibility(View.VISIBLE);
                 holder.mMainGroup.setTextIsSelectable(true);
-                final GroupAdapter groupAdapter = new GroupAdapter();
+                groupAdapter = new GroupAdapter();
                 groupAdapter.setGroup(mProfile.getSubgroups());
                 holder.mGroups.setAdapter(groupAdapter);
                 holder.mGroups.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -357,7 +364,7 @@ public class ProfileFragment extends Fragment {
                     ClipData clip = ClipData.newPlainText("", MyViewHolder.this.mMail.getText());
                     clipboard.setPrimaryClip(clip);
 
-                    Snackbar.make(itemView, "Текст скопирован в буфер обмена", Snackbar.LENGTH_LONG)
+                    Snackbar.make(itemView, R.string.copied, Snackbar.LENGTH_LONG)
                             .show();
                     return false;
                 }
@@ -395,8 +402,6 @@ public class ProfileFragment extends Fragment {
         public void onBindViewHolder(@NonNull GroupViewHolder holder, int position) {
             final UserProfile.Subgroup group = mGroup.get(position);
             holder.mGroup.setText(group.getName());
-            holder.mGroup.setTextIsSelectable(true);
-
         }
 
         @Override
@@ -413,6 +418,14 @@ public class ProfileFragment extends Fragment {
         public GroupViewHolder(@NonNull View itemView) {
             super(itemView);
             mGroup = itemView.findViewById(R.id.group_profile);
+            mGroup.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    int pos = GroupViewHolder.this.getAdapterPosition();
+                    Integer id = groupAdapter.mGroup.get(pos).getId();
+                    ((Router) context).onGroupSelected(id);
+                }
+            });
         }
     }
 
@@ -436,57 +449,46 @@ public class ProfileFragment extends Fragment {
         @Override
         public void onBindViewHolder(@NonNull AccountViewHolder holder, int position) {
             final UserProfile.Account group = mAccount.get(position);
-            String string;
             if (group.getName().equals("vkontakte")) {
                 holder.mImage.setImageBitmap(BitmapFactory.decodeResource(context.getResources(), R.mipmap.vk_logo));
-                string = "<a href=\"" + group.getValue() + "\" target=\"_blank\">" + group.getValue() + "</a>";
             }
             if (group.getName().equals("odnoklassniki")) {
                 holder.mImage.setImageBitmap(BitmapFactory.decodeResource(context.getResources(), R.mipmap.ok_logo));
-                string = "<a href=\"" + group.getValue() + "\" target=\"_blank\">" + group.getValue() + "</a>";
             }
             if (group.getName().equals("github")) {
                 holder.mImage.setImageBitmap(BitmapFactory.decodeResource(context.getResources(), R.mipmap.github_logo));
-                string = "<a href=\"" + group.getValue() + "\" target=\"_blank\">" + group.getValue() + "</a>";
             }
             if (group.getName().equals("facebook")) {
                 holder.mImage.setImageBitmap(BitmapFactory.decodeResource(context.getResources(), R.mipmap.facebook_logo));
-                string = "<a href=\"" + group.getValue() + "\" target=\"_blank\">" + group.getValue() + "</a>";
             }
             if (group.getName().equals("agent")) {
                 holder.mImage.setImageBitmap(BitmapFactory.decodeResource(context.getResources(), R.mipmap.mailru_agent_logo));
-                string = "<a href=\"" + group.getValue() + "\" target=\"_blank\">" + group.getValue() + "</a>";
             }
             if (group.getName().equals("telegram")) {
                 holder.mImage.setImageBitmap(BitmapFactory.decodeResource(context.getResources(), R.mipmap.telegram_logo));
-                string = group.getValue();
             }
             if (group.getName().equals("tamtam")) {
                 holder.mImage.setImageBitmap(BitmapFactory.decodeResource(context.getResources(), R.mipmap.tam_tam_logo));
-                string = group.getValue();
             }
             if (group.getName().equals("skype")) {
                 holder.mImage.setImageBitmap(BitmapFactory.decodeResource(context.getResources(), R.mipmap.skype_logo));
-                string = group.getValue();
             }
             if (group.getName().equals("icq")) {
                 holder.mImage.setImageBitmap(BitmapFactory.decodeResource(context.getResources(), R.mipmap.icq_logo));
-                string = group.getValue();
             }
             if (group.getName().equals("bitbucket")) {
                 holder.mImage.setImageBitmap(BitmapFactory.decodeResource(context.getResources(), R.mipmap.bitbucket_logo));
-                string = group.getValue();
-            } else {
-                string = group.getValue();
+            }
+            if (group.getName().equals("myworld")) {
+                holder.mImage.setImageBitmap(BitmapFactory.decodeResource(context.getResources(), R.mipmap.my_world_logo));
             }
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                holder.mAccount.setText(Html.fromHtml(string, Html.FROM_HTML_MODE_COMPACT));
+                holder.mAccount.setText(Html.fromHtml(group.getValue(), Html.FROM_HTML_MODE_COMPACT));
             } else {
-                holder.mAccount.setText(Html.fromHtml(string));
+                holder.mAccount.setText(Html.fromHtml(group.getValue()));
             }
             holder.mAccount.setMovementMethod(LinkMovementMethod.getInstance());
-            holder.mAccount.setTextIsSelectable(true);
 
         }
 
@@ -502,10 +504,31 @@ public class ProfileFragment extends Fragment {
         protected TextView mAccount;
         protected ImageView mImage;
 
-        public AccountViewHolder(@NonNull View itemView) {
+        public AccountViewHolder(@NonNull final View itemView) {
             super(itemView);
             mAccount = itemView.findViewById(R.id.account);
             mImage = itemView.findViewById(R.id.account_image);
+
+            mAccount.setOnLongClickListener((new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    Vibrator vibrator = (Vibrator) context.getSystemService(VIBRATOR_SERVICE);
+                    if (Build.VERSION.SDK_INT >= 26) {
+                        vibrator.vibrate(VibrationEffect.createOneShot(150, VibrationEffect.DEFAULT_AMPLITUDE));
+                    } else {
+                        vibrator.vibrate(150);
+                    }
+
+                    ClipboardManager clipboard = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
+                    ClipData clip = ClipData.newPlainText("", AccountViewHolder.this.mAccount.getText());
+                    clipboard.setPrimaryClip(clip);
+
+                    Snackbar.make(itemView, R.string.copied, Snackbar.LENGTH_LONG)
+                            .show();
+
+                    return false;
+                }
+            }));
         }
     }
 

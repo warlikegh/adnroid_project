@@ -12,8 +12,7 @@
     <com.imbryk.viewPager.LoopViewPager
         android:id="@+id/viewpager"
         android:layout_width="match_parent"
-        android:layout_height="160dp">
-    </com.imbryk.viewPager.LoopViewPager>
+        android:layout_height="160dp"></com.imbryk.viewPager.LoopViewPager>
 
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tab_layout"
@@ -55,13 +54,5 @@
         android:backgroundTint="@color/colorAccent"
         android:text="@string/log_in"
         android:textColor="@color/colorGrey" />
-
-    <ProgressBar
-        android:id="@+id/progress"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:indeterminate="true"
-        android:visibility="gone" />
-
 
 </LinearLayout>
