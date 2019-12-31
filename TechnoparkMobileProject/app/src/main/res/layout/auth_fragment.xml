@@ -1,58 +1,73 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/activity_main"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:gravity="center"
-    android:orientation="vertical"
-    tools:context=".auth.AuthFragment">
+    android:layout_height="match_parent">
 
-    <com.imbryk.viewPager.LoopViewPager
-        android:id="@+id/viewpager"
+    <com.example.technoparkmobileproject.auth.SnowView
         android:layout_width="match_parent"
-        android:layout_height="160dp"></com.imbryk.viewPager.LoopViewPager>
+        android:layout_height="match_parent"
+        android:translationZ="5dp"
+        android:id="@+id/snow_view"/>
 
-    <com.google.android.material.tabs.TabLayout
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/activity_main"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="vertical"
+        tools:context=".auth.AuthFragment">
+
+        <com.imbryk.viewPager.LoopViewPager
+            android:id="@+id/viewpager"
+            android:layout_width="match_parent"
+            android:layout_height="152dp"
+            android:translationZ="4dp"/>
+
+        <com.google.android.material.tabs.TabLayout
         android:id="@+id/tab_layout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:tabBackground="@drawable/tab_selector"
-        app:tabGravity="center"
-        app:tabIndicatorHeight="0dp" />
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:tabBackground="@drawable/tab_selector"
+            app:tabGravity="center"
+            android:translationZ="6dp"
+            app:tabIndicatorHeight="0dp" />
 
-    <EditText
-        android:id="@+id/login"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="64dp"
-        android:layout_marginRight="64dp"
-        android:hint="E-mail/Login"
-        android:inputType="textEmailAddress"
-        android:padding="5dp"
-        android:textAlignment="center" />
+        <EditText
+            android:id="@+id/login"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="64dp"
+            android:layout_marginRight="64dp"
+            android:hint="@string/e_mail_login"
+            android:inputType="textEmailAddress"
+           android:padding="8dp"
+            android:textAlignment="center" />
 
-    <EditText
-        android:id="@+id/password"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="64dp"
-        android:layout_marginRight="64dp"
-        android:hint="Password"
-        android:inputType="textPassword"
-        android:padding="8dp"
-        android:textAlignment="center" />
+        <EditText
+            android:id="@+id/password"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="64dp"
+            android:layout_marginRight="64dp"
+            android:hint="@string/password"
+            android:inputType="textPassword"
+            android:padding="8dp"
+            android:textAlignment="center"
+            />
 
-    <Button
-        android:id="@+id/getBtn"
-        style="@style/Widget.AppCompat.Button.Colored"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="64dp"
-        android:layout_marginRight="64dp"
-        android:backgroundTint="@color/colorAccent"
-        android:text="@string/log_in"
-        android:textColor="@color/colorGrey" />
+        <Button
+            android:id="@+id/getBtn"
+            style="@style/Widget.AppCompat.Button.Colored"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="64dp"
+            android:layout_marginRight="64dp"
+            android:backgroundTint="@color/colorButtonAuth"
+            android:text="@string/log_in"
+            android:elevation="6dp"
+            android:textColor="@color/colorGrey" />
 
-</LinearLayout>
+    </LinearLayout>
+</FrameLayout>

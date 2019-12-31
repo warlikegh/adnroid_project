@@ -64,6 +64,15 @@ public class ProfileFragment extends Fragment {
     Boolean isOther;
     static FragmentManager fragmentManager;
 
+    public static ProfileFragment newInstance(int id, String username) {
+        ProfileFragment fragment = new ProfileFragment();
+        Bundle bundle = new Bundle();
+        bundle.putString("username", username);
+        bundle.putInt("id", id);
+        fragment.setArguments(bundle);
+        return fragment;
+    }
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -234,7 +243,7 @@ public class ProfileFragment extends Fragment {
                 holder.mAccountsString.setVisibility(GONE);
 
                 holder.mAbout.setVisibility(View.VISIBLE);
-                holder.mAbout.setText("Нет соединения");
+                holder.mAbout.setText(R.string.http_failed);
                 holder.mAbout.setTextSize(20);
                 holder.mAbout.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
 
@@ -289,44 +298,8 @@ public class ProfileFragment extends Fragment {
             mButton.setOnClickListener((new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                   /* AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                    builder.setTitle(R.string.answer_log_out);
-                    builder.setMessage("yes");
-                    builder.setCancelable(true);
-                    builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() { // Кнопка ОК
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.dismiss();
-                        }
-                    });
-                    AlertDialog dialog = builder.create();
-                    dialog.show();*/
                     AlertDialog dialog = new DialogLogOut().getDialog(context);
                     dialog.show();
-
-
-/*
-                    SharedPreferences mSecretSettings = new SecretData().getSecretData(context);
-                    SharedPreferences.Editor mSecretEditor = mSecretSettings.edit();
-                    mSecretEditor.remove(LOGIN)
-                            .remove(PASSWORD)
-                            .remove(AUTH_TOKEN)
-                            .remove(SITE)
-                            .apply();
-
-                    SharedPreferences mSettings = context.getSharedPreferences("createFirst", Context.MODE_PRIVATE);
-                    SharedPreferences.Editor mEditor = mSettings.edit();
-                    mEditor.putBoolean("isFirstNews", true)
-                            .putBoolean("isFirstSchedule", true)
-                            .putBoolean("isFirstProfile", true)
-                            .apply();
-
-                   // mProfileViewModel.cleanDB();
-                    mScheduleViewModel.cleanDB();
-
-                    context.startActivity(new Intent(context, AuthActivity.class)
-                            .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
-                            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));*/
                 }
             }));
 
@@ -481,6 +454,9 @@ public class ProfileFragment extends Fragment {
             }
             if (group.getName().equals("myworld")) {
                 holder.mImage.setImageBitmap(BitmapFactory.decodeResource(context.getResources(), R.mipmap.my_world_logo));
+            }
+            if (group.getName().equals("linkedin")) {
+                holder.mImage.setImageBitmap(BitmapFactory.decodeResource(context.getResources(), R.mipmap.linkedin_logo));
             }
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {

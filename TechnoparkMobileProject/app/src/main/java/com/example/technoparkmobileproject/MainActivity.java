@@ -2,8 +2,6 @@ package com.example.technoparkmobileproject;
 
 import android.os.Bundle;
 
-import com.example.technoparkmobileproject.ui.news.NewsFragment;
-
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import androidx.fragment.app.FragmentActivity;
@@ -12,7 +10,7 @@ import androidx.navigation.NavOptions;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.NavigationUI;
 
-public class MainActivity extends FragmentActivity implements Router{
+public class MainActivity extends FragmentActivity implements Router {
 
     NavController navController;
 
@@ -31,6 +29,7 @@ public class MainActivity extends FragmentActivity implements Router{
         bundle.putString("username", username);
         bundle.putInt("id", id);
         NavOptions.Builder builder = new NavOptions.Builder();
+        builder.setLaunchSingleTop(true);
         NavOptions navOptions = builder.setEnterAnim(R.anim.nav_default_enter_anim).setExitAnim(R.anim.nav_default_exit_anim).build();
         navController.navigate(R.id.navigation_notifications, bundle, navOptions);
     }
@@ -40,7 +39,9 @@ public class MainActivity extends FragmentActivity implements Router{
         Bundle bundle = new Bundle();
         bundle.putInt("id", id);
         NavOptions.Builder builder = new NavOptions.Builder();
-        NavOptions navOptions = builder.setEnterAnim(R.anim.nav_default_enter_anim).setExitAnim(R.anim.nav_default_exit_anim).build();
+        builder.setLaunchSingleTop(true);
+        NavOptions navOptions = builder.setEnterAnim(R.anim.nav_default_enter_anim)
+                .setExitAnim(R.anim.nav_default_exit_anim).build();
         navController.navigate(R.id.groupFragment, bundle, navOptions);
     }
 }

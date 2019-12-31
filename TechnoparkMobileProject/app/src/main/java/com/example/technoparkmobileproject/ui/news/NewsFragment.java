@@ -67,6 +67,10 @@ public class NewsFragment extends Fragment {
     public NewsFragment() {
     }
 
+    public static NewsFragment newInstance() {
+        return new NewsFragment();
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -213,7 +217,11 @@ public class NewsFragment extends Fragment {
 
             String date = new SecretData().getDateString(news.getPublishDate());
             holder.mDate.setText(date);
-            holder.mRating.setText(news.getRating().toString());
+            String rating = "";
+            if (news.getRating()>0)
+                rating = "+";
+            rating += ((Integer)news.getRating().intValue()).toString();
+            holder.mRating.setText(rating);
 
             boolean buttonIsActive = false;
             holder.mCommentsCount.setText(news.getCommentsCount().toString());

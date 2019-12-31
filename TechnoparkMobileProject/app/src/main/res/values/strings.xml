@@ -16,4 +16,13 @@
     <string name="yes">"Yes"</string>
     <string name="no">"No"</string>
     <string name="Search">Search</string>
+    <string name="e_mail_login">E-mail/Login</string>
+    <string name="password">Password</string>
+    <string name="error_400">Something wrong! Check your login/password</string>
+    <string name="http_failed">No network!</string>
+    <string name="load">Loading…</string>
+    <string name="disciplines">Disciplines</string>
+    <string name="all_disciplines">All disciplines</string>
+    <string name="all_semester">Whole semester</string>
+    <string name="two_week">Next two weeks</string>
 </resources>

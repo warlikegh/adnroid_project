@@ -41,8 +41,8 @@ public class ScheduleFragment extends Fragment {
     private List<UserSchedule> tempSchedule = new ArrayList<>();
     static GroupAdapter groupAdapter;
     final ScheduleAdapter scheduleAdapter = new ScheduleAdapter();
-    String ALL_DISCIPLINES = "Все дисциплины";
-    String disciplineText = ALL_DISCIPLINES;
+    String ALL_DISCIPLINES;
+    String disciplineText;
     final Boolean[] isDefault = {true};
     private ScheduleViewModel mScheduleViewModel;
     static Context context;
@@ -50,6 +50,9 @@ public class ScheduleFragment extends Fragment {
     SharedPreferences mSettings;
     SharedPreferences.Editor mEditor;
 
+    public static ScheduleFragment newInstance() {
+        return new ScheduleFragment();
+    }
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,6 +62,8 @@ public class ScheduleFragment extends Fragment {
         mSettings = Objects.requireNonNull(getContext()).getSharedPreferences("createFirst", Context.MODE_PRIVATE);
         mEditor = mSettings.edit();
         mScheduleViewModel.pullFromDB();
+        ALL_DISCIPLINES = context.getResources().getString(R.string.all_disciplines);
+        disciplineText = ALL_DISCIPLINES;
     }
 
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -101,6 +106,7 @@ public class ScheduleFragment extends Fragment {
         final Spinner spinner = view.findViewById(R.id.spinner_discipline);
         final List<String> disciplines = new ArrayList<>();
         final ArrayAdapter<String>[] adapter = new ArrayAdapter[]{new ArrayAdapter<String>(context, android.R.layout.simple_spinner_item, disciplines)};
+
         adapter[0].setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter[0]);
         spinner.setSelection(adapter[0].getPosition(disciplineText));

@@ -16,6 +16,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
@@ -39,6 +40,14 @@ public class GroupFragment extends Fragment {
     Integer id;
     SearchView searchView;
     String searchSave = "";
+
+    public static GroupFragment newInstance(Integer id) {
+        GroupFragment fragment = new GroupFragment();
+        Bundle bundle = new Bundle();
+        bundle.putInt("id", id);
+        fragment.setArguments(bundle);
+        return fragment;
+    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -86,7 +95,6 @@ public class GroupFragment extends Fragment {
         });
         if (savedInstanceState != null) {
             searchSave = savedInstanceState.getString("search");
-
         }
         searchView.setQuery(searchSave, true);
 
@@ -204,8 +212,7 @@ public class GroupFragment extends Fragment {
                     int pos = GroupViewHolder.this.getAdapterPosition();
                     Integer id = adapter.items.get(pos).getId();
                     String username = adapter.items.get(pos).getUsername();
-                    getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
-                    //getActivity().getWindow().injectInputEvent();
+                    getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING);
                     if (view != null) {
                         InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
                         imm.hideSoftInputFromWindow(view.getWindowToken(), 0);

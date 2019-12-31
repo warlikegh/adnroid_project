@@ -6,7 +6,7 @@
     android:layout_height="wrap_content"
     android:layout_margin="8dp"
     android:orientation="vertical"
-    android:background="@drawable/shape_grey_round"
+    android:background="@drawable/shape_white_round"
     android:padding="8dp"
     >
 

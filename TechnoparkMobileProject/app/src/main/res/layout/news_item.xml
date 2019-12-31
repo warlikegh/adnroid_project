@@ -34,7 +34,7 @@
         android:layout_below="@id/blog"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="8dp"
-        android:background="@drawable/shape_grey_round"
+        android:background="@drawable/shape_white_round"
         android:padding="8dp"
         tools:context=".ArticleFragment" />
 
@@ -85,10 +85,8 @@
         android:layout_height="24dp"
         android:layout_below="@id/next"
         android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
         android:layout_toLeftOf="@+id/rating_news_author"
-        android:background="@drawable/ic_star_border_black_24dp" />
-    />
+        android:background="@drawable/ic_unfold_more_black_24dp" />
 
     <TextView
         android:id="@+id/date_news_author"
