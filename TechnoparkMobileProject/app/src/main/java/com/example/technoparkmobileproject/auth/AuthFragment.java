@@ -56,7 +56,7 @@ public class AuthFragment extends Fragment {
         int[] pictureIds = new int[]{
                 R.mipmap.tech_park,
                 R.mipmap.tech_sfera,
-                R.mipmap.tech_track,
+                R.mipmap.logo_track,
                 R.mipmap.tech_polis,
                 R.mipmap.tech_atom,
                 R.mipmap.voronezsch,
@@ -121,27 +121,18 @@ public class AuthFragment extends Fragment {
     public class ViewPagerAdapter extends PagerAdapter {
         private Context mContext;
         private int[] mPictureIDs;
-        int[] redpos = new int[]{44, 255, 255, 44, 135, 255, 255, 252, 255};
-        int[] greenpos = new int[]{43, 255, 255, 43, 66, 255, 255, 44, 255};
-        int[] bluepos = new int[]{41, 255, 255, 41, 221, 255, 255, 56, 255};
+        int[] redpos = new int[]{44, 255, 208, 44, 135, 255, 255, 252, 255};
+        int[] greenpos = new int[]{43, 255, 18, 43, 66, 255, 255, 44, 255};
+        int[] bluepos = new int[]{41, 255, 22, 41, 221, 255, 255, 56, 255};
         int[] viewpos = new int[]{getResources().getColor(colorWindow),
                 getResources().getDrawable(R.drawable.tech_sfera_background).getAlpha(),
-                getResources().getColor(colorRedTrackAuth),
+                getResources().getColor(colorWindow),
                 getResources().getColor(colorWindow),
                 getResources().getColor(colorWindow),
                 getResources().getColor(colorBlueBackgroungIS),
                 getResources().getColor(colorBlueBackgroungIS),
                 getResources().getColor(colorWindow),
                 getResources().getColor(colorRedMadeAuth)};
-        int[] logopos = new int[]{(getResources().getColor(R.color.colorGradientTopAuth)),
-                getResources().getColor(colorRedTrackAuth),
-                getResources().getColor(colorWindow),
-                getResources().getColor(colorWindow),
-                getResources().getColor(colorBlueBackgroungIS),
-                getResources().getColor(colorBlueBackgroungIS),
-                getResources().getColor(colorWindow),
-                getResources().getColor(colorRedMadeAuth),
-                getResources().getColor(colorWindow)};
 
         public ViewPagerAdapter(Context context, int[] resids) {
             this.mContext = context;
@@ -177,7 +168,6 @@ public class AuthFragment extends Fragment {
                     viewAll.setBackgroundColor(viewpos[posDown]);
                 }
                 snowView.setRGB(redpos[posDown], greenpos[posDown], bluepos[posDown]);
-                avatarImageView.setBackgroundColor((position - 1 >= 0) ? position - 1 : 8);
             } else {
                 int posUp = (position - 1 >= 0) ? position - 1 : 8;
                 if (position == 2) {
@@ -186,7 +176,6 @@ public class AuthFragment extends Fragment {
                     viewAll.setBackgroundColor(viewpos[posUp]);
                 }
                 snowView.setRGB(redpos[posUp], greenpos[posUp], bluepos[posUp]);
-                avatarImageView.setBackgroundColor(logopos[posUp]);
             }
             mPos = position;
             container.addView(itemView);

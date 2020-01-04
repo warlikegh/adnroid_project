@@ -49,7 +49,6 @@ public class AuthRepo {
         mSettings = new SecretData().getSecretData(context);
         editor = mSettings.edit();
         return TechnoparkApplication.from(context).getAuthRepo();
-
     }
 
     private MutableLiveData<AuthProgress> mAuthProgress;

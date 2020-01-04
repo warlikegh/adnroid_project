@@ -53,8 +53,8 @@
 
     <ImageView
         android:id="@+id/photo"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         android:layout_below="@id/next"
         android:layout_marginTop="8dp" />
 
@@ -67,6 +67,8 @@
         android:layout_marginTop="8dp"
         android:layout_toEndOf="@+id/photo"
         android:text="Author"
+        android:background="@drawable/ripple_white"
+        android:padding="8dp"
         android:textSize="16sp" />
 
     <TextView
@@ -75,7 +77,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/next"
         android:layout_alignParentEnd="true"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="16dp"
         android:text="Rating"
         android:textSize="16sp" />
 
@@ -84,7 +86,7 @@
         android:layout_width="24dp"
         android:layout_height="24dp"
         android:layout_below="@id/next"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="16dp"
         android:layout_toLeftOf="@+id/rating_news_author"
         android:background="@drawable/ic_unfold_more_black_24dp" />
 
@@ -92,7 +94,7 @@
         android:id="@+id/date_news_author"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/author"
+        android:layout_below="@id/photo"
         android:layout_marginTop="8dp"
         android:text="Date"
         android:textSize="16sp"
@@ -102,9 +104,10 @@
         android:id="@+id/comments_news"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/rating_news_author"
+        android:layout_below="@id/photo"
         android:layout_alignParentEnd="true"
         android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
         android:text="CommentsCount"
         android:textSize="16sp" />
 
@@ -112,7 +115,7 @@
         android:id="@+id/comment_image"
         android:layout_width="24dp"
         android:layout_height="24dp"
-        android:layout_below="@id/rating_image"
+        android:layout_below="@id/photo"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
         android:layout_toLeftOf="@+id/comments_news"

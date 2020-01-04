@@ -15,6 +15,7 @@ import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -73,8 +74,22 @@ public class ProfileFragment extends Fragment {
         return fragment;
     }
 
+    private void del() {
+        adapter.cleanProfile();
+        Log.d(getLogTag(), "adapter.setProfile(null);");
+    }
+
+    @Override
+    public void onDestroyView() {
+        del();
+        super.onDestroyView();
+        Log.d(getLogTag(), "onDestroyView");
+    }
+
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
+        Log.d(getLogTag(), "onCreate");
         super.onCreate(savedInstanceState);
         context = getContext();
         mProfileViewModel = new ViewModelProvider(Objects.requireNonNull(getActivity()))
@@ -87,6 +102,7 @@ public class ProfileFragment extends Fragment {
 
     @Override
     public void onStart() {
+        Log.d(getLogTag(), "onStart");
         super.onStart();
         mSettings = Objects.requireNonNull(getContext()).getSharedPreferences("createFirst", Context.MODE_PRIVATE);
         mEditor = mSettings.edit();
@@ -102,7 +118,7 @@ public class ProfileFragment extends Fragment {
             isOther = false;
         } else {
             isOther = true;
-            mProfileViewModel.refresh(username, id);
+            mProfileViewModel.pullFromDB(id, username);
         }
     }
 
@@ -111,6 +127,7 @@ public class ProfileFragment extends Fragment {
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
+        Log.d(getLogTag(), "onCreateView");
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
 
         final SwipeRefreshLayout pullToRefresh = view.findViewById(R.id.pullToRefresh);
@@ -164,6 +181,10 @@ public class ProfileFragment extends Fragment {
 
         public void setProfile(UserProfile profile) {
             mProfile = profile;
+            notifyDataSetChanged();
+        }
+        public void cleanProfile() {
+            mProfile = null;
             notifyDataSetChanged();
         }
 
@@ -384,7 +405,7 @@ public class ProfileFragment extends Fragment {
 
     }
 
-    static class GroupViewHolder extends RecyclerView.ViewHolder {
+    class GroupViewHolder extends RecyclerView.ViewHolder {
 
         protected TextView mGroup;
 
@@ -401,6 +422,7 @@ public class ProfileFragment extends Fragment {
             });
         }
     }
+
 
 
     private class AccountAdapter extends RecyclerView.Adapter<AccountViewHolder> {
@@ -475,7 +497,7 @@ public class ProfileFragment extends Fragment {
 
     }
 
-    static class AccountViewHolder extends RecyclerView.ViewHolder {
+    class AccountViewHolder extends RecyclerView.ViewHolder {
 
         protected TextView mAccount;
         protected ImageView mImage;
@@ -508,4 +530,65 @@ public class ProfileFragment extends Fragment {
         }
     }
 
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        Log.d(getLogTag(), "onAttach");
+        adapter.setProfile(null);
+    }
+
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        Log.d(getLogTag(), "onActivityCreated");
+    }
+
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.d(getLogTag(), "onResume");
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        Log.d(getLogTag(), "onPause");
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        Log.d(getLogTag(), "onStop");
+    }
+
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Log.d(getLogTag(), "onDestroy");
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        Log.d(getLogTag(), "onDetach");
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        Log.d(getLogTag(), "onSaveInstanceState");
+    }
+
+    @Override
+    public void onViewStateRestored(@Nullable final Bundle savedInstanceState) {
+        super.onViewStateRestored(savedInstanceState);
+        Log.d(getLogTag(), "onViewStateRestored");
+    }
+
+    protected String getLogTag() {
+        return getClass().getSimpleName();
+    }
 }

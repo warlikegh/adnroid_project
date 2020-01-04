@@ -5,6 +5,8 @@ import android.app.Application;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MediatorLiveData;
+import androidx.lifecycle.Observer;
 
 public class ProfileViewModel extends AndroidViewModel {
     private ProfileRepo mRepo = new ProfileRepo(getApplication());
@@ -30,8 +32,11 @@ public class ProfileViewModel extends AndroidViewModel {
         mRepo.refresh(username, (int) id);
     }
 
+    public void pullFromDB(long id, String username) {
+        mRepo.pullFromDB(id, username);
+    }
+
     public void cleanDB() {
         mRepo.cleanDB();
     }
-
 }

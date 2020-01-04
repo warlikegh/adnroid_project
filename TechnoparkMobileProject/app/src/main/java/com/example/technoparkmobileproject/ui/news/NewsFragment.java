@@ -240,7 +240,7 @@ public class NewsFragment extends Fragment {
 
             Glide.with(Objects.requireNonNull(getContext()))
                     .load(news.getAuthor().getAvatarUrl())
-                    .placeholder(R.drawable.ic_launcher_foreground)
+                    .placeholder(R.mipmap.profile)
                     .apply(RequestOptions.circleCropTransform())
                     .into(holder.mAvatar);
         }
@@ -349,7 +349,7 @@ public class NewsFragment extends Fragment {
             } else if (type.equals("img")) {
                 Glide.with(Objects.requireNonNull(getContext()))
                         .load(text)
-                        .placeholder(R.mipmap.profile)
+                        .placeholder(R.drawable.ic_restore_black_24dp)
                         .into(holder.mImageNews);
                 holder.mTextNews.setEnabled(true);
             } else {
