@@ -67,6 +67,10 @@ public class NewsFragment extends Fragment {
     public NewsFragment() {
     }
 
+    public static NewsFragment newInstance() {
+        return new NewsFragment();
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -213,7 +217,11 @@ public class NewsFragment extends Fragment {
 
             String date = new SecretData().getDateString(news.getPublishDate());
             holder.mDate.setText(date);
-            holder.mRating.setText(news.getRating().toString());
+            String rating = "";
+            if (news.getRating()>0)
+                rating = "+";
+            rating += ((Integer)news.getRating().intValue()).toString();
+            holder.mRating.setText(rating);
 
             boolean buttonIsActive = false;
             holder.mCommentsCount.setText(news.getCommentsCount().toString());
@@ -232,7 +240,7 @@ public class NewsFragment extends Fragment {
 
             Glide.with(Objects.requireNonNull(getContext()))
                     .load(news.getAuthor().getAvatarUrl())
-                    .placeholder(R.drawable.ic_launcher_foreground)
+                    .placeholder(R.mipmap.profile)
                     .apply(RequestOptions.circleCropTransform())
                     .into(holder.mAvatar);
         }
@@ -341,7 +349,7 @@ public class NewsFragment extends Fragment {
             } else if (type.equals("img")) {
                 Glide.with(Objects.requireNonNull(getContext()))
                         .load(text)
-                        .placeholder(R.mipmap.profile)
+                        .placeholder(R.drawable.ic_restore_black_24dp)
                         .into(holder.mImageNews);
                 holder.mTextNews.setEnabled(true);
             } else {

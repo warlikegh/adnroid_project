@@ -6,7 +6,7 @@
     android:layout_height="wrap_content"
     android:layout_margin="8dp"
     android:orientation="vertical"
-    android:background="@drawable/shape_grey_round"
+    android:background="@drawable/shape_white_round"
     android:padding="8dp"
     >
 
@@ -36,7 +36,10 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/title"
         android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
         android:text="Short title"
+        android:layout_alignParentLeft="true"
+        android:layout_toStartOf="@+id/groups"
         android:textSize="16sp"
         android:textIsSelectable="true"/>
 
@@ -87,7 +90,7 @@
         android:id="@+id/groups"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/short_title"
+        android:layout_below="@id/title"
         android:layout_alignParentEnd="true"
         />
 </RelativeLayout>

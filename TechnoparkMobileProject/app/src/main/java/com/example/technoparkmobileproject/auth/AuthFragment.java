@@ -26,8 +26,11 @@ import com.google.android.material.tabs.TabLayout;
 import com.imbryk.viewPager.LoopViewPager;
 
 import static com.example.technoparkmobileproject.R.color.colorAccent;
+import static com.example.technoparkmobileproject.R.color.colorBlueBackgroungIS;
 import static com.example.technoparkmobileproject.R.color.colorOrange;
 import static com.example.technoparkmobileproject.R.color.colorRed;
+import static com.example.technoparkmobileproject.R.color.colorRedMadeAuth;
+import static com.example.technoparkmobileproject.R.color.colorRedTrackAuth;
 import static com.example.technoparkmobileproject.R.color.colorWindow;
 
 
@@ -36,21 +39,24 @@ public class AuthFragment extends Fragment {
     Button enter;
     EditText mLogin;
     EditText mPassword;
+    SnowView snowView;
+    View viewAll;
+    Integer mPos = 1;
 
     private AuthViewModel mAuthViewModel;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        final View view = inflater.inflate(R.layout.auth_fragment, container, false);
-        mLogin = view.findViewById(R.id.login);
-        mPassword = view.findViewById(R.id.password);
-        enter = view.findViewById(R.id.getBtn);
-
+        viewAll = inflater.inflate(R.layout.auth_fragment, container, false);
+        mLogin = viewAll.findViewById(R.id.login);
+        mPassword = viewAll.findViewById(R.id.password);
+        enter = viewAll.findViewById(R.id.getBtn);
+        snowView = viewAll.findViewById(R.id.snow_view);
         int[] pictureIds = new int[]{
                 R.mipmap.tech_park,
                 R.mipmap.tech_sfera,
-                R.mipmap.tech_track,
+                R.mipmap.logo_track,
                 R.mipmap.tech_polis,
                 R.mipmap.tech_atom,
                 R.mipmap.voronezsch,
@@ -58,13 +64,12 @@ public class AuthFragment extends Fragment {
                 R.mipmap.p_manager,
                 R.mipmap.big_data
         };
-
-        final LoopViewPager viewpager = view.findViewById(R.id.viewpager);
-        viewpager.setBackgroundColor(getResources().getColor(colorWindow));
+        final LoopViewPager viewpager = viewAll.findViewById(R.id.viewpager);
         ViewPagerAdapter adapter = new ViewPagerAdapter(getContext(), pictureIds);
         viewpager.setAdapter(adapter);
+        viewpager.setPageTransformer(true, new ZoomOutPageTransformer());
 
-        TabLayout tabLayout = (TabLayout) view.findViewById(R.id.tab_layout);
+        TabLayout tabLayout = viewAll.findViewById(R.id.tab_layout);
         tabLayout.setupWithViewPager(viewpager, true);
 
         mAuthViewModel = new ViewModelProvider(getActivity()).get(AuthViewModel.class);
@@ -75,17 +80,17 @@ public class AuthFragment extends Fragment {
                 if (authState == AuthViewModel.AuthState.FAILED) {
                     enter.setEnabled(true);
                     enter.setBackgroundColor(getResources().getColor(colorRed));
-                    Snackbar.make(view, "Что-то не так! Вероятно, неправильно указаны данные", Snackbar.LENGTH_LONG)
+                    Snackbar.make(viewAll, R.string.error_400, Snackbar.LENGTH_LONG)
                             .show();
                 } else if (authState == AuthViewModel.AuthState.FAILED_NET) {
                     enter.setEnabled(true);
                     enter.setBackgroundColor(getResources().getColor(colorOrange));
-                    Snackbar.make(view, "Нет соединения!", Snackbar.LENGTH_LONG)
+                    Snackbar.make(viewAll, R.string.http_failed, Snackbar.LENGTH_LONG)
                             .show();
                 } else if (authState == AuthViewModel.AuthState.IN_PROGRESS) {
                     enter.setBackgroundColor(getResources().getColor(colorAccent));
                     enter.setEnabled(false);
-                    Snackbar.make(view, "Загружаю...", Snackbar.LENGTH_LONG)
+                    Snackbar.make(viewAll, R.string.load, Snackbar.LENGTH_LONG)
                             .show();
                 } else if (authState == AuthViewModel.AuthState.SUCCESS) {
                     Router router = (Router) getActivity();
@@ -107,21 +112,27 @@ public class AuthFragment extends Fragment {
             }
         });
 
-        return view;
+        return viewAll;
 
     }
 
-    @SuppressWarnings("ConstantConditions")
-    @Override
-    public void onViewCreated(@NonNull final View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
 
-
-    }
 
     public class ViewPagerAdapter extends PagerAdapter {
         private Context mContext;
         private int[] mPictureIDs;
+        int[] redpos = new int[]{44, 255, 208, 44, 135, 255, 255, 252, 255};
+        int[] greenpos = new int[]{43, 255, 18, 43, 66, 255, 255, 44, 255};
+        int[] bluepos = new int[]{41, 255, 22, 41, 221, 255, 255, 56, 255};
+        int[] viewpos = new int[]{getResources().getColor(colorWindow),
+                getResources().getDrawable(R.drawable.tech_sfera_background).getAlpha(),
+                getResources().getColor(colorWindow),
+                getResources().getColor(colorWindow),
+                getResources().getColor(colorWindow),
+                getResources().getColor(colorBlueBackgroungIS),
+                getResources().getColor(colorBlueBackgroungIS),
+                getResources().getColor(colorWindow),
+                getResources().getColor(colorRedMadeAuth)};
 
         public ViewPagerAdapter(Context context, int[] resids) {
             this.mContext = context;
@@ -142,15 +153,31 @@ public class AuthFragment extends Fragment {
         @Override
         public Object instantiateItem(@NonNull ViewGroup container, int position) {
             ImageView avatarImageView;
-
-            LayoutInflater inflater = (LayoutInflater) mContext
-                    .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            View itemView = inflater.inflate(R.layout.auth_pager_holder, container,
-                    false);
+            LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            View itemView = inflater.inflate(R.layout.auth_pager_holder, container, false);
             avatarImageView = itemView.findViewById(R.id.imageViewAvatar);
             avatarImageView.setImageResource(mPictureIDs[position]);
-            avatarImageView.setBackgroundColor(getResources().getColor(colorWindow));
             avatarImageView.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
+
+            if (mPos - position == 3 || mPos - position == 2 || mPos - position == 1 ||
+                    (mPos == 0 && (position == 8 || position == 6)) || (mPos == 2 && position == 8)) {
+                int posDown = (position + 1) % mPictureIDs.length;
+                if (position == 0) {
+                    viewAll.setBackground(getResources().getDrawable(R.drawable.tech_sfera_background));
+                } else {
+                    viewAll.setBackgroundColor(viewpos[posDown]);
+                }
+                snowView.setRGB(redpos[posDown], greenpos[posDown], bluepos[posDown]);
+            } else {
+                int posUp = (position - 1 >= 0) ? position - 1 : 8;
+                if (position == 2) {
+                    viewAll.setBackground(getResources().getDrawable(R.drawable.tech_sfera_background));
+                } else {
+                    viewAll.setBackgroundColor(viewpos[posUp]);
+                }
+                snowView.setRGB(redpos[posUp], greenpos[posUp], bluepos[posUp]);
+            }
+            mPos = position;
             container.addView(itemView);
             return itemView;
         }
@@ -159,6 +186,5 @@ public class AuthFragment extends Fragment {
         public void destroyItem(@NonNull ViewGroup container, int position, @NonNull Object object) {
             container.removeView((LinearLayout) object);
         }
-
     }
 }

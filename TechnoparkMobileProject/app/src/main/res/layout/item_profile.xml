@@ -76,7 +76,7 @@
         android:layout_below="@+id/about_string"
         android:text="text_about"
         android:padding="8dp"
-        android:background="@drawable/shape_grey_round"
+        android:background="@drawable/shape_white_round"
         android:textSize="16sp"
         android:layout_marginStart="@dimen/margin_ava"
         android:layout_marginEnd="@dimen/margin_ava"
@@ -98,7 +98,8 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/groups"
         android:layout_marginStart="@dimen/margin_ava"
-        android:layout_marginEnd="@dimen/margin_ava"/>
+        android:layout_marginEnd="@dimen/margin_ava"
+        android:layout_marginTop="8dp"/>
 
     <TextView
         android:id="@+id/contacts_string"

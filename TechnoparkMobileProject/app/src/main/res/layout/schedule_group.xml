@@ -1,13 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    >
     <TextView
         android:id="@+id/group_schedule"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
         android:text="Group"
+        android:background="@drawable/ripple_white"
+        android:padding="8dp"
         android:textColor="@color/colorAccent"
         android:textSize="16sp" />
 </LinearLayout>

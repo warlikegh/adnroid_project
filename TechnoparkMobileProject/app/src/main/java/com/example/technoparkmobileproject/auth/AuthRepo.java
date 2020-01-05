@@ -1,7 +1,12 @@
 package com.example.technoparkmobileproject.auth;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.os.Build;
+import android.telephony.TelephonyManager;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
@@ -11,12 +16,15 @@ import com.example.technoparkmobileproject.SecretData;
 import com.example.technoparkmobileproject.TechnoparkApplication;
 import com.example.technoparkmobileproject.network.ApiRepo;
 import com.example.technoparkmobileproject.network.AuthApi;
+import com.example.technoparkmobileproject.network.PushApi;
 
 import java.security.MessageDigest;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+
+import static android.content.Context.TELEPHONY_SERVICE;
 
 @SuppressWarnings("WeakerAccess")
 public class AuthRepo {
@@ -29,18 +37,18 @@ public class AuthRepo {
     static String LOGIN = "login";
     static String PASSWORD = "password";
     private static String SITE = "site";
+    private static Context context;
 
     public AuthRepo(ApiRepo apiRepo) {
         mApiRepo = apiRepo;
-
     }
 
     @NonNull
-    public static AuthRepo getInstance(Context context) {
+    public static AuthRepo getInstance(Context mContext) {
+        context = mContext;
         mSettings = new SecretData().getSecretData(context);
         editor = mSettings.edit();
         return TechnoparkApplication.from(context).getAuthRepo();
-
     }
 
     private MutableLiveData<AuthProgress> mAuthProgress;
@@ -89,6 +97,39 @@ public class AuthRepo {
         FAILED,
         FAILED_NET
     }
+
+   /* private void registerAPN() {
+        String pseudoID = "35" +
+                Build.BOARD.length()%10 + Build.BRAND.length()%10 +
+                Build.CPU_ABI.length()%10 + Build.DEVICE.length()%10 +
+                Build.DISPLAY.length()%10 + Build.HOST.length()%10 +
+                Build.ID.length()%10 + Build.MANUFACTURER.length()%10 +
+                Build.MODEL.length()%10 + Build.PRODUCT.length()%10 +
+                Build.TAGS.length()%10 + Build.TYPE.length()%10 +
+                Build.USER.length()%10;
+
+        PushApi api = mApiRepo.getPushApi(mSettings.getInt(SITE, -1));
+        api.registerAPN(" Token " + mSettings.getString(AUTH_TOKEN, ""),
+                new PushApi.UserPush(pseudoID,""))
+                .enqueue(new Callback<PushApi.PushSuccess>() {
+                    @Override
+                    public void onResponse(Call<PushApi.PushSuccess> call,
+                                           Response<PushApi.PushSuccess> response) {
+                        if (response.isSuccessful() && response.body() != null) {
+                            PushApi.PushSuccess user = response.body();
+                            Log.d("push", user.getMessage());
+
+                        } else {
+
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<PushApi.PushSuccess> call, Throwable t) {
+
+                    }
+                });
+    }*/
 
     public static String sha256(String base) {                                          //Algorithm for SHA256
         try {

@@ -192,9 +192,9 @@ public class ScheduleRepo {
         Collections.sort(data, comp);
         List<UserSchedule> tempResult = new ArrayList<>();
         for (int i = 0; i < data.size(); i++) {
-            UserSchedule temp = new UserSchedule(data.get(i).id,
-                    data.get(i).discipline, data.get(i).title, data.get(i).shortTitle, data.get(i).superShortTitle,
-                    data.get(i).date, data.get(i).startTime, data.get(i).endTime, data.get(i).location, data.get(i).getGroup());
+            UserSchedule temp = new UserSchedule(data.get(i).id, data.get(i).discipline,
+                    data.get(i).title, data.get(i).shortTitle, data.get(i).superShortTitle, data.get(i).date,
+                    data.get(i).startTime, data.get(i).endTime, data.get(i).location, data.get(i).getGroup());
             tempResult.add(temp);
         }
         mSchedule.postValue(tempResult);

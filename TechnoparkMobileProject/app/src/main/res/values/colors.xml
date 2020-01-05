@@ -4,12 +4,18 @@
     <color name="colorPrimaryDark">#426382</color>
     <color name="colorAccent">#5994cc</color>
     <color name="colorWindow">#f7f7f7</color>
-    <color name="black">#030207</color>
+    <color name="black">#090909</color>
     <color name="colorGrey">#ffffff</color>
+    <color name="colorWhite">#ffffff</color>
     <color name="colorText">#8b8a90</color>
     <color name="colorRed">#c0474e</color>
     <color name="colorDarkGrey">#929294</color>
     <color name="colorOrange">#ffb500</color>
     <color name="colorWindowSplashScreen">#e7e7e7</color>
-
+    <color name="colorButtonAuth">#517da2</color>
+    <color name="colorGradientTopAuth">#43aab9</color>
+    <color name="colorGradientBottomAuth">#29a78e</color>
+    <color name="colorBlueBackgroungIS">#1e92fc</color>
+    <color name="colorRedMadeAuth">#fc2c38</color>
+    <color name="colorRedTrackAuth">#c3262f</color>
 </resources>

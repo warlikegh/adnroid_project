@@ -15,4 +15,13 @@
     <string name="yes">"Да"</string>
     <string name="no">"Нет"</string>
     <string name="Search">Поиск</string>
+    <string name="e_mail_login">E-mail/Логин</string>
+    <string name="password">Пароль</string>
+    <string name="error_400">Что-то не так! Вероятно, неправильно указаны данные</string>
+    <string name="http_failed">Нет соединения!</string>
+    <string name="load">Загружаю…</string>
+    <string name="disciplines">Дисциплины</string>
+    <string name="all_disciplines">Все дисциплины</string>
+    <string name="all_semester">Весь семестр</string>
+    <string name="two_week">Ближайшие две недели</string>
 </resources>

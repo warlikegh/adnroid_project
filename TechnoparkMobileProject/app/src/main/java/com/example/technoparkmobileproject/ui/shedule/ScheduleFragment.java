@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,16 +40,22 @@ import java.util.Objects;
 public class ScheduleFragment extends Fragment {
     private List<UserSchedule> mSchedule = new ArrayList<>();
     private List<UserSchedule> tempSchedule = new ArrayList<>();
-    static GroupAdapter groupAdapter;
+    static GroupAdapter oldGroupAdapter;
+    static GroupAdapter newGroupAdapter;
     final ScheduleAdapter scheduleAdapter = new ScheduleAdapter();
-    String ALL_DISCIPLINES = "Все дисциплины";
-    String disciplineText = ALL_DISCIPLINES;
+    String ALL_DISCIPLINES;
+    String disciplineText;
     final Boolean[] isDefault = {true};
     private ScheduleViewModel mScheduleViewModel;
     static Context context;
     RecyclerView recycler;
     SharedPreferences mSettings;
     SharedPreferences.Editor mEditor;
+    Integer clickPos;
+
+    public static ScheduleFragment newInstance() {
+        return new ScheduleFragment();
+    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -59,6 +66,8 @@ public class ScheduleFragment extends Fragment {
         mSettings = Objects.requireNonNull(getContext()).getSharedPreferences("createFirst", Context.MODE_PRIVATE);
         mEditor = mSettings.edit();
         mScheduleViewModel.pullFromDB();
+        ALL_DISCIPLINES = context.getResources().getString(R.string.all_disciplines);
+        disciplineText = ALL_DISCIPLINES;
     }
 
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -101,6 +110,7 @@ public class ScheduleFragment extends Fragment {
         final Spinner spinner = view.findViewById(R.id.spinner_discipline);
         final List<String> disciplines = new ArrayList<>();
         final ArrayAdapter<String>[] adapter = new ArrayAdapter[]{new ArrayAdapter<String>(context, android.R.layout.simple_spinner_item, disciplines)};
+
         adapter[0].setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter[0]);
         spinner.setSelection(adapter[0].getPosition(disciplineText));
@@ -276,9 +286,9 @@ public class ScheduleFragment extends Fragment {
             holder.mTitle.setText(schedule.getTitle());
             holder.mDiscipline.setText(schedule.getDiscipline());
 
-            groupAdapter = new GroupAdapter();
-            groupAdapter.setGroup(schedule.getGroups());
-            holder.mGroups.setAdapter(groupAdapter);
+            oldGroupAdapter = new GroupAdapter();
+            oldGroupAdapter.setGroup(schedule.getGroups(), schedule.getDiscipline() + " " + schedule.getTitle());
+            holder.mGroups.setAdapter(oldGroupAdapter);
             holder.mGroups.setLayoutManager(new LinearLayoutManager(getContext()));
         }
 
@@ -289,7 +299,7 @@ public class ScheduleFragment extends Fragment {
 
     }
 
-    static class ScheduleViewHolder extends RecyclerView.ViewHolder {
+    class ScheduleViewHolder extends RecyclerView.ViewHolder {
 
         protected TextView mDateSchedule;
         protected TextView mDiscipline;
@@ -304,6 +314,12 @@ public class ScheduleFragment extends Fragment {
             mDateSchedule = itemView.findViewById(R.id.date_schedule);
             mDiscipline = itemView.findViewById(R.id.discipline);
             mGroups = itemView.findViewById(R.id.groups);
+            mGroups.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    clickPos = ScheduleViewHolder.this.getAdapterPosition();
+                }
+            });
             mShortTitle = itemView.findViewById(R.id.short_title);
             mLocation = itemView.findViewById(R.id.location);
             mTime = itemView.findViewById(R.id.time);
@@ -315,9 +331,11 @@ public class ScheduleFragment extends Fragment {
     private class GroupAdapter extends RecyclerView.Adapter<GroupViewHolder> {
 
         private List<UserSchedule.Group> mGroup = new ArrayList<>();
+        String namedis;
 
-        public void setGroup(List<UserSchedule.Group> group) {
+        public void setGroup(List<UserSchedule.Group> group, String string) {
             mGroup = group;
+            namedis = string;
             notifyDataSetChanged();
         }
 
@@ -341,7 +359,7 @@ public class ScheduleFragment extends Fragment {
 
     }
 
-    static class GroupViewHolder extends RecyclerView.ViewHolder {
+    class GroupViewHolder extends RecyclerView.ViewHolder {
 
         protected TextView mGroup;
 
@@ -351,9 +369,19 @@ public class ScheduleFragment extends Fragment {
             mGroup.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    int pos = GroupViewHolder.this.getAdapterPosition();
-                    Integer id = groupAdapter.mGroup.get(pos).getId();
-                    ((Router) context).onGroupSelected(id);
+                    Integer pos = GroupViewHolder.this.getAdapterPosition();
+                    Integer posScheduleViewHolder = 0;
+                    for (int i = 0; i<tempSchedule.size();i++){
+                        for (int j = 0; j<tempSchedule.get(i).getGroups().size();j++){
+                            if (mGroup.getText().equals(tempSchedule.get(i).getGroups().get(j).getName())){
+                                posScheduleViewHolder = i;
+
+                            }
+                        }
+                    }
+                    String namedis = oldGroupAdapter.namedis;
+                    Log.e("schedule", namedis);
+                    ((Router) context).onGroupSelected(tempSchedule.get(posScheduleViewHolder).getGroups().get(pos).getId());
                 }
             });
         }

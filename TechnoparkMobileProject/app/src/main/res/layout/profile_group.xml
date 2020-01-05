@@ -1,17 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingBottom="8dp">
     <TextView
         android:id="@+id/group_profile"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
         android:text="Group"
-        android:paddingTop="8dp"
-        android:paddingBottom="8dp"
         android:textAlignment="center"
-        android:background="@drawable/shape_grey_round"
+        android:background="@drawable/ripple_white"
+        android:padding="8dp"
         android:textColor="@color/colorAccent"
         android:textSize="16sp"/>
 </RelativeLayout>

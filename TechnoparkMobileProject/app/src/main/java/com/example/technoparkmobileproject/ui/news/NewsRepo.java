@@ -122,7 +122,6 @@ class NewsRepo {
 
             @Override
             public void onFailure(Call<NewsApi.UserNewsPlain> call, Throwable t) {
-                Log.e("NewsRepo", "Failed to load", t);
 
             }
         });

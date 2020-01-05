@@ -41,7 +41,7 @@
                         android:layout_marginTop="24dp"
                         android:background="@drawable/shape_blue_round"
                         android:gravity="center_vertical"
-                        android:text="Дисциплины"
+                        android:text="@string/disciplines"
                         android:textAlignment="center"
                         android:textColor="@color/colorWindow"
                         android:textSize="16sp"
@@ -55,12 +55,11 @@
                         android:layout_marginLeft="8dp"
                         android:layout_marginRight="8dp"
                         android:layout_marginBottom="8dp"
-                        android:background="@drawable/shape_grey_round"
+                        android:background="@drawable/shape_white_round"
                         android:outlineAmbientShadowColor="@color/colorWindow"
                         app:layout_scrollFlags="scroll|snap" />
 
                     <Button
-
                         android:id="@+id/all_semester"
                         style="@style/RoundedCornerButton"
                         android:layout_width="128dp"
@@ -69,7 +68,7 @@
                         android:layout_alignParentLeft="true"
                         android:layout_marginLeft="8dp"
                         android:paddingTop="8dp"
-                        android:text="Весь семестр"
+                        android:text="@string/all_semester"
                         android:textSize="12sp" />
 
                     <Button
@@ -82,7 +81,7 @@
                         android:layout_marginRight="8dp"
                         android:layout_toRightOf="@id/all_semester"
                         android:paddingTop="8dp"
-                        android:text="Ближайшие две недели"
+                        android:text="@string/two_week"
                         android:textSize="12sp" />
                 </RelativeLayout>
 

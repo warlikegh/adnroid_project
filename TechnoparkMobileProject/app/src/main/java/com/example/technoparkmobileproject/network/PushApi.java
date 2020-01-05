@@ -31,6 +31,15 @@ public interface PushApi {
 
     class UserPush {
 
+        public UserPush() {
+
+        }
+
+        public UserPush(String deviceId, String deviceToken) {
+            this.deviceId = deviceId;
+            this.deviceToken = deviceToken;
+        }
+
         @SerializedName("device_id")
         @Expose
         private String deviceId;

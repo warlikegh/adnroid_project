@@ -2,6 +2,7 @@ package com.example.technoparkmobileproject.group;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +17,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
@@ -39,6 +41,17 @@ public class GroupFragment extends Fragment {
     Integer id;
     SearchView searchView;
     String searchSave = "";
+    TextView groupName;
+
+    public static GroupFragment newInstance(Integer id) {
+        GroupFragment fragment = new GroupFragment();
+        Bundle bundle = new Bundle();
+        bundle.putInt("id", id);
+        fragment.setArguments(bundle);
+        return fragment;
+    }
+
+
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -53,7 +66,7 @@ public class GroupFragment extends Fragment {
     public void onStart() {
         super.onStart();
         id = getArguments().getInt("id");
-        mGroupViewModel.refresh(id);
+        mGroupViewModel.pullFromDB(id);
     }
 
     @Override
@@ -67,7 +80,7 @@ public class GroupFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_group, container, false);
         adapter = new GroupAdapter();
-        searchView = view.findViewById(R.id.searchView);
+        SearchView searchView = view.findViewById(R.id.searchView);
         final TextView groupName = view.findViewById(R.id.group_name);
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
@@ -86,7 +99,6 @@ public class GroupFragment extends Fragment {
         });
         if (savedInstanceState != null) {
             searchSave = savedInstanceState.getString("search");
-
         }
         searchView.setQuery(searchSave, true);
 
@@ -100,7 +112,7 @@ public class GroupFragment extends Fragment {
             }
         });
 
-        recycler = view.findViewById(R.id.students);
+        RecyclerView recycler = view.findViewById(R.id.students);
 
         recycler.setAdapter(adapter);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
@@ -128,6 +140,9 @@ public class GroupFragment extends Fragment {
                     adapter.filter(searchSave);
                     mGroup = group;
                     groupName.setText(group.getName());
+                } else {
+                    adapter.setGroup(null);
+                    groupName.setText(R.string.http_failed);
                 }
             }
         };
@@ -137,6 +152,32 @@ public class GroupFragment extends Fragment {
                 .observe(getViewLifecycleOwner(), observer);
 
         return view;
+    }
+
+    @Override
+    public void onDestroyView() {
+        del();
+        super.onDestroyView();
+        del();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+    }
+
+    private void del() {
+        adapter.setGroup(null);
+        recycler = null;
+        searchView = null;
+        groupName = null;
+
+        Log.d("groupfragment", "adapter.setProfile(null);");
     }
 
     private class GroupAdapter extends RecyclerView.Adapter<GroupViewHolder> {
@@ -158,17 +199,19 @@ public class GroupFragment extends Fragment {
 
         public void filter(String text) {
             items.clear();
-            if (text.isEmpty()) {
-                items.addAll(mStudents);
-            } else {
-                text = text.toLowerCase();
-                for (UserGroup.Student item : mStudents) {
-                    if (item.getFullname().toLowerCase().contains(text)) {
-                        items.add(item);
+            if (mStudents != null) {
+                if (text.isEmpty()) {
+                    items.addAll(mStudents);
+                } else {
+                    text = text.toLowerCase();
+                    for (UserGroup.Student item : mStudents) {
+                        if (item.getFullname().toLowerCase().contains(text)) {
+                            items.add(item);
+                        }
                     }
                 }
+                notifyDataSetChanged();
             }
-            notifyDataSetChanged();
         }
 
         @Override
@@ -204,8 +247,7 @@ public class GroupFragment extends Fragment {
                     int pos = GroupViewHolder.this.getAdapterPosition();
                     Integer id = adapter.items.get(pos).getId();
                     String username = adapter.items.get(pos).getUsername();
-                    getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
-                    //getActivity().getWindow().injectInputEvent();
+                    getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING);
                     if (view != null) {
                         InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
                         imm.hideSoftInputFromWindow(view.getWindowToken(), 0);

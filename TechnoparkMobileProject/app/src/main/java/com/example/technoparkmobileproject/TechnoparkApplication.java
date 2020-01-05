@@ -25,7 +25,7 @@ public class TechnoparkApplication extends Application {
 
         mSecretSettings = new SecretData().getSecretData(getApplicationContext());
         mSecretEditor = mSecretSettings.edit();
-        mSecretEditor.putString(SALT, "").apply();
+        mSecretEditor.putString(SALT, "Here must be salt").apply();
 
         mApiRepo = new ApiRepo(getApplicationContext());
         mAuthRepo = new AuthRepo(mApiRepo);
