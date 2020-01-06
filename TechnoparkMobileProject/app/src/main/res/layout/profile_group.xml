@@ -13,6 +13,6 @@
         android:textAlignment="center"
         android:background="@drawable/ripple_white"
         android:padding="8dp"
-        android:textColor="@color/colorAccent"
+        android:textColor="@color/colorTextBlue"
         android:textSize="16sp"/>
 </RelativeLayout>

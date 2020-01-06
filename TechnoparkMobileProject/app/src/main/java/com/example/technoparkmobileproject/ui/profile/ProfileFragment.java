@@ -183,6 +183,7 @@ public class ProfileFragment extends Fragment {
             mProfile = profile;
             notifyDataSetChanged();
         }
+
         public void cleanProfile() {
             mProfile = null;
             notifyDataSetChanged();
@@ -209,11 +210,17 @@ public class ProfileFragment extends Fragment {
                 holder.mGroups.setLayoutManager(new LinearLayoutManager(getContext()));
                 holder.mGroups.setVisibility(View.VISIBLE);
 
-                holder.mAbout.setText(mProfile.getAbout());
+                //holder.mAbout.setText(mProfile.getAbout());
                 holder.mAbout.setTextSize(16);
                 holder.mAbout.setTextAlignment(View.TEXT_ALIGNMENT_VIEW_START);
                 holder.mAbout.setVisibility(View.VISIBLE);
-                holder.mAbout.setTextIsSelectable(true);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    holder.mAbout.setText(Html.fromHtml(mProfile.getAbout(), Html.FROM_HTML_MODE_COMPACT));
+                } else {
+                    holder.mAbout.setText(Html.fromHtml(mProfile.getAbout()));
+                }
+                holder.mAbout.setMovementMethod(LinkMovementMethod.getInstance());
+
 
                 holder.mBirthday.setText(mProfile.getBirthdate());
                 holder.mBirthday.setVisibility(View.VISIBLE);
@@ -424,7 +431,6 @@ public class ProfileFragment extends Fragment {
     }
 
 
-
     private class AccountAdapter extends RecyclerView.Adapter<AccountViewHolder> {
 
         private List<UserProfile.Account> mAccount = new ArrayList<>();
@@ -479,6 +485,9 @@ public class ProfileFragment extends Fragment {
             }
             if (group.getName().equals("linkedin")) {
                 holder.mImage.setImageBitmap(BitmapFactory.decodeResource(context.getResources(), R.mipmap.linkedin_logo));
+            }
+            if (group.getName().equals("jabber")) {
+                holder.mImage.setImageBitmap(BitmapFactory.decodeResource(context.getResources(), R.mipmap.jabber_logo));
             }
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {

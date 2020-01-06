@@ -5,7 +5,9 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="8dp"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:background="@drawable/shape_white_round"
+    android:padding="8dp">
 
 
     <TextView
@@ -35,17 +37,16 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="8dp"
         android:background="@drawable/shape_white_round"
-        android:padding="8dp"
         tools:context=".ArticleFragment" />
 
     <TextView
         android:id="@+id/next"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/content"
         android:layout_centerHorizontal="true"
-        android:text="Показать полностью..."
-        android:background="@drawable/ripple"
+        android:text="@string/expand_more"
+        android:background="@drawable/ripple_white"
         android:padding="8dp"
         android:textColor="@color/colorAccent"
         android:textSize="16sp"
@@ -75,9 +76,9 @@
         android:id="@+id/rating_news_author"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/next"
+        android:layout_below="@id/photo"
         android:layout_alignParentEnd="true"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="8dp"
         android:text="Rating"
         android:textSize="16sp" />
 
@@ -85,8 +86,8 @@
         android:id="@+id/rating_image"
         android:layout_width="24dp"
         android:layout_height="24dp"
-        android:layout_below="@id/next"
-        android:layout_marginTop="16dp"
+        android:layout_below="@id/photo"
+        android:layout_marginTop="8dp"
         android:layout_toLeftOf="@+id/rating_news_author"
         android:background="@drawable/ic_unfold_more_black_24dp" />
 
@@ -105,7 +106,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/photo"
-        android:layout_alignParentEnd="true"
+        android:layout_toLeftOf="@+id/rating_image"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
         android:text="CommentsCount"

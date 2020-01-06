@@ -54,7 +54,7 @@ public class ScheduleRepo {
         }
     };
 
-    ScheduleRepo(Context context) {
+    public ScheduleRepo(Context context) {
         mContext = context;
 
         SharedPreferences mSettings;
