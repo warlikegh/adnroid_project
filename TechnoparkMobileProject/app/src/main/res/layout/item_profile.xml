@@ -17,7 +17,7 @@
         android:layout_marginTop="@dimen/margin_ava"
         android:layout_toEndOf="@+id/photo"
         android:text="fullName"
-        android:textColor="@color/colorAccent"
+        android:textColor="@color/colorTextBlue"
         android:layout_marginStart="@dimen/margin_ava"
         android:layout_marginEnd="@dimen/margin_ava"
         android:textSize="20sp"
@@ -65,7 +65,7 @@
         android:layout_marginTop="@dimen/margin_ava"
         android:layout_below="@+id/photo"
         android:text="@string/about_string"
-        android:textColor="@color/colorAccent"
+        android:textColor="@color/colorTextBlue"
         android:textSize="20sp"
         android:layout_marginStart="@dimen/margin_ava"/>
     <TextView
@@ -80,8 +80,7 @@
         android:textSize="16sp"
         android:layout_marginStart="@dimen/margin_ava"
         android:layout_marginEnd="@dimen/margin_ava"
-        android:visibility="invisible"
-        android:textIsSelectable="true"/>
+        android:visibility="invisible" />
     <TextView
         android:id="@+id/groups"
         android:layout_width="wrap_content"
@@ -89,7 +88,7 @@
         android:layout_marginTop="@dimen/margin_ava"
         android:layout_below="@+id/about"
         android:text="@string/Groups"
-        android:textColor="@color/colorAccent"
+        android:textColor="@color/colorTextBlue"
         android:textSize="20sp"
         android:layout_marginStart="@dimen/margin_ava"/>
     <androidx.recyclerview.widget.RecyclerView
@@ -108,7 +107,7 @@
         android:layout_marginTop="@dimen/margin_ava"
         android:layout_below="@+id/subgroups"
         android:text="@string/contacts_string"
-        android:textColor="@color/colorAccent"
+        android:textColor="@color/colorTextBlue"
         android:textSize="20sp"
         android:layout_marginStart="@dimen/margin_ava"/>
     <ImageView
@@ -159,7 +158,7 @@
         android:layout_marginTop="@dimen/margin_ava"
         android:layout_below="@+id/mail"
         android:text="@string/accounts_string"
-        android:textColor="@color/colorAccent"
+        android:textColor="@color/colorTextBlue"
         android:textSize="20sp"
         android:layout_marginStart="@dimen/margin_ava"/>
     <androidx.recyclerview.widget.RecyclerView

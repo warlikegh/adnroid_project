@@ -82,7 +82,7 @@
         android:layout_below="@id/discipline"
         android:layout_marginTop="8dp"
         android:text="Title"
-        android:textColor="@color/colorAccent"
+        android:textColor="@color/colorTextBlue"
         android:textSize="20sp"
         android:textIsSelectable="true"/>
 

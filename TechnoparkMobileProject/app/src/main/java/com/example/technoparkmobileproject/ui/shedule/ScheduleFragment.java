@@ -40,8 +40,7 @@ import java.util.Objects;
 public class ScheduleFragment extends Fragment {
     private List<UserSchedule> mSchedule = new ArrayList<>();
     private List<UserSchedule> tempSchedule = new ArrayList<>();
-    static GroupAdapter oldGroupAdapter;
-    static GroupAdapter newGroupAdapter;
+    static GroupAdapter groupAdapter;
     final ScheduleAdapter scheduleAdapter = new ScheduleAdapter();
     String ALL_DISCIPLINES;
     String disciplineText;
@@ -51,7 +50,6 @@ public class ScheduleFragment extends Fragment {
     RecyclerView recycler;
     SharedPreferences mSettings;
     SharedPreferences.Editor mEditor;
-    Integer clickPos;
 
     public static ScheduleFragment newInstance() {
         return new ScheduleFragment();
@@ -286,9 +284,9 @@ public class ScheduleFragment extends Fragment {
             holder.mTitle.setText(schedule.getTitle());
             holder.mDiscipline.setText(schedule.getDiscipline());
 
-            oldGroupAdapter = new GroupAdapter();
-            oldGroupAdapter.setGroup(schedule.getGroups(), schedule.getDiscipline() + " " + schedule.getTitle());
-            holder.mGroups.setAdapter(oldGroupAdapter);
+            groupAdapter = new GroupAdapter();
+            groupAdapter.setGroup(schedule.getGroups(), schedule.getDiscipline() + " " + schedule.getTitle());
+            holder.mGroups.setAdapter(groupAdapter);
             holder.mGroups.setLayoutManager(new LinearLayoutManager(getContext()));
         }
 
@@ -314,12 +312,6 @@ public class ScheduleFragment extends Fragment {
             mDateSchedule = itemView.findViewById(R.id.date_schedule);
             mDiscipline = itemView.findViewById(R.id.discipline);
             mGroups = itemView.findViewById(R.id.groups);
-            mGroups.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    clickPos = ScheduleViewHolder.this.getAdapterPosition();
-                }
-            });
             mShortTitle = itemView.findViewById(R.id.short_title);
             mLocation = itemView.findViewById(R.id.location);
             mTime = itemView.findViewById(R.id.time);
@@ -369,17 +361,21 @@ public class ScheduleFragment extends Fragment {
             mGroup.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Integer pos = GroupViewHolder.this.getAdapterPosition();
-                    Integer posScheduleViewHolder = 0;
-                    for (int i = 0; i<tempSchedule.size();i++){
-                        for (int j = 0; j<tempSchedule.get(i).getGroups().size();j++){
-                            if (mGroup.getText().equals(tempSchedule.get(i).getGroups().get(j).getName())){
+                    int pos = GroupViewHolder.this.getAdapterPosition();
+                    int posScheduleViewHolder = 0;
+                    boolean isFind = false;
+                    for (int i = 0; i < tempSchedule.size(); i++) {
+                        for (int j = 0; j < tempSchedule.get(i).getGroups().size(); j++) {
+                            if (mGroup.getText().equals(tempSchedule.get(i).getGroups().get(j).getName())) {
                                 posScheduleViewHolder = i;
-
+                                isFind = true;
                             }
                         }
+                        if (isFind) {
+                            break;
+                        }
                     }
-                    String namedis = oldGroupAdapter.namedis;
+                    String namedis = groupAdapter.namedis;
                     Log.e("schedule", namedis);
                     ((Router) context).onGroupSelected(tempSchedule.get(posScheduleViewHolder).getGroups().get(pos).getId());
                 }

@@ -81,7 +81,6 @@ public class Profile {
         }
         this.contactsName = new SecretData().parseListToString(tempContactsName, contactsSize);
         this.contactsValue = new SecretData().parseListToString(tempContactsValue, contactsSize);
-
         this.accountsSize = accounts.size();
         List<String> tempAccountsName = new ArrayList<>();
         List<String> tempAccountsValue = new ArrayList<>();
@@ -112,14 +111,19 @@ public class Profile {
     }
 
     public List<UserProfile.Contact> getContacts() {
+        List<UserProfile.Contact> contacts = new ArrayList<>();
         List<String> listName = new SecretData().parseStringToList(contactsName);
         List<String> listValue = new SecretData().parseStringToList(contactsValue);
         UserProfile temp = new UserProfile();
-        List<UserProfile.Contact> contacts = new ArrayList<>();
+
         for (int i = 0; i < contactsSize; i++) {
-            contacts.add(temp.new Contact(listName.get(i), listValue.get(i)));
+            if (listValue.size() > 1)
+                contacts.add(temp.new Contact(listName.get(i), listValue.get(i)));
+            else
+                contacts.add(temp.new Contact(listName.get(i), "-"));
         }
         return contacts;
+
     }
 
     public List<UserProfile.Account> getAccounts() {

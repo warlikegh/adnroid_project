@@ -30,7 +30,6 @@ import static com.example.technoparkmobileproject.R.color.colorBlueBackgroungIS;
 import static com.example.technoparkmobileproject.R.color.colorOrange;
 import static com.example.technoparkmobileproject.R.color.colorRed;
 import static com.example.technoparkmobileproject.R.color.colorRedMadeAuth;
-import static com.example.technoparkmobileproject.R.color.colorRedTrackAuth;
 import static com.example.technoparkmobileproject.R.color.colorWindow;
 
 

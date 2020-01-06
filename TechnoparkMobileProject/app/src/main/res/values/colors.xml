@@ -17,5 +17,6 @@
     <color name="colorGradientBottomAuth">#29a78e</color>
     <color name="colorBlueBackgroungIS">#1e92fc</color>
     <color name="colorRedMadeAuth">#fc2c38</color>
-    <color name="colorRedTrackAuth">#c3262f</color>
+    <color name="colorTextBlue">#4193c0</color>
+    <color name="colorGreySeparator">#dedede</color>
 </resources>
