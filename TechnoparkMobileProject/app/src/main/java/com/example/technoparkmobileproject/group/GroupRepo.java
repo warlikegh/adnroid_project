@@ -22,6 +22,7 @@ import retrofit2.Response;
 
 class GroupRepo {
     private final static MutableLiveData<UserGroup> mGroup = new MutableLiveData<>();
+    private final static MutableLiveData<GroupProgress> mGroupProgress = new MutableLiveData<>();
     private SharedPreferences mSecretSettings;
     private SharedPreferences mSettings;
     private SharedPreferences.Editor mEditor;
@@ -58,7 +59,12 @@ class GroupRepo {
         return mGroup;
     }
 
+    public LiveData<GroupProgress> getGroupProgress() {
+        return mGroupProgress;
+    }
+
     public void refresh(final Integer id) {
+        mGroupProgress.postValue(GroupProgress.IN_PROGRESS);
         String url = "groups/" + id.toString();
         mSecretSettings = new SecretData().getSecretData(mContext);
         mGroupApi.getStudentsGroup(" Token " + mSecretSettings.getString(AUTH_TOKEN, ""), url).enqueue(
@@ -70,13 +76,15 @@ class GroupRepo {
                     GroupApi.StudentGroupPlain result = response.body();
                     cleanGroup(result.getId());
                     mGroup.postValue(transform(result));
+                    mGroupProgress.postValue(GroupProgress.SUCCESS);
                     saveData(transform(result));
                 } else {
                     if (key == 0) {
                         pullFromDB(id);
                         key++;
                     } else {
-                        mGroup.postValue(null);
+                        //mGroup.postValue(null);
+                        mGroupProgress.postValue(GroupProgress.FAILED);
                     }
                 }
             }
@@ -87,7 +95,8 @@ class GroupRepo {
                     pullFromDB(id);
                     key++;
                 } else {
-                    mGroup.postValue(null);
+                    //mGroup.postValue(null);
+                    mGroupProgress.postValue(GroupProgress.FAILED_NET);
                 }
             }
         });
@@ -135,6 +144,7 @@ class GroupRepo {
             Log.d("groupRepoPost", data.get(i).fullname);
         }
         mGroup.postValue(new UserGroup(data.get(0).idGroup, data.get(0).nameGroup, tempResult));
+        mGroupProgress.postValue(GroupProgress.SUCCESS);
     }
 
     private void saveData(UserGroup result) {
@@ -152,5 +162,11 @@ class GroupRepo {
         }
 
         mEditor.putInt("groupID", id).apply();
+    }
+    public enum GroupProgress {
+        IN_PROGRESS,
+        SUCCESS,
+        FAILED,
+        FAILED_NET
     }
 }

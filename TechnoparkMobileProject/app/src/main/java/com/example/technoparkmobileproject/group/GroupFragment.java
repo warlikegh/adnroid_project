@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.SearchView;
 import android.widget.TextView;
 
@@ -31,10 +32,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import static android.view.View.GONE;
+
 public class GroupFragment extends Fragment {
 
     private UserGroup mGroup;
     private static GroupViewModel mGroupViewModel;
+    private GroupRepo.GroupProgress mGroupProgress;
     static Context context;
     RecyclerView recycler;
     static GroupAdapter adapter;
@@ -50,8 +54,6 @@ public class GroupFragment extends Fragment {
         fragment.setArguments(bundle);
         return fragment;
     }
-
-
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -81,6 +83,7 @@ public class GroupFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_group, container, false);
         adapter = new GroupAdapter();
         SearchView searchView = view.findViewById(R.id.searchView);
+        final ProgressBar mProgressBar = view.findViewById(R.id.progress_bar);
         final TextView groupName = view.findViewById(R.id.group_name);
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
@@ -136,48 +139,42 @@ public class GroupFragment extends Fragment {
             @Override
             public void onChanged(UserGroup group) {
                 if (group != null) {
+                    mProgressBar.setVisibility(GONE);
                     adapter.setGroup(group.getStudents());
                     adapter.filter(searchSave);
                     mGroup = group;
                     groupName.setText(group.getName());
-                } else {
-                    adapter.setGroup(null);
-                    groupName.setText(R.string.http_failed);
+                }
+            }
+        };
+
+        Observer<GroupRepo.GroupProgress> observerProgress = new Observer<GroupRepo.GroupProgress>() {
+            @Override
+            public void onChanged(GroupRepo.GroupProgress groupProgress) {
+                if (groupProgress != null) {
+                    mGroupProgress = groupProgress;
+                    if (mGroupProgress == GroupRepo.GroupProgress.FAILED_NET) {
+                        adapter.setGroup(null);
+                        mProgressBar.setVisibility(GONE);
+                        groupName.setText(R.string.http_failed);
+                    } else if (mGroupProgress == GroupRepo.GroupProgress.IN_PROGRESS) {
+                        adapter.setGroup(null);
+                        groupName.setText(R.string.load);
+                        mProgressBar.setVisibility(View.VISIBLE);
+                    }
                 }
             }
         };
 
         mGroupViewModel
-                .getNews()
+                .getGroup()
                 .observe(getViewLifecycleOwner(), observer);
 
+        mGroupViewModel
+                .getGroupProgress()
+                .observe(getViewLifecycleOwner(), observerProgress);
+
         return view;
-    }
-
-    @Override
-    public void onDestroyView() {
-        del();
-        super.onDestroyView();
-        del();
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-    }
-
-    private void del() {
-        adapter.setGroup(null);
-        recycler = null;
-        searchView = null;
-        groupName = null;
-
-        Log.d("groupfragment", "adapter.setProfile(null);");
     }
 
     private class GroupAdapter extends RecyclerView.Adapter<GroupViewHolder> {

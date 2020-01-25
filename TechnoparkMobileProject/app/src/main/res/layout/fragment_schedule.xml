@@ -1,98 +1,79 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
 
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/pullToRefresh"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_alignParentTop="true">
+        android:layout_height="wrap_content">
 
-        <androidx.coordinatorlayout.widget.CoordinatorLayout
-            xmlns:android="http://schemas.android.com/apk/res/android"
+        <androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
             xmlns:app="http://schemas.android.com/apk/res-auto"
-            xmlns:tools="http://schemas.android.com/tools"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@color/colorWindow"
-            android:fitsSystemWindows="true">
+            android:layout_height="match_parent">
 
-
-            <com.google.android.material.appbar.AppBarLayout
-                android:id="@+id/main.appbar"
+            <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:fitsSystemWindows="true"
-                android:theme="@style/Theme.Design.Light.NoActionBar">
+                android:layout_marginBottom="8dp">
 
-                <RelativeLayout
+                <TextView
+                    android:id="@+id/text_discipline"
+                    android:layout_width="match_parent"
+                    android:layout_height="32dp"
+                    android:layout_margin="8dp"
+                    android:layout_marginTop="24dp"
+                    android:background="@drawable/shape_blue_round"
+                    android:gravity="center_vertical"
+                    android:text="@string/disciplines"
+                    android:textAlignment="center"
+                    android:textColor="@color/colorWindow"
+                    android:textSize="16sp" />
+
+                <Spinner
+                    android:id="@+id/spinner_discipline"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:layout_below="@+id/text_discipline"
+                    android:layout_marginLeft="8dp"
+                    android:layout_marginRight="8dp"
+                    android:layout_marginBottom="8dp"
+                    android:background="@drawable/shape_white_round"
+                    android:outlineAmbientShadowColor="@color/colorWindow" />
+
+                <Button
+                    android:id="@+id/all_semester"
+                    style="@style/RoundedCornerButton"
+                    android:layout_width="128dp"
+                    android:layout_height="40dp"
+                    android:layout_below="@+id/spinner_discipline"
+                    android:layout_alignParentLeft="true"
+                    android:layout_marginLeft="8dp"
+                    android:paddingTop="8dp"
+                    android:text="@string/all_semester"
+                    android:textSize="12sp" />
+
+                <Button
+                    android:id="@+id/two_week"
+                    style="@style/RoundedCornerButton"
+                    android:layout_width="200dp"
+                    android:layout_height="40dp"
+                    android:layout_below="@+id/spinner_discipline"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginRight="8dp"
+                    android:layout_toRightOf="@id/all_semester"
+                    android:paddingTop="8dp"
+                    android:text="@string/two_week"
+                    android:textSize="12sp" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/schedule"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:layout_scrollFlags="scroll|noScroll"
-                    android:layout_marginBottom="8dp">
-
-                    <TextView
-                        android:id="@+id/text_discipline"
-                        android:layout_width="match_parent"
-                        android:layout_height="32dp"
-                        android:layout_margin="8dp"
-                        android:layout_marginTop="24dp"
-                        android:background="@drawable/shape_blue_round"
-                        android:gravity="center_vertical"
-                        android:text="@string/disciplines"
-                        android:textAlignment="center"
-                        android:textColor="@color/colorWindow"
-                        android:textSize="16sp"
-                        app:layout_scrollFlags="scroll|snap" />
-
-                    <Spinner
-                        android:id="@+id/spinner_discipline"
-                        android:layout_width="match_parent"
-                        android:layout_height="40dp"
-                        android:layout_below="@+id/text_discipline"
-                        android:layout_marginLeft="8dp"
-                        android:layout_marginRight="8dp"
-                        android:layout_marginBottom="8dp"
-                        android:background="@drawable/shape_white_round"
-                        android:outlineAmbientShadowColor="@color/colorWindow"
-                        app:layout_scrollFlags="scroll|snap" />
-
-                    <Button
-                        android:id="@+id/all_semester"
-                        style="@style/RoundedCornerButton"
-                        android:layout_width="128dp"
-                        android:layout_height="40dp"
-                        android:layout_below="@+id/spinner_discipline"
-                        android:layout_alignParentLeft="true"
-                        android:layout_marginLeft="8dp"
-                        android:paddingTop="8dp"
-                        android:text="@string/all_semester"
-                        android:textSize="12sp" />
-
-                    <Button
-                        android:id="@+id/two_week"
-                        style="@style/RoundedCornerButton"
-                        android:layout_width="200dp"
-                        android:layout_height="40dp"
-                        android:layout_below="@+id/spinner_discipline"
-                        android:layout_alignParentRight="true"
-                        android:layout_marginRight="8dp"
-                        android:layout_toRightOf="@id/all_semester"
-                        android:paddingTop="8dp"
-                        android:text="@string/two_week"
-                        android:textSize="12sp" />
-                </RelativeLayout>
-
-            </com.google.android.material.appbar.AppBarLayout>
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/schedule"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/all_semester"
-                app:layout_behavior="@string/appbar_scrolling_view_behavior" />
-        </androidx.coordinatorlayout.widget.CoordinatorLayout>
+                    android:layout_below="@+id/all_semester" />
+            </RelativeLayout>
+        </androidx.core.widget.NestedScrollView>
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
-</RelativeLayout>
+</LinearLayout>

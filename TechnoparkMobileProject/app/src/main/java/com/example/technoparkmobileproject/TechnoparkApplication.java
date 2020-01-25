@@ -6,7 +6,6 @@ import android.content.SharedPreferences;
 
 import com.example.technoparkmobileproject.auth.AuthRepo;
 import com.example.technoparkmobileproject.network.ApiRepo;
-import com.jakewharton.threetenabp.AndroidThreeTen;
 
 public class TechnoparkApplication extends Application {
 
@@ -20,8 +19,6 @@ public class TechnoparkApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-
-        AndroidThreeTen.init(this);
 
         mSecretSettings = new SecretData().getSecretData(getApplicationContext());
         mSecretEditor = mSecretSettings.edit();

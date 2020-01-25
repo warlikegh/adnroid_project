@@ -10,13 +10,18 @@ public class GroupViewModel extends AndroidViewModel {
 
     private GroupRepo mRepo = new GroupRepo(getApplication());
     private LiveData<UserGroup> mGroup = mRepo.getGroup();
+    private LiveData<GroupRepo.GroupProgress> mGroupProgress = mRepo.getGroupProgress();
 
     public GroupViewModel(@NonNull Application application) {
         super(application);
     }
 
-    public LiveData<UserGroup> getNews() {
+    public LiveData<UserGroup> getGroup() {
         return mGroup;
+    }
+
+    public LiveData<GroupRepo.GroupProgress> getGroupProgress() {
+        return mGroupProgress;
     }
 
     public void refresh(Integer id) {

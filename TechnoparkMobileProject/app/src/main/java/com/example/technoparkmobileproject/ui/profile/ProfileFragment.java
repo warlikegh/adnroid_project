@@ -1,12 +1,9 @@
 package com.example.technoparkmobileproject.ui.profile;
 
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.BitmapFactory;
 import android.os.Build;
@@ -21,6 +18,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
@@ -37,9 +35,6 @@ import com.example.technoparkmobileproject.R;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.technoparkmobileproject.Router;
-import com.example.technoparkmobileproject.SecretData;
-import com.example.technoparkmobileproject.auth.AuthActivity;
-import com.example.technoparkmobileproject.ui.shedule.ScheduleViewModel;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.util.ArrayList;
@@ -52,18 +47,37 @@ import static android.view.View.GONE;
 public class ProfileFragment extends Fragment {
     static GroupAdapter groupAdapter;
     private UserProfile mProfile;
-    private static ProfileViewModel mProfileViewModel;
-    private static ScheduleViewModel mScheduleViewModel;
+    private ProfileRepo.ProfileProgress mProfileProgress;
+    private ProfileViewModel mProfileViewModel;
     static SharedPreferences mSettings;
     static Context context;
     static SharedPreferences.Editor mEditor;
 
     RecyclerView recycler;
-    final MyAdapter adapter = new MyAdapter();
     int id;
     String username;
     Boolean isOther;
     static FragmentManager fragmentManager;
+
+    protected ImageView mAva;
+    protected TextView mFullName;
+    protected TextView mMainGroup;
+    protected RecyclerView mGroups;
+    protected TextView mAbout;
+    protected TextView mBirthday;
+    protected TextView mPhone;
+    protected TextView mMail;
+    protected RecyclerView mAccounts;
+    protected Button mButton;
+
+    protected ImageView mBirthdayImage;
+    protected ImageView mPhoneImage;
+    protected ImageView mMailImage;
+    protected TextView mAboutString;
+    protected TextView mGroupsString;
+    protected TextView mContactsString;
+    protected TextView mAccountsString;
+    protected ProgressBar mProgressBar;
 
     public static ProfileFragment newInstance(int id, String username) {
         ProfileFragment fragment = new ProfileFragment();
@@ -74,18 +88,6 @@ public class ProfileFragment extends Fragment {
         return fragment;
     }
 
-    private void del() {
-        adapter.cleanProfile();
-        Log.d(getLogTag(), "adapter.setProfile(null);");
-    }
-
-    @Override
-    public void onDestroyView() {
-        del();
-        super.onDestroyView();
-        Log.d(getLogTag(), "onDestroyView");
-    }
-
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -94,8 +96,6 @@ public class ProfileFragment extends Fragment {
         context = getContext();
         mProfileViewModel = new ViewModelProvider(Objects.requireNonNull(getActivity()))
                 .get(ProfileViewModel.class);
-        mScheduleViewModel = new ViewModelProvider(Objects.requireNonNull(getActivity()))
-                .get(ScheduleViewModel.class);
         fragmentManager = getChildFragmentManager();
 
     }
@@ -128,7 +128,51 @@ public class ProfileFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         Log.d(getLogTag(), "onCreateView");
-        View view = inflater.inflate(R.layout.fragment_profile, container, false);
+        final View view = inflater.inflate(R.layout.fragment_profile, container, false);
+
+        mProgressBar = view.findViewById(R.id.progress_bar);
+        mAva = view.findViewById(R.id.photo);
+        mFullName = view.findViewById(R.id.full_name);
+        mMainGroup = view.findViewById(R.id.main_group);
+        mGroups = view.findViewById(R.id.subgroups);
+        mAbout = view.findViewById(R.id.about);
+        mBirthday = view.findViewById(R.id.birthday);
+        mPhone = view.findViewById(R.id.phone);
+        mMail = view.findViewById(R.id.mail);
+        mAccounts = view.findViewById(R.id.accounts_recycler);
+
+        mButton = view.findViewById(R.id.logOut);
+        mButton.setOnClickListener((new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                AlertDialog dialog = new DialogLogOut().getDialog(context);
+                dialog.show();
+            }
+        }));
+
+        mPhone.setOnLongClickListener((new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                clipAndVibrate(view, mPhone);
+                return false;
+            }
+        }));
+
+        mMail.setOnLongClickListener((new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                clipAndVibrate(view, mMail);
+                return false;
+            }
+        }));
+
+        mBirthdayImage = view.findViewById(R.id.birthday_image);
+        mPhoneImage = view.findViewById(R.id.phone_image);
+        mMailImage = view.findViewById(R.id.mail_image);
+        mAboutString = view.findViewById(R.id.about_string);
+        mGroupsString = view.findViewById(R.id.groups);
+        mContactsString = view.findViewById(R.id.contacts_string);
+        mAccountsString = view.findViewById(R.id.accounts_string);
 
         final SwipeRefreshLayout pullToRefresh = view.findViewById(R.id.pullToRefresh);
         pullToRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -147,17 +191,90 @@ public class ProfileFragment extends Fragment {
                 pullToRefresh.setRefreshing(false);
             }
         });
-        recycler = view.findViewById(R.id.profile);
-        recycler.setAdapter(adapter);
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
-        recycler.setLayoutManager(linearLayoutManager);
-
 
         Observer<UserProfile> observer = new Observer<UserProfile>() {
             @Override
             public void onChanged(UserProfile profile) {
-                adapter.setProfile(profile);
                 mProfile = profile;
+                if (mProfile != null) {
+                    mProgressBar.setVisibility(GONE);
+                    Glide.with(Objects.requireNonNull(getContext()))
+                            .load(mProfile.getAvatarUrl())
+                            .placeholder(R.mipmap.profile)
+                            .apply(RequestOptions.circleCropTransform())
+                            .into(mAva);
+                    mAva.setVisibility(View.VISIBLE);
+                    mFullName.setText(mProfile.getFullname());
+                    mFullName.setVisibility(View.VISIBLE);
+                    mFullName.setTextIsSelectable(true);
+                    mMainGroup.setText(mProfile.getMainGroup());
+                    mMainGroup.setVisibility(View.VISIBLE);
+                    mMainGroup.setTextIsSelectable(true);
+                    groupAdapter = new GroupAdapter();
+                    groupAdapter.setGroup(mProfile.getSubgroups());
+                    mGroups.setAdapter(groupAdapter);
+                    mGroups.setLayoutManager(new LinearLayoutManager(getContext()));
+                    mGroups.setVisibility(View.VISIBLE);
+
+                    mAbout.setTextSize(16);
+                    mAbout.setTextAlignment(View.TEXT_ALIGNMENT_VIEW_START);
+                    mAbout.setVisibility(View.VISIBLE);
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                        mAbout.setText(Html.fromHtml(mProfile.getAbout(), Html.FROM_HTML_MODE_COMPACT));
+                    } else {
+                        mAbout.setText(Html.fromHtml(mProfile.getAbout()));
+                    }
+                    mAbout.setMovementMethod(LinkMovementMethod.getInstance());
+
+
+                    mBirthday.setText(mProfile.getBirthdate());
+                    mBirthday.setVisibility(View.VISIBLE);
+                    mBirthday.setTextIsSelectable(true);
+
+                    mPhone.setText(mProfile.getContacts().get(0).getValue());
+                    mPhone.setVisibility(View.VISIBLE);
+
+                    mMail.setText(mProfile.getContacts().get(1).getValue());
+                    mMail.setVisibility(View.VISIBLE);
+
+                    final AccountAdapter accountAdapter = new AccountAdapter();
+                    accountAdapter.setGroup(mProfile.getAccounts());
+                    mAccounts.setAdapter(accountAdapter);
+                    mAccounts.setLayoutManager(new LinearLayoutManager(getContext()));
+                    mAccounts.setVisibility(View.VISIBLE);
+
+                    mBirthdayImage.setVisibility(View.VISIBLE);
+                    mPhoneImage.setVisibility(View.VISIBLE);
+                    mMailImage.setVisibility(View.VISIBLE);
+                    mAboutString.setVisibility(View.VISIBLE);
+                    mContactsString.setVisibility(View.VISIBLE);
+                    mGroupsString.setVisibility(View.VISIBLE);
+                    mAccountsString.setVisibility(View.VISIBLE);
+
+                }
+                if (isOther) {
+                    mButton.setVisibility(GONE);
+                } else {
+                    mButton.setVisibility(View.VISIBLE);
+                }
+            }
+        };
+
+        Observer<ProfileRepo.ProfileProgress> observerProgress = new Observer<ProfileRepo.ProfileProgress>() {
+            @Override
+            public void onChanged(ProfileRepo.ProfileProgress profileProgress) {
+                if (profileProgress != null) {
+                    mProfileProgress = profileProgress;
+                    if (mProfileProgress == ProfileRepo.ProfileProgress.FAILED_NET) {
+                        visibleGone();
+                        mProgressBar.setVisibility(GONE);
+                        mAbout.setText(R.string.http_failed);
+                    } else if (mProfileProgress == ProfileRepo.ProfileProgress.IN_PROGRESS) {
+                        visibleGone();
+                        mAbout.setVisibility(GONE);
+                        mProgressBar.setVisibility(View.VISIBLE);
+                    }
+                }
             }
         };
 
@@ -165,223 +282,51 @@ public class ProfileFragment extends Fragment {
                 .getProfile()
                 .observe(getViewLifecycleOwner(), observer);
 
+        mProfileViewModel
+                .getProfileProgress()
+                .observe(getViewLifecycleOwner(), observerProgress);
 
         return view;
     }
 
-    private class MyAdapter extends RecyclerView.Adapter<MyViewHolder> {
-        private UserProfile mProfile;
+    void visibleGone() {
+        mAva.setVisibility(View.INVISIBLE);
+        mFullName.setVisibility(GONE);
+        mMainGroup.setVisibility(GONE);
+        mBirthday.setVisibility(GONE);
+        mGroups.setVisibility(GONE);
+        mPhone.setVisibility(GONE);
+        mMail.setVisibility(GONE);
+        mAccounts.setVisibility(GONE);
 
-        @NonNull
-        @Override
-        public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            return new MyViewHolder(LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.item_profile, parent, false));
-        }
+        mBirthdayImage.setVisibility(GONE);
+        mPhoneImage.setVisibility(GONE);
+        mMailImage.setVisibility(GONE);
+        mAboutString.setVisibility(GONE);
+        mContactsString.setVisibility(GONE);
+        mGroupsString.setVisibility(GONE);
+        mAccountsString.setVisibility(GONE);
 
-        public void setProfile(UserProfile profile) {
-            mProfile = profile;
-            notifyDataSetChanged();
-        }
-
-        public void cleanProfile() {
-            mProfile = null;
-            notifyDataSetChanged();
-        }
-
-        @Override
-        public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
-            if (mProfile != null) {
-                Glide.with(Objects.requireNonNull(getContext()))
-                        .load(mProfile.getAvatarUrl())
-                        .placeholder(R.mipmap.profile)
-                        .apply(RequestOptions.circleCropTransform())
-                        .into(holder.mAva);
-                holder.mAva.setVisibility(View.VISIBLE);
-                holder.mFullName.setText(mProfile.getFullname());
-                holder.mFullName.setVisibility(View.VISIBLE);
-                holder.mFullName.setTextIsSelectable(true);
-                holder.mMainGroup.setText(mProfile.getMainGroup());
-                holder.mMainGroup.setVisibility(View.VISIBLE);
-                holder.mMainGroup.setTextIsSelectable(true);
-                groupAdapter = new GroupAdapter();
-                groupAdapter.setGroup(mProfile.getSubgroups());
-                holder.mGroups.setAdapter(groupAdapter);
-                holder.mGroups.setLayoutManager(new LinearLayoutManager(getContext()));
-                holder.mGroups.setVisibility(View.VISIBLE);
-
-                //holder.mAbout.setText(mProfile.getAbout());
-                holder.mAbout.setTextSize(16);
-                holder.mAbout.setTextAlignment(View.TEXT_ALIGNMENT_VIEW_START);
-                holder.mAbout.setVisibility(View.VISIBLE);
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                    holder.mAbout.setText(Html.fromHtml(mProfile.getAbout(), Html.FROM_HTML_MODE_COMPACT));
-                } else {
-                    holder.mAbout.setText(Html.fromHtml(mProfile.getAbout()));
-                }
-                holder.mAbout.setMovementMethod(LinkMovementMethod.getInstance());
-
-
-                holder.mBirthday.setText(mProfile.getBirthdate());
-                holder.mBirthday.setVisibility(View.VISIBLE);
-                holder.mBirthday.setTextIsSelectable(true);
-
-                holder.mPhone.setText(mProfile.getContacts().get(0).getValue());
-                holder.mPhone.setVisibility(View.VISIBLE);
-
-                holder.mMail.setText(mProfile.getContacts().get(1).getValue());
-                holder.mMail.setVisibility(View.VISIBLE);
-
-                final AccountAdapter accountAdapter = new AccountAdapter();
-                accountAdapter.setGroup(mProfile.getAccounts());
-                holder.mAccounts.setAdapter(accountAdapter);
-                holder.mAccounts.setLayoutManager(new LinearLayoutManager(getContext()));
-                holder.mAccounts.setVisibility(View.VISIBLE);
-
-                if (isOther) {
-                    holder.mButton.setVisibility(GONE);
-                } else {
-                    holder.mButton.setVisibility(View.VISIBLE);
-                }
-
-                holder.mBirthdayImage.setVisibility(View.VISIBLE);
-                holder.mPhoneImage.setVisibility(View.VISIBLE);
-                holder.mMailImage.setVisibility(View.VISIBLE);
-                holder.mAboutString.setVisibility(View.VISIBLE);
-                holder.mContactsString.setVisibility(View.VISIBLE);
-                holder.mGroupsString.setVisibility(View.VISIBLE);
-                holder.mAccountsString.setVisibility(View.VISIBLE);
-
-            } else {
-                holder.mAva.setVisibility(View.INVISIBLE);
-                holder.mFullName.setVisibility(GONE);
-                holder.mMainGroup.setVisibility(GONE);
-                holder.mBirthday.setVisibility(GONE);
-                holder.mGroups.setVisibility(GONE);
-                holder.mPhone.setVisibility(GONE);
-                holder.mMail.setVisibility(GONE);
-                holder.mAccounts.setVisibility(GONE);
-
-                holder.mBirthdayImage.setVisibility(GONE);
-                holder.mPhoneImage.setVisibility(GONE);
-                holder.mMailImage.setVisibility(GONE);
-                holder.mAboutString.setVisibility(GONE);
-                holder.mContactsString.setVisibility(GONE);
-                holder.mGroupsString.setVisibility(GONE);
-                holder.mAccountsString.setVisibility(GONE);
-
-                holder.mAbout.setVisibility(View.VISIBLE);
-                holder.mAbout.setText(R.string.http_failed);
-                holder.mAbout.setTextSize(20);
-                holder.mAbout.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
-
-                if (isOther) {
-                    holder.mButton.setVisibility(GONE);
-                } else {
-                    holder.mButton.setVisibility(View.VISIBLE);
-                }
-            }
-        }
-
-        @Override
-        public int getItemCount() {
-            return 1;
-        }
+        mAbout.setVisibility(View.VISIBLE);
+        mAbout.setTextSize(20);
+        mAbout.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
     }
 
-    static class MyViewHolder extends RecyclerView.ViewHolder {
-
-        protected ImageView mAva;
-        protected TextView mFullName;
-        protected TextView mMainGroup;
-        protected RecyclerView mGroups;
-        protected TextView mAbout;
-        protected TextView mBirthday;
-        protected TextView mPhone;
-        protected TextView mMail;
-        protected RecyclerView mAccounts;
-        protected Button mButton;
-
-        protected ImageView mBirthdayImage;
-        protected ImageView mPhoneImage;
-        protected ImageView mMailImage;
-        protected TextView mAboutString;
-        protected TextView mGroupsString;
-        protected TextView mContactsString;
-        protected TextView mAccountsString;
-
-        public MyViewHolder(@NonNull final View itemView) {
-            super(itemView);
-            mAva = itemView.findViewById(R.id.photo);
-            mFullName = itemView.findViewById(R.id.full_name);
-            mMainGroup = itemView.findViewById(R.id.main_group);
-            mGroups = itemView.findViewById(R.id.subgroups);
-            mAbout = itemView.findViewById(R.id.about);
-            mBirthday = itemView.findViewById(R.id.birthday);
-            mPhone = itemView.findViewById(R.id.phone);
-            mMail = itemView.findViewById(R.id.mail);
-            mAccounts = itemView.findViewById(R.id.accounts_recycler);
-
-            mButton = itemView.findViewById(R.id.logOut);
-            mButton.setOnClickListener((new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    AlertDialog dialog = new DialogLogOut().getDialog(context);
-                    dialog.show();
-                }
-            }));
-
-            mPhone.setOnLongClickListener((new View.OnLongClickListener() {
-                @Override
-                public boolean onLongClick(View v) {
-                    Vibrator vibrator = (Vibrator) context.getSystemService(VIBRATOR_SERVICE);
-                    if (Build.VERSION.SDK_INT >= 26) {
-                        vibrator.vibrate(VibrationEffect.createOneShot(150, VibrationEffect.DEFAULT_AMPLITUDE));
-                    } else {
-                        vibrator.vibrate(150);
-                    }
-
-                    ClipboardManager clipboard = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
-                    ClipData clip = ClipData.newPlainText("", MyViewHolder.this.mPhone.getText());
-                    clipboard.setPrimaryClip(clip);
-
-                    Snackbar.make(itemView, R.string.copied, Snackbar.LENGTH_LONG)
-                            .show();
-                    return false;
-                }
-            }));
-
-            mMail.setOnLongClickListener((new View.OnLongClickListener() {
-                @Override
-                public boolean onLongClick(View v) {
-                    Vibrator vibrator = (Vibrator) context.getSystemService(VIBRATOR_SERVICE);
-                    if (Build.VERSION.SDK_INT >= 26) {
-                        vibrator.vibrate(VibrationEffect.createOneShot(150, VibrationEffect.DEFAULT_AMPLITUDE));
-                    } else {
-                        vibrator.vibrate(150);
-                    }
-
-                    ClipboardManager clipboard = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
-                    ClipData clip = ClipData.newPlainText("", MyViewHolder.this.mMail.getText());
-                    clipboard.setPrimaryClip(clip);
-
-                    Snackbar.make(itemView, R.string.copied, Snackbar.LENGTH_LONG)
-                            .show();
-                    return false;
-                }
-            }));
-
-            mBirthdayImage = itemView.findViewById(R.id.birthday_image);
-            mPhoneImage = itemView.findViewById(R.id.phone_image);
-            mMailImage = itemView.findViewById(R.id.mail_image);
-            mAboutString = itemView.findViewById(R.id.about_string);
-            mGroupsString = itemView.findViewById(R.id.groups);
-            mContactsString = itemView.findViewById(R.id.contacts_string);
-            mAccountsString = itemView.findViewById(R.id.accounts_string);
+    void clipAndVibrate(View view, TextView textView) {
+        Vibrator vibrator = (Vibrator) context.getSystemService(VIBRATOR_SERVICE);
+        if (Build.VERSION.SDK_INT >= 26) {
+            vibrator.vibrate(VibrationEffect.createOneShot(150, VibrationEffect.DEFAULT_AMPLITUDE));
+        } else {
+            vibrator.vibrate(150);
         }
 
-    }
+        ClipboardManager clipboard = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
+        ClipData clip = ClipData.newPlainText("", textView.getText());
+        clipboard.setPrimaryClip(clip);
 
+        Snackbar.make(view, R.string.copied, Snackbar.LENGTH_LONG)
+                .show();
+    }
 
     private class GroupAdapter extends RecyclerView.Adapter<GroupViewHolder> {
 
@@ -537,65 +482,9 @@ public class ProfileFragment extends Fragment {
                 }
             }));
         }
+
     }
 
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        Log.d(getLogTag(), "onAttach");
-        adapter.setProfile(null);
-    }
-
-
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        Log.d(getLogTag(), "onActivityCreated");
-    }
-
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        Log.d(getLogTag(), "onResume");
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        Log.d(getLogTag(), "onPause");
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        Log.d(getLogTag(), "onStop");
-    }
-
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        Log.d(getLogTag(), "onDestroy");
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        Log.d(getLogTag(), "onDetach");
-    }
-
-    @Override
-    public void onSaveInstanceState(@NonNull Bundle outState) {
-        super.onSaveInstanceState(outState);
-        Log.d(getLogTag(), "onSaveInstanceState");
-    }
-
-    @Override
-    public void onViewStateRestored(@Nullable final Bundle savedInstanceState) {
-        super.onViewStateRestored(savedInstanceState);
-        Log.d(getLogTag(), "onViewStateRestored");
-    }
 
     protected String getLogTag() {
         return getClass().getSimpleName();

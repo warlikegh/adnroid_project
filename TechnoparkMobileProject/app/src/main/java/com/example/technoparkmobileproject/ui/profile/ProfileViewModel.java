@@ -11,6 +11,7 @@ import androidx.lifecycle.Observer;
 public class ProfileViewModel extends AndroidViewModel {
     private ProfileRepo mRepo = new ProfileRepo(getApplication());
     private LiveData<UserProfile> mProfile = mRepo.getProfile();
+    private LiveData<ProfileRepo.ProfileProgress> mProfileProgress = mRepo.getProfileProgress();
 
     public ProfileViewModel(@NonNull Application application) {
         super(application);
@@ -18,6 +19,10 @@ public class ProfileViewModel extends AndroidViewModel {
 
     public LiveData<UserProfile> getProfile() {
         return mProfile;
+    }
+
+    public LiveData<ProfileRepo.ProfileProgress> getProfileProgress() {
+        return mProfileProgress;
     }
 
     public void refreshMe() {

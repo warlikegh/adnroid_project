@@ -98,39 +98,6 @@ public class AuthRepo {
         FAILED_NET
     }
 
-   /* private void registerAPN() {
-        String pseudoID = "35" +
-                Build.BOARD.length()%10 + Build.BRAND.length()%10 +
-                Build.CPU_ABI.length()%10 + Build.DEVICE.length()%10 +
-                Build.DISPLAY.length()%10 + Build.HOST.length()%10 +
-                Build.ID.length()%10 + Build.MANUFACTURER.length()%10 +
-                Build.MODEL.length()%10 + Build.PRODUCT.length()%10 +
-                Build.TAGS.length()%10 + Build.TYPE.length()%10 +
-                Build.USER.length()%10;
-
-        PushApi api = mApiRepo.getPushApi(mSettings.getInt(SITE, -1));
-        api.registerAPN(" Token " + mSettings.getString(AUTH_TOKEN, ""),
-                new PushApi.UserPush(pseudoID,""))
-                .enqueue(new Callback<PushApi.PushSuccess>() {
-                    @Override
-                    public void onResponse(Call<PushApi.PushSuccess> call,
-                                           Response<PushApi.PushSuccess> response) {
-                        if (response.isSuccessful() && response.body() != null) {
-                            PushApi.PushSuccess user = response.body();
-                            Log.d("push", user.getMessage());
-
-                        } else {
-
-                        }
-                    }
-
-                    @Override
-                    public void onFailure(Call<PushApi.PushSuccess> call, Throwable t) {
-
-                    }
-                });
-    }*/
-
     public static String sha256(String base) {                                          //Algorithm for SHA256
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");

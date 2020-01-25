@@ -35,9 +35,9 @@ class ProfileRepo {
     private ProfileApi mProfileApi;
     private static String AUTH_TOKEN = "auth_token";
     private static String SITE = "site";
-    private final Executor executor = Executors.newSingleThreadExecutor();
     private int key = 0;
     private static String username_repo;
+    private MutableLiveData<ProfileProgress> mProfileProgress = new MutableLiveData<>();
 
     private final ProfileDbManager.ReadListener<Profile> readListener = new ProfileDbManager.ReadListener<Profile>() {
         @Override
@@ -63,15 +63,19 @@ class ProfileRepo {
 
         mSettings = mContext.getSharedPreferences("createFirst", Context.MODE_PRIVATE);
         mEditor = mSettings.edit();
-        //  myId = mSettings.getInt("my_id", -1);
-
     }
 
     public LiveData<UserProfile> getProfile() {
         return mProfile;
     }
 
+    public LiveData<ProfileProgress> getProfileProgress() {
+        return mProfileProgress;
+    }
+
     public void refreshMe() {
+        mProfileProgress.postValue(ProfileProgress.IN_PROGRESS);
+        mProfile.postValue(null);
         mEditor.putBoolean("isFirstProfile", false);
         mEditor.apply();
         mSecretSettings = new SecretData().getSecretData(mContext);
@@ -82,16 +86,16 @@ class ProfileRepo {
                 if (response.isSuccessful() && response.body() != null) {
                     ProfileApi.UserProfilePlain result = response.body();
                     mProfile.postValue(transform(result));
-
+                    mProfileProgress.postValue(ProfileProgress.SUCCESS);
                     saveData(transform(result));
                     mEditor.putInt("my_id", result.getId()).commit();
-
                 } else {
                     if (key == 0) {
                         pullMeFromDB();
                         key++;
                     } else {
-                        mProfile.postValue(null);
+                      //  mProfile.postValue(null);
+                        mProfileProgress.postValue(ProfileProgress.FAILED);
                     }
                 }
             }
@@ -102,7 +106,8 @@ class ProfileRepo {
                     pullMeFromDB();
                     key++;
                 } else {
-                    mProfile.postValue(null);
+                   // mProfile.postValue(null);
+                    mProfileProgress.postValue(ProfileProgress.FAILED_NET);
                 }
             }
         });
@@ -110,6 +115,8 @@ class ProfileRepo {
 
 
     public void refresh(final String username, final int id) {
+        mProfileProgress.postValue(ProfileProgress.IN_PROGRESS);
+        mProfile.postValue(null);
         username_repo = username;
         final ProfileDbManager manager = ProfileDbManager.getInstance(mContext);
         mSecretSettings = new SecretData().getSecretData(mContext);
@@ -120,13 +127,15 @@ class ProfileRepo {
                 if (response.isSuccessful() && response.body() != null) {
                     ProfileApi.UserProfilePlain result = response.body();
                     mProfile.postValue(transform(result));
+                    mProfileProgress.postValue(ProfileProgress.SUCCESS);
                     saveData(transform(result));
                 } else {
                     if (key == 0) {
                         pullFromDB(id, username);
                         key++;
                     } else {
-                        mProfile.postValue(null);
+                   //     mProfile.postValue(null);
+                        mProfileProgress.postValue(ProfileProgress.FAILED);
                     }
 
                 }
@@ -138,13 +147,16 @@ class ProfileRepo {
                     pullFromDB(id, username);
                     key++;
                 } else {
-                    mProfile.postValue(null);
+                  //  mProfile.postValue(null);
+                    mProfileProgress.postValue(ProfileProgress.FAILED_NET);
                 }
             }
         });
     }
 
     public void pullMeFromDB() {
+        mProfileProgress.postValue(ProfileProgress.IN_PROGRESS);
+    //    mProfile.postValue(null);
         ProfileDbManager manager = ProfileDbManager.getInstance(mContext);
         long id = mSettings.getInt("my_id", -1);
         manager.read(readListener, id);
@@ -157,6 +169,8 @@ class ProfileRepo {
     }
 
     public void pullFromDB(long id, String username) {
+        mProfileProgress.postValue(ProfileProgress.IN_PROGRESS);
+    //    mProfile.postValue(null);
         ProfileDbManager manager = ProfileDbManager.getInstance(mContext);
         username_repo = username;
         manager.read(readListener, id);
@@ -231,6 +245,7 @@ class ProfileRepo {
                 profile.gender, profile.avatarUrl, profile.mainGroup, profile.birthdate, profile.online, profile.about,
                 profile.getSubgroups(), profile.getActivity(), profile.getContacts(), profile.getAccounts(), profile.rating);
         mProfile.postValue(temp);
+        mProfileProgress.postValue(ProfileProgress.SUCCESS);;
     }
 
     private void saveData(UserProfile result) {
@@ -251,5 +266,12 @@ class ProfileRepo {
                 result.getContacts(),
                 result.getAccounts(),
                 result.getRating());
+    }
+
+    public enum ProfileProgress {
+        IN_PROGRESS,
+        SUCCESS,
+        FAILED,
+        FAILED_NET
     }
 }
