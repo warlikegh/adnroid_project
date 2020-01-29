@@ -213,6 +213,7 @@
                     android:layout_below="@+id/progress_bar"
                     android:layout_centerHorizontal="true"
                     android:layout_marginStart="@dimen/margin_ava"
+                    android:layout_marginBottom="8dp"
                     android:text="@string/Out_of_account"
                     android:textColor="@color/colorRed"
                     android:visibility="gone" />

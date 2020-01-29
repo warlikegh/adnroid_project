@@ -25,7 +25,6 @@ import retrofit2.Response;
 
 class NewsRepo {
     private final static MutableLiveData<UserNews> mNews = new MutableLiveData<>();
-    private final static MutableLiveData<UserNews> mNextNews = new MutableLiveData<>();
     private SharedPreferences mSettings;
     private final Context mContext;
     private NewsApi mNewsApi;
@@ -57,10 +56,6 @@ class NewsRepo {
 
     public LiveData<UserNews> getNews() {
         return mNews;
-    }
-
-    public LiveData<UserNews> getNextNews() {
-        return mNextNews;
     }
 
     public void refresh() {
@@ -113,8 +108,8 @@ class NewsRepo {
                                    Response<NewsApi.UserNewsPlain> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     NewsApi.UserNewsPlain result = response.body();
-                    mNextNews.postValue(transform(result));
                     savedata(transform(result));
+                    pullFromDB();
                 } else {
 
                 }

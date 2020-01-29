@@ -14,7 +14,6 @@ public class NewsViewModel extends AndroidViewModel {
 
     private NewsRepo mRepo = new NewsRepo(getApplication());
     private LiveData<UserNews> mNews = mRepo.getNews();
-    private LiveData<UserNews> mNextNews = mRepo.getNextNews();
 
     public NewsViewModel(@NonNull Application application) {
         super(application);
@@ -22,10 +21,6 @@ public class NewsViewModel extends AndroidViewModel {
 
     public LiveData<UserNews> getNews() {
         return mNews;
-    }
-
-    public LiveData<UserNews> getNextNews() {
-        return mNextNews;
     }
 
     public void refresh() {

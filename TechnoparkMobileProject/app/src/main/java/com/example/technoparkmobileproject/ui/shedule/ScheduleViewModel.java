@@ -16,6 +16,7 @@ public class ScheduleViewModel extends AndroidViewModel {
 
     private ScheduleRepo mRepo = new ScheduleRepo(getApplication());
     private LiveData<List<UserSchedule>> mSchedule = mRepo.getSchedule();
+    private LiveData<ScheduleRepo.ScheduleProgress> mScheduleProgress = mRepo.getScheduleProgress();
 
     public ScheduleViewModel(@NonNull Application application) {
         super(application);
@@ -23,6 +24,10 @@ public class ScheduleViewModel extends AndroidViewModel {
 
     public LiveData<List<UserSchedule>> getSchedule() {
         return mSchedule;
+    }
+
+    public LiveData<ScheduleRepo.ScheduleProgress> getScheduleProgress() {
+        return mScheduleProgress;
     }
 
     public void refresh() {

@@ -29,6 +29,7 @@ import retrofit2.Response;
 
 public class ScheduleRepo {
     private final static MutableLiveData<List<UserSchedule>> mSchedule = new MutableLiveData<>();
+    private final static MutableLiveData<ScheduleProgress> mScheduleProgress = new MutableLiveData<>();
     private SharedPreferences mSettings;
     private final Context mContext;
     private ScheduleApi mScheduleApi;
@@ -70,8 +71,12 @@ public class ScheduleRepo {
         return mSchedule;
     }
 
+    public LiveData<ScheduleProgress> getScheduleProgress() {
+        return mScheduleProgress;
+    }
 
     public void refresh() {
+        mScheduleProgress.postValue(ScheduleProgress.IN_PROGRESS);
         final ScheduleDbManager manager = ScheduleDbManager.getInstance(mContext);
         mSettings = new SecretData().getSecretData(mContext);
         mScheduleApi.getUserSchedule(" Token " + mSettings.getString(AUTH_TOKEN, "")).enqueue(new Callback<List<ScheduleApi.UserSchedulePlain>>() {
@@ -83,10 +88,13 @@ public class ScheduleRepo {
                     mSchedule.postValue(transform(result));
                     manager.clean();
                     savedata(transform(result));
+                    mScheduleProgress.postValue(ScheduleProgress.SUCCESS);
                 } else {
                     if (key == 0) {
                         manager.readAll(readListener);
                         key++;
+                    } else {
+                        mScheduleProgress.postValue(ScheduleProgress.FAILED);
                     }
                 }
             }
@@ -96,6 +104,8 @@ public class ScheduleRepo {
                 if (key == 0) {
                     manager.readAll(readListener);
                     key++;
+                } else {
+                    mScheduleProgress.postValue(ScheduleProgress.FAILED_NET);
                 }
             }
         });
@@ -178,7 +188,7 @@ public class ScheduleRepo {
         Comparator<Schedule> comp = new Comparator<Schedule>() {
             @Override
             public int compare(Schedule a, Schedule b) {
-                Date resultB =  new SecretData().getDate(b.startTime);
+                Date resultB = new SecretData().getDate(b.startTime);
                 Date resultA = new SecretData().getDate(a.startTime);
 
                 if (resultA != null) {
@@ -198,6 +208,13 @@ public class ScheduleRepo {
             tempResult.add(temp);
         }
         mSchedule.postValue(tempResult);
+        mScheduleProgress.postValue(ScheduleProgress.SUCCESS);
+    }
 
+    public enum ScheduleProgress {
+        IN_PROGRESS,
+        SUCCESS,
+        FAILED,
+        FAILED_NET
     }
 }

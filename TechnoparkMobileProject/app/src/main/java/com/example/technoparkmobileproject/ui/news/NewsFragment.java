@@ -67,10 +67,6 @@ public class NewsFragment extends Fragment {
     public NewsFragment() {
     }
 
-    public static NewsFragment newInstance() {
-        return new NewsFragment();
-    }
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -115,33 +111,10 @@ public class NewsFragment extends Fragment {
             }
         };
 
-        Observer<UserNews> observer_next = new Observer<UserNews>() {
-            @Override
-            public void onChanged(UserNews news) {
-                if (news != null) {
-                    List<UserNews.Result> tempResult = new ArrayList<>();
-                    if (mNews != null)
-                        tempResult.addAll(mNews.getResults());
-                    tempResult.addAll(news.getResults());
-                    if (mNews != null) {
-                        UserNews temp = new UserNews(news.getCount(), news.getNext(), news.getPrevious(), tempResult);
-                        mNews = temp;
-                        mExtraNews = mNews;
-                    } else {
-                        mNews = news;
-                        mExtraNews = mNews;
-                    }
-                    adapter.setNews(mNews.getResults());
-                }
-            }
-        };
-
         mNewsViewModel
                 .getNews()
                 .observe(getViewLifecycleOwner(), observer);
-        mNewsViewModel
-                .getNextNews()
-                .observe(getViewLifecycleOwner(), observer_next);
+
         return view;
     }
 
@@ -228,6 +201,7 @@ public class NewsFragment extends Fragment {
             if (news.getText().size() > 1 ||
                     (!(news.getText().get(0).getContent().equals(news.getTextShort().get(0).getContent())))) {
                 holder.mNext.setVisibility(View.VISIBLE);
+                holder.mNext.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
                 buttonIsActive = true;
             }
 

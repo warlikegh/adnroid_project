@@ -80,36 +80,21 @@ public class News {
         textShortSize = mTextShort.size();
     }
 
-    /*qu*/
     public List<UserNews.Text> getText() {
         List<String> listContent = new SecretData().parseStringToList(contentText);
         List<String> listType = new SecretData().parseStringToList(typeText);
-        /*qu*/
         UserNews temp = new UserNews();
-        /*qu*/
         List<UserNews.Text> text = new ArrayList<>();
-        /*Log.d("database", textSize.toString());
-        Log.d("database", url);
-        Log.d("database", title);
-        for (int k = 0; k < listContent.size(); k++) {
-            Log.d("database", listContent.get(k));
-        }
-        for (int k = 0; k < listType.size(); k++) {
-            Log.d("database", listType.get(k));
-        }*/
         for (int i = 0; i < textSize; i++) {
             text.add(temp.new Text(listType.get(i), listContent.get(i)));
         }
         return text;
     }
 
-    /*qu*/
     public List<UserNews.TextShort> getTextShort() {
         List<String> listContent = new SecretData().parseStringToList(contentShort);
         List<String> listType = new SecretData().parseStringToList(typeShort);
-        /*qu*/
         UserNews temp = new UserNews();
-        /*qu*/
         List<UserNews.TextShort> textShort = new ArrayList<>();
         for (int i = 0; i < textShortSize; i++) {
             textShort.add(temp.new TextShort(listType.get(i), listContent.get(i)));

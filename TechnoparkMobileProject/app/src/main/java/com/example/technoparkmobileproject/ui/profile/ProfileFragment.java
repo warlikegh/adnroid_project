@@ -79,16 +79,6 @@ public class ProfileFragment extends Fragment {
     protected TextView mAccountsString;
     protected ProgressBar mProgressBar;
 
-    public static ProfileFragment newInstance(int id, String username) {
-        ProfileFragment fragment = new ProfileFragment();
-        Bundle bundle = new Bundle();
-        bundle.putString("username", username);
-        bundle.putInt("id", id);
-        fragment.setArguments(bundle);
-        return fragment;
-    }
-
-
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         Log.d(getLogTag(), "onCreate");
@@ -225,6 +215,7 @@ public class ProfileFragment extends Fragment {
                         mAbout.setText(Html.fromHtml(mProfile.getAbout()));
                     }
                     mAbout.setMovementMethod(LinkMovementMethod.getInstance());
+                    mAbout.setTextIsSelectable(true);
 
 
                     mBirthday.setText(mProfile.getBirthdate());

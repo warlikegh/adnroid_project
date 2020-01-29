@@ -40,20 +40,9 @@ public class GroupFragment extends Fragment {
     private static GroupViewModel mGroupViewModel;
     private GroupRepo.GroupProgress mGroupProgress;
     static Context context;
-    RecyclerView recycler;
     static GroupAdapter adapter;
     Integer id;
-    SearchView searchView;
     String searchSave = "";
-    TextView groupName;
-
-    public static GroupFragment newInstance(Integer id) {
-        GroupFragment fragment = new GroupFragment();
-        Bundle bundle = new Bundle();
-        bundle.putInt("id", id);
-        fragment.setArguments(bundle);
-        return fragment;
-    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -120,20 +109,6 @@ public class GroupFragment extends Fragment {
         recycler.setAdapter(adapter);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
         recycler.setLayoutManager(linearLayoutManager);
-        recycler.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                int topRowVerticalPosition =
-                        (recyclerView == null || recyclerView.getChildCount() == 0) ? 0 : recyclerView.getChildAt(0).getTop();
-                pullToRefresh.setEnabled(topRowVerticalPosition >= 0);
-            }
-
-            @Override
-            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-                super.onScrollStateChanged(recyclerView, newState);
-            }
-        });
-
 
         Observer<UserGroup> observer = new Observer<UserGroup>() {
             @Override

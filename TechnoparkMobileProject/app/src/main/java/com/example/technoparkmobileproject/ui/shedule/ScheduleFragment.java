@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -37,8 +38,11 @@ import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
+import static android.view.View.GONE;
+
 public class ScheduleFragment extends Fragment {
     private List<UserSchedule> mSchedule = new ArrayList<>();
+    private ScheduleRepo.ScheduleProgress mScheduleProgress;
     private List<UserSchedule> tempSchedule = new ArrayList<>();
     static GroupAdapter groupAdapter;
     final ScheduleAdapter scheduleAdapter = new ScheduleAdapter();
@@ -50,10 +54,6 @@ public class ScheduleFragment extends Fragment {
     RecyclerView recycler;
     SharedPreferences mSettings;
     SharedPreferences.Editor mEditor;
-
-    public static ScheduleFragment newInstance() {
-        return new ScheduleFragment();
-    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -72,6 +72,7 @@ public class ScheduleFragment extends Fragment {
                              ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_schedule, container, false);
 
+        final ProgressBar mProgressBar = view.findViewById(R.id.progress_bar);
         final SwipeRefreshLayout pullToRefresh = view.findViewById(R.id.pullToRefresh);
         pullToRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -89,19 +90,6 @@ public class ScheduleFragment extends Fragment {
         recycler.setAdapter(scheduleAdapter);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
         recycler.setLayoutManager(linearLayoutManager);
-        recycler.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                int topRowVerticalPosition =
-                        (recyclerView == null || recyclerView.getChildCount() == 0) ? 0 : recyclerView.getChildAt(0).getTop();
-                pullToRefresh.setEnabled(topRowVerticalPosition >= 0);
-            }
-
-            @Override
-            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-                super.onScrollStateChanged(recyclerView, newState);
-            }
-        });
 
         disciplineText = mSettings.getString("discipline", ALL_DISCIPLINES);
         isDefault[0] = mSettings.getBoolean("default", true);
@@ -153,7 +141,7 @@ public class ScheduleFragment extends Fragment {
             public void onChanged(List<UserSchedule> schedule) {
                 if (schedule != null) {
                     mSchedule = schedule;
-
+                    mProgressBar.setVisibility(GONE);
                     disciplines.clear();
                     disciplines.add(ALL_DISCIPLINES);
                     for (int i = 0; i < mSchedule.size(); i++) {
@@ -203,6 +191,25 @@ public class ScheduleFragment extends Fragment {
         mScheduleViewModel
                 .getSchedule()
                 .observe(getViewLifecycleOwner(), observer);
+
+        Observer<ScheduleRepo.ScheduleProgress> observerProgress = new Observer<ScheduleRepo.ScheduleProgress>() {
+            @Override
+            public void onChanged(ScheduleRepo.ScheduleProgress scheduleProgress) {
+                if (scheduleProgress != null) {
+                    mScheduleProgress = scheduleProgress;
+                    if (mScheduleProgress == ScheduleRepo.ScheduleProgress.FAILED_NET) {
+                        mProgressBar.setVisibility(GONE);
+                    } else if (mScheduleProgress == ScheduleRepo.ScheduleProgress.IN_PROGRESS) {
+                        mProgressBar.setVisibility(View.VISIBLE);
+                    }
+                }
+            }
+        };
+
+        mScheduleViewModel
+                .getScheduleProgress()
+                .observe(getViewLifecycleOwner(), observerProgress);
+
         return view;
     }
 
@@ -255,6 +262,9 @@ public class ScheduleFragment extends Fragment {
     private class ScheduleAdapter extends RecyclerView.Adapter<ScheduleViewHolder> {
 
         private List<UserSchedule> mSchedule = new ArrayList<>();
+        private List<UserSchedule> mWholeSchedule = new ArrayList<>();
+        private boolean isDefaultTime;
+        private String discipline = "";
 
         public void setSchedule(List<UserSchedule> schedule) {
             mSchedule = schedule;
