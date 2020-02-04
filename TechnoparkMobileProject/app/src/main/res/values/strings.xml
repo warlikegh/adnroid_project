@@ -26,4 +26,7 @@
     <string name="all_semester">Whole semester</string>
     <string name="two_week">Next two weeks</string>
     <string name="expand_more">Expand more...</string>
+    <string name="phone_string">Mobile phone</string>
+    <string name="mail_string">Mail</string>
+    <string name="birthday_string">Birthday</string>
 </resources>

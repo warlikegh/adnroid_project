@@ -70,14 +70,17 @@ public class ProfileFragment extends Fragment {
     protected RecyclerView mAccounts;
     protected Button mButton;
 
-    protected ImageView mBirthdayImage;
-    protected ImageView mPhoneImage;
-    protected ImageView mMailImage;
+    protected TextView mBirthdayString;
+    protected TextView mPhoneString;
+    protected TextView mMailString;
     protected TextView mAboutString;
     protected TextView mGroupsString;
     protected TextView mContactsString;
     protected TextView mAccountsString;
     protected ProgressBar mProgressBar;
+    protected View mSeparator1;
+    protected View mSeparator2;
+    protected View mSeparator3;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -120,6 +123,9 @@ public class ProfileFragment extends Fragment {
         Log.d(getLogTag(), "onCreateView");
         final View view = inflater.inflate(R.layout.fragment_profile, container, false);
 
+        mSeparator1 = view.findViewById(R.id.separator1);
+        mSeparator2 = view.findViewById(R.id.separator2);
+        mSeparator3 = view.findViewById(R.id.separator3);
         mProgressBar = view.findViewById(R.id.progress_bar);
         mAva = view.findViewById(R.id.photo);
         mFullName = view.findViewById(R.id.full_name);
@@ -156,9 +162,9 @@ public class ProfileFragment extends Fragment {
             }
         }));
 
-        mBirthdayImage = view.findViewById(R.id.birthday_image);
-        mPhoneImage = view.findViewById(R.id.phone_image);
-        mMailImage = view.findViewById(R.id.mail_image);
+        mBirthdayString = view.findViewById(R.id.birthday_string);
+        mPhoneString = view.findViewById(R.id.phone_string);
+        mMailString = view.findViewById(R.id.mail_string);
         mAboutString = view.findViewById(R.id.about_string);
         mGroupsString = view.findViewById(R.id.groups);
         mContactsString = view.findViewById(R.id.contacts_string);
@@ -191,7 +197,7 @@ public class ProfileFragment extends Fragment {
                     Glide.with(Objects.requireNonNull(getContext()))
                             .load(mProfile.getAvatarUrl())
                             .placeholder(R.mipmap.profile)
-                            .apply(RequestOptions.circleCropTransform())
+                          //  .apply(RequestOptions.circleCropTransform())
                             .into(mAva);
                     mAva.setVisibility(View.VISIBLE);
                     mFullName.setText(mProfile.getFullname());
@@ -234,9 +240,12 @@ public class ProfileFragment extends Fragment {
                     mAccounts.setLayoutManager(new LinearLayoutManager(getContext()));
                     mAccounts.setVisibility(View.VISIBLE);
 
-                    mBirthdayImage.setVisibility(View.VISIBLE);
-                    mPhoneImage.setVisibility(View.VISIBLE);
-                    mMailImage.setVisibility(View.VISIBLE);
+                    mSeparator1.setVisibility(View.VISIBLE);
+                    mSeparator2.setVisibility(View.VISIBLE);
+                    mSeparator3.setVisibility(View.VISIBLE);
+                    mBirthdayString.setVisibility(View.VISIBLE);
+                    mPhoneString.setVisibility(View.VISIBLE);
+                    mMailString.setVisibility(View.VISIBLE);
                     mAboutString.setVisibility(View.VISIBLE);
                     mContactsString.setVisibility(View.VISIBLE);
                     mGroupsString.setVisibility(View.VISIBLE);
@@ -281,6 +290,9 @@ public class ProfileFragment extends Fragment {
     }
 
     void visibleGone() {
+        mSeparator1.setVisibility(GONE);
+        mSeparator2.setVisibility(GONE);
+        mSeparator3.setVisibility(GONE);
         mAva.setVisibility(View.INVISIBLE);
         mFullName.setVisibility(GONE);
         mMainGroup.setVisibility(GONE);
@@ -290,9 +302,9 @@ public class ProfileFragment extends Fragment {
         mMail.setVisibility(GONE);
         mAccounts.setVisibility(GONE);
 
-        mBirthdayImage.setVisibility(GONE);
-        mPhoneImage.setVisibility(GONE);
-        mMailImage.setVisibility(GONE);
+        mBirthdayString.setVisibility(GONE);
+        mPhoneString.setVisibility(GONE);
+        mMailString.setVisibility(GONE);
         mAboutString.setVisibility(GONE);
         mContactsString.setVisibility(GONE);
         mGroupsString.setVisibility(GONE);
