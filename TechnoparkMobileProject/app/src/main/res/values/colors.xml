@@ -3,7 +3,7 @@
     <color name="colorPrimary">#5994cc</color>
     <color name="colorPrimaryDark">#426382</color>
     <color name="colorAccent">#5994cc</color>
-    <color name="colorWindow">#f7f7f7</color>
+    <color name="colorWindow">#ecedf1</color>
     <color name="black">#090909</color>
     <color name="colorGrey">#ffffff</color>
     <color name="colorWhite">#ffffff</color>
@@ -18,5 +18,5 @@
     <color name="colorBlueBackgroungIS">#1e92fc</color>
     <color name="colorRedMadeAuth">#fc2c38</color>
     <color name="colorTextBlue">#4193c0</color>
-    <color name="colorGreySeparator">#dedede</color>
+    <color name="colorGreySeparator">#f4f4f4</color>
 </resources>
