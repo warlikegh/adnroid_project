@@ -85,7 +85,6 @@ public class ScheduleFragment extends Fragment {
         final Button allSemesters = view.findViewById(R.id.all_semester);
         final Button twoWeeks = view.findViewById(R.id.two_week);
 
-        scheduleAdapter.setSchedule(tempSchedule);
         recycler = view.findViewById(R.id.schedule);
         recycler.setAdapter(scheduleAdapter);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
@@ -111,7 +110,8 @@ public class ScheduleFragment extends Fragment {
                 twoWeeks.setBackgroundColor(getResources().getColor(R.color.colorGrey));
                 twoWeeks.setTextColor(getResources().getColor(R.color.colorAccent));
                 isDefault[0] = false;
-                default_settings(isDefault[0]);
+                scheduleAdapter.setTime(isDefault[0]);
+                mEditor.putBoolean("default", isDefault[0]).commit();
             }
         });
 
@@ -126,7 +126,8 @@ public class ScheduleFragment extends Fragment {
                 allSemesters.setBackgroundColor(getResources().getColor(R.color.colorGrey));
                 allSemesters.setTextColor(getResources().getColor(R.color.colorAccent));
                 isDefault[0] = true;
-                default_settings(isDefault[0]);
+                scheduleAdapter.setTime(isDefault[0]);
+                mEditor.putBoolean("default", isDefault[0]).commit();
             }
         });
 
@@ -159,11 +160,11 @@ public class ScheduleFragment extends Fragment {
                     adapter[0].setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                     spinner.setAdapter(adapter[0]);
                     spinner.setSelection(adapter[0].getPosition(disciplineText));
+                    scheduleAdapter.setSchedule(mSchedule, disciplineText, isDefault[0]);
                 }
             }
         };
 
-        default_settings(isDefault[0]);
         AdapterView.OnItemSelectedListener itemSelectedListener = new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -171,14 +172,7 @@ public class ScheduleFragment extends Fragment {
                 String item = (String) parent.getItemAtPosition(position);
                 mEditor.putString("discipline", item).commit();
                 disciplineText = item;
-
-                for (int i = 0; i < mSchedule.size(); i++) {
-                    if (mSchedule.get(i).getDiscipline().equals(item) ||
-                            (item.equals(ALL_DISCIPLINES))) {
-                        tempSchedule.add(mSchedule.get(i));
-                    }
-                }
-                default_settings(isDefault[0]);
+                scheduleAdapter.setDiscipline(disciplineText);
             }
 
             @Override
@@ -230,35 +224,6 @@ public class ScheduleFragment extends Fragment {
         setSaveState();
     }
 
-    private void default_settings(boolean isDefault) {
-        if (isDefault) {
-            List<UserSchedule> temp = new ArrayList<>();
-            for (int i = 0; i < tempSchedule.size(); i++) {
-                Date localDate = new SecretData().getDate(tempSchedule.get(i).getEndTime());
-                Date today = new Date();
-                Calendar instance = Calendar.getInstance();
-                instance.setTime(today);
-                instance.add(Calendar.DAY_OF_MONTH, 14);
-                Date daysBefore = instance.getTime();
-
-                if (localDate.compareTo(today) >= 0 && daysBefore.compareTo(localDate) >= 0) {
-                    temp.add(tempSchedule.get(i));
-                }
-            }
-            tempSchedule = temp;
-        } else {
-            tempSchedule.clear();
-            for (int i = 0; i < mSchedule.size(); i++) {
-                if (mSchedule.get(i).getDiscipline().equals(disciplineText) ||
-                        (disciplineText.equals(ALL_DISCIPLINES))) {
-                    tempSchedule.add(mSchedule.get(i));
-                }
-            }
-        }
-        scheduleAdapter.setSchedule(tempSchedule);
-        mEditor.putBoolean("default", isDefault).commit();
-    }
-
     private class ScheduleAdapter extends RecyclerView.Adapter<ScheduleViewHolder> {
 
         private List<UserSchedule> mSchedule = new ArrayList<>();
@@ -266,9 +231,53 @@ public class ScheduleFragment extends Fragment {
         private boolean isDefaultTime;
         private String discipline = "";
 
-        public void setSchedule(List<UserSchedule> schedule) {
-            mSchedule = schedule;
+        public void setSchedule(List<UserSchedule> schedule, String disciplineText, boolean defaultTime) {
+            mWholeSchedule = schedule;
+            discipline = disciplineText;
+            isDefaultTime = defaultTime;
+            filter(discipline, isDefaultTime);
             notifyDataSetChanged();
+        }
+
+        public void setTime(boolean time) {
+            isDefaultTime = time;
+            filter(discipline, isDefaultTime);
+        }
+
+        public void setDiscipline(String text) {
+            discipline = text;
+            filter(discipline, isDefaultTime);
+        }
+
+        public void filter(String text, boolean defaultTime) {
+            mSchedule.clear();
+            if (!defaultTime) {
+                if (mWholeSchedule != null) {
+                    if (text.isEmpty()) {
+                        mSchedule.addAll(mWholeSchedule);
+                    } else {
+                        for (UserSchedule item : mWholeSchedule) {
+                            if (item.getDiscipline().equals(text) || text.equals(ALL_DISCIPLINES))
+                                mSchedule.add(item);
+                        }
+                    }
+                } else {
+                    for (int i = 0; i < mWholeSchedule.size(); i++) {
+                        Date localDate = new SecretData().getDate(mWholeSchedule.get(i).getEndTime());
+                        Date today = new Date();
+                        Calendar instance = Calendar.getInstance();
+                        instance.setTime(today);
+                        instance.add(Calendar.DAY_OF_MONTH, 14);
+                        Date daysBefore = instance.getTime();
+
+                        if (localDate.compareTo(today) >= 0 && daysBefore.compareTo(localDate) >= 0)
+                            if (mWholeSchedule.get(i).getDiscipline().equals(text) || text.equals(ALL_DISCIPLINES))
+                                mSchedule.add(mWholeSchedule.get(i));
+                    }
+                }
+            }
+            notifyDataSetChanged();
+
         }
 
         @NonNull

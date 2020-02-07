@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical">
@@ -19,27 +20,41 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
+                <ImageView
+                    android:id="@+id/background"
+                    android:layout_width="match_parent"
+                    android:layout_height="160dp"
+                    android:scaleType="centerCrop"
+                    android:elevation="1dp"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginBottom="8dp"
+                    android:background="@color/colorWhite"/>
+
+                <ImageView
+                    android:id="@+id/photo"
+                    android:layout_width="136dp"
+                    android:layout_height="136dp"
+                    android:scaleType="centerCrop"
+                    android:layout_marginTop="8dp"
+                    android:layout_centerHorizontal="true"
+                    android:elevation="2dp" />
+
                 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
                     android:id="@+id/about_layout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@color/colorWhite"
-                    android:elevation="1dp"
+                    android:elevation="2dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_below="@+id/photo"
                     android:orientation="vertical">
 
-                    <ImageView
-                        android:id="@+id/photo"
-                        android:layout_width="match_parent"
-                        android:layout_height="136dp"
-                        android:scaleType="centerCrop" />
 
                     <TextView
                         android:id="@+id/full_name"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_below="@+id/photo"
                         android:layout_marginStart="@dimen/margin_ava"
-                        android:layout_marginTop="@dimen/margin_ava"
                         android:layout_marginEnd="@dimen/margin_ava"
                         android:layout_toEndOf="@+id/photo"
                         android:text="fullName"
@@ -131,7 +146,7 @@
                     android:layout_below="@+id/about_layout"
                     android:layout_marginTop="8dp"
                     android:background="@color/colorWhite"
-                    android:elevation="1dp"
+                    android:elevation="2dp"
                     android:orientation="vertical">
 
                     <TextView
@@ -152,6 +167,7 @@
                         android:layout_below="@id/groups"
                         android:layout_marginTop="8dp"
                         android:layout_marginBottom="8dp" />
+
                 </LinearLayout>
 
                 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -161,7 +177,7 @@
                     android:layout_below="@+id/groups_layout"
                     android:layout_marginTop="8dp"
                     android:background="@color/colorWhite"
-                    android:elevation="1dp"
+                    android:elevation="2dp"
                     android:orientation="vertical">
 
                     <TextView
@@ -241,7 +257,7 @@
                     android:layout_below="@+id/contacts_layout"
                     android:layout_marginTop="8dp"
                     android:background="@color/colorWhite"
-                    android:elevation="1dp"
+                    android:elevation="2dp"
                     android:orientation="vertical">
 
                     <TextView
@@ -252,7 +268,6 @@
                         android:layout_marginStart="@dimen/margin_ava"
                         android:layout_marginTop="@dimen/margin_ava"
                         android:text="@string/accounts_string"
-
                         android:textSize="12sp" />
 
                     <androidx.recyclerview.widget.RecyclerView
@@ -273,6 +288,7 @@
                     android:layout_centerHorizontal="true"
                     android:visibility="gone" />
 
+
                 <Button
                     android:id="@+id/logOut"
                     style="@style/Widget.AppCompat.Button.Borderless.Colored"
@@ -285,7 +301,8 @@
                     android:background="@drawable/ripple_rectangle_white"
                     android:text="@string/Out_of_account"
                     android:textColor="@color/colorRed"
-                    android:visibility="visible" />
+                    android:visibility="visible"
+                    android:elevation="2dp"/>
             </RelativeLayout>
 
         </androidx.core.widget.NestedScrollView>

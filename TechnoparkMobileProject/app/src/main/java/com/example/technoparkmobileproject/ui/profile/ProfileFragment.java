@@ -40,7 +40,6 @@ import com.google.android.material.snackbar.Snackbar;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-
 import static android.content.Context.VIBRATOR_SERVICE;
 import static android.view.View.GONE;
 
@@ -60,6 +59,7 @@ public class ProfileFragment extends Fragment {
     static FragmentManager fragmentManager;
 
     protected ImageView mAva;
+    protected ImageView mBackground;
     protected TextView mFullName;
     protected TextView mMainGroup;
     protected RecyclerView mGroups;
@@ -128,6 +128,7 @@ public class ProfileFragment extends Fragment {
         mSeparator3 = view.findViewById(R.id.separator3);
         mProgressBar = view.findViewById(R.id.progress_bar);
         mAva = view.findViewById(R.id.photo);
+        mBackground = view.findViewById(R.id.background);
         mFullName = view.findViewById(R.id.full_name);
         mMainGroup = view.findViewById(R.id.main_group);
         mGroups = view.findViewById(R.id.subgroups);
@@ -170,6 +171,10 @@ public class ProfileFragment extends Fragment {
         mContactsString = view.findViewById(R.id.contacts_string);
         mAccountsString = view.findViewById(R.id.accounts_string);
 
+       /* Glide.with(Objects.requireNonNull(getContext()))
+                .load(R.mipmap.profile_background02)
+                .into(mBackground);*/
+
         final SwipeRefreshLayout pullToRefresh = view.findViewById(R.id.pullToRefresh);
         pullToRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -197,7 +202,7 @@ public class ProfileFragment extends Fragment {
                     Glide.with(Objects.requireNonNull(getContext()))
                             .load(mProfile.getAvatarUrl())
                             .placeholder(R.mipmap.profile)
-                          //  .apply(RequestOptions.circleCropTransform())
+                            .apply(RequestOptions.circleCropTransform())
                             .into(mAva);
                     mAva.setVisibility(View.VISIBLE);
                     mFullName.setText(mProfile.getFullname());

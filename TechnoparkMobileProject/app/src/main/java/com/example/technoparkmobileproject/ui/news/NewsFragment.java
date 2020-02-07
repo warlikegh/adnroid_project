@@ -305,6 +305,7 @@ public class NewsFragment extends Fragment {
         public void onBindViewHolder(@NonNull ContentViewHolder holder, int position) {
             final String text;
             final String type;
+            SecretData secretData = new SecretData();
             if (isActive) {
                 text = mTextShort.get(position).getContent();
                 type = mTextShort.get(position).getType();
