@@ -120,5 +120,14 @@ public class SecretData {
         return hour + ":" + minute;
     }
 
+    public String deleteEnter(String text) {
+        while ((text.endsWith("\n")) || (text.endsWith("<br/>")) || (text.endsWith(" "))){
+            if ((text.endsWith("\n")) || (text.endsWith(" ")))
+                text = text.substring(0, text.length()-2);
+            else
+                text = text.substring(0, text.length()-6);
+        }
+        return text;
+    }
 
 }

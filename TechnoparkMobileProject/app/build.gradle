@@ -21,6 +21,7 @@ android {
         repositories {
             jcenter()
             google()
+            maven { url 'https://jitpack.io' }
         }
     }
 }
@@ -28,7 +29,6 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'androidx.appcompat:appcompat:1.1.0'
-    implementation 'com.github.ksoichiro:android-observablescrollview:1.5.0'
     implementation 'com.google.android.material:material:1.2.0-alpha04'
     implementation "androidx.security:security-crypto:1.0.0-alpha02"
     implementation "androidx.paging:paging-runtime:2.1.1"
@@ -57,12 +57,16 @@ dependencies {
     implementation 'androidx.recyclerview:recyclerview:1.1.0'
 
     implementation 'com.google.android.material:material:1.0.0'
-    implementation 'com.android.support:design:22.2.0'
 
     implementation "android.arch.persistence.room:runtime:1.1.1"
     annotationProcessor "android.arch.persistence.room:compiler:1.1.1"
     implementation 'com.squareup.okhttp3:okhttp:3.12.0'
     implementation 'com.squareup.okhttp:okhttp:2.5.0'
     implementation 'com.squareup.okhttp3:logging-interceptor:3.9.0'
+    // Material Dialog Library
+    implementation 'com.shreyaspatil:MaterialDialog:2.1'
+
+    // Material Design Library
+    implementation 'com.google.android.material:material:1.0.0'
     implementation project(path: ':LoopingViewPager')
 }
