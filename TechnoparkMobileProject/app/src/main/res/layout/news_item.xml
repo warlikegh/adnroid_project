@@ -4,14 +4,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginTop="8dp"
-    android:layout_marginBottom="8dp"
-    android:orientation="vertical"
+    android:layout_marginBottom="16dp"
     android:background="@color/colorWhite"
-    android:padding="16dp"
     android:elevation="4dp"
-    >
-
+    android:orientation="vertical"
+    android:padding="16dp">
 
     <TextView
         android:id="@+id/title"
@@ -29,8 +26,8 @@
         android:layout_below="@id/title"
         android:layout_centerHorizontal="true"
         android:text="Blog"
-        android:textSize="16sp"
-        android:textIsSelectable="true"/>
+        android:textIsSelectable="true"
+        android:textSize="16sp" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/content"
@@ -48,12 +45,12 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/content"
         android:layout_centerHorizontal="true"
-        android:text="@string/expand_more"
         android:background="@drawable/ripple_white"
         android:padding="8dp"
+        android:text="@string/expand_more"
         android:textColor="@color/colorAccent"
         android:textSize="16sp"
-        android:visibility="gone"/>
+        android:visibility="gone" />
 
     <ImageView
         android:id="@+id/photo"
@@ -70,9 +67,9 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:layout_toEndOf="@+id/photo"
-        android:text="Author"
         android:background="@drawable/ripple_white"
         android:padding="8dp"
+        android:text="Author"
         android:textSize="16sp" />
 
     <TextView
@@ -101,17 +98,17 @@
         android:layout_below="@id/photo"
         android:layout_marginTop="8dp"
         android:text="Date"
-        android:textSize="16sp"
-        android:textIsSelectable="true"/>
+        android:textIsSelectable="true"
+        android:textSize="16sp" />
 
     <TextView
         android:id="@+id/comments_news"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/photo"
-        android:layout_toLeftOf="@+id/rating_image"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
+        android:layout_toLeftOf="@+id/rating_image"
         android:text="CommentsCount"
         android:textSize="16sp" />
 

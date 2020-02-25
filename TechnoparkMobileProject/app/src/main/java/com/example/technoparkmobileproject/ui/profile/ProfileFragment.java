@@ -40,6 +40,7 @@ import com.google.android.material.snackbar.Snackbar;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+
 import static android.content.Context.VIBRATOR_SERVICE;
 import static android.view.View.GONE;
 
@@ -52,11 +53,25 @@ public class ProfileFragment extends Fragment {
     static Context context;
     static SharedPreferences.Editor mEditor;
 
-    RecyclerView recycler;
     int id;
     String username;
     Boolean isOther;
     static FragmentManager fragmentManager;
+    int[] background = {R.color.colorWhite,
+            R.mipmap.profile_background01,
+            R.mipmap.profile_background02,
+            R.mipmap.profile_background03,
+            R.mipmap.profile_background04,
+            R.mipmap.profile_background05,
+            R.mipmap.profile_background06,
+            R.mipmap.profile_background07,
+            R.mipmap.profile_background08,
+            R.mipmap.profile_background09,
+            R.mipmap.profile_background10,
+            R.mipmap.profile_background11,
+            R.mipmap.profile_background12,
+            R.mipmap.profile_background13};
+    int backgroundNumber = 0;
 
     protected ImageView mAva;
     protected ImageView mBackground;
@@ -171,9 +186,9 @@ public class ProfileFragment extends Fragment {
         mContactsString = view.findViewById(R.id.contacts_string);
         mAccountsString = view.findViewById(R.id.accounts_string);
 
-       /* Glide.with(Objects.requireNonNull(getContext()))
-                .load(R.mipmap.profile_background02)
-                .into(mBackground);*/
+        Glide.with(Objects.requireNonNull(getContext()))
+                .load(background[0])
+                .into(mBackground);
 
         final SwipeRefreshLayout pullToRefresh = view.findViewById(R.id.pullToRefresh);
         pullToRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -189,6 +204,9 @@ public class ProfileFragment extends Fragment {
                     isOther = true;
                     mProfileViewModel.refresh(username, id);
                 }
+                Glide.with(Objects.requireNonNull(getContext()))
+                        .load(background[(++backgroundNumber) % 14])
+                        .into(mBackground);
                 pullToRefresh.setRefreshing(false);
             }
         });
@@ -220,12 +238,15 @@ public class ProfileFragment extends Fragment {
                     mAbout.setTextSize(16);
                     mAbout.setTextAlignment(View.TEXT_ALIGNMENT_VIEW_START);
                     mAbout.setVisibility(View.VISIBLE);
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                        mAbout.setText(Html.fromHtml(mProfile.getAbout(), Html.FROM_HTML_MODE_COMPACT));
-                    } else {
-                        mAbout.setText(Html.fromHtml(mProfile.getAbout()));
-                    }
-                    mAbout.setMovementMethod(LinkMovementMethod.getInstance());
+                    if (mProfile.getAbout() != null) {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                            mAbout.setText(Html.fromHtml(mProfile.getAbout(), Html.FROM_HTML_MODE_COMPACT));
+                        } else {
+                            mAbout.setText(Html.fromHtml(mProfile.getAbout()));
+                        }
+                        mAbout.setMovementMethod(LinkMovementMethod.getInstance());
+                    } else
+                        mAbout.setText(mProfile.getAbout());
                     mAbout.setTextIsSelectable(true);
 
 
@@ -285,11 +306,15 @@ public class ProfileFragment extends Fragment {
 
         mProfileViewModel
                 .getProfile()
-                .observe(getViewLifecycleOwner(), observer);
+                .
+
+                        observe(getViewLifecycleOwner(), observer);
 
         mProfileViewModel
                 .getProfileProgress()
-                .observe(getViewLifecycleOwner(), observerProgress);
+                .
+
+                        observe(getViewLifecycleOwner(), observerProgress);
 
         return view;
     }
