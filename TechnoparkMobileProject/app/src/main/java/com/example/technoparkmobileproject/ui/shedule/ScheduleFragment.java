@@ -2,9 +2,7 @@ package com.example.technoparkmobileproject.ui.shedule;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,10 +13,8 @@ import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-
 import androidx.annotation.Nullable;
 import androidx.annotation.NonNull;
-import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 
 import androidx.lifecycle.Observer;
@@ -63,9 +59,11 @@ public class ScheduleFragment extends Fragment {
                 .get(ScheduleViewModel.class);
         mSettings = Objects.requireNonNull(getContext()).getSharedPreferences("createFirst", Context.MODE_PRIVATE);
         mEditor = mSettings.edit();
-        mScheduleViewModel.pullFromDB();
+        if (mSettings.getBoolean("isFirstSchedule", true))
+            mScheduleViewModel.refresh();
+        else
+            mScheduleViewModel.pullFromDB();
         ALL_DISCIPLINES = context.getResources().getString(R.string.all_disciplines);
-        disciplineText = ALL_DISCIPLINES;
     }
 
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -89,6 +87,20 @@ public class ScheduleFragment extends Fragment {
         recycler.setAdapter(scheduleAdapter);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
         recycler.setLayoutManager(linearLayoutManager);
+        recycler.addOnScrollListener(new RecyclerView.OnScrollListener(){
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                int topRowVerticalPosition =
+                        (recyclerView == null || recyclerView.getChildCount() == 0) ? 0 : recyclerView.getChildAt(0).getTop();
+                pullToRefresh.setEnabled(topRowVerticalPosition >= 0);
+
+            }
+
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+            }
+        });
 
         disciplineText = mSettings.getString("discipline", ALL_DISCIPLINES);
         isDefault[0] = mSettings.getBoolean("default", true);
@@ -116,7 +128,7 @@ public class ScheduleFragment extends Fragment {
         });
 
         twoWeeks.setOnClickListener(new View.OnClickListener() {
-            @RequiresApi(api = Build.VERSION_CODES.O)
+            //@RequiresApi(api = Build.VERSION_CODES.O)
             @Override
             public void onClick(View view) {
                 twoWeeks.setClickable(false);
@@ -145,16 +157,14 @@ public class ScheduleFragment extends Fragment {
                     mProgressBar.setVisibility(GONE);
                     disciplines.clear();
                     disciplines.add(ALL_DISCIPLINES);
+                    boolean isReplay;
                     for (int i = 0; i < mSchedule.size(); i++) {
-                        boolean isReplay = false;
-                        for (int j = 0; j < disciplines.size(); j++) {
-                            if (mSchedule.get(i).getDiscipline().equals(disciplines.get(j))) {
+                        isReplay = false;
+                        for (int j = 0; j < disciplines.size(); j++)
+                            if (mSchedule.get(i).getDiscipline().equals(disciplines.get(j)))
                                 isReplay = true;
-                            }
-                        }
-                        if (!isReplay) {
+                        if (!isReplay)
                             disciplines.add(mSchedule.get(i).getDiscipline());
-                        }
                     }
                     adapter[0] = new ArrayAdapter<String>(context, android.R.layout.simple_spinner_item, disciplines);
                     adapter[0].setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -168,7 +178,6 @@ public class ScheduleFragment extends Fragment {
         AdapterView.OnItemSelectedListener itemSelectedListener = new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                tempSchedule.clear();
                 String item = (String) parent.getItemAtPosition(position);
                 mEditor.putString("discipline", item).commit();
                 disciplineText = item;
@@ -207,23 +216,6 @@ public class ScheduleFragment extends Fragment {
         return view;
     }
 
-    public void setSaveState() {
-        mEditor.putString("discipline", disciplineText).commit();
-    }
-
-    @Override
-    public void onSaveInstanceState(@NonNull Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putString("discipline", disciplineText);
-        setSaveState();
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        setSaveState();
-    }
-
     private class ScheduleAdapter extends RecyclerView.Adapter<ScheduleViewHolder> {
 
         private List<UserSchedule> mSchedule = new ArrayList<>();
@@ -251,16 +243,14 @@ public class ScheduleFragment extends Fragment {
 
         public void filter(String text, boolean defaultTime) {
             mSchedule.clear();
-            if (!defaultTime) {
-                if (mWholeSchedule != null) {
-                    if (text.isEmpty()) {
+            if (mWholeSchedule != null) {
+                if (!defaultTime) {
+                    if (text.isEmpty() || text.equals(ALL_DISCIPLINES))
                         mSchedule.addAll(mWholeSchedule);
-                    } else {
-                        for (UserSchedule item : mWholeSchedule) {
-                            if (item.getDiscipline().equals(text) || text.equals(ALL_DISCIPLINES))
+                    else
+                        for (UserSchedule item : mWholeSchedule)
+                            if (item.getDiscipline().equals(text))
                                 mSchedule.add(item);
-                        }
-                    }
                 } else {
                     for (int i = 0; i < mWholeSchedule.size(); i++) {
                         Date localDate = new SecretData().getDate(mWholeSchedule.get(i).getEndTime());
@@ -276,8 +266,8 @@ public class ScheduleFragment extends Fragment {
                     }
                 }
             }
+            tempSchedule = mSchedule;
             notifyDataSetChanged();
-
         }
 
         @NonNull
@@ -287,7 +277,7 @@ public class ScheduleFragment extends Fragment {
                     .inflate(R.layout.schedule_item, parent, false));
         }
 
-        @RequiresApi(api = Build.VERSION_CODES.O)
+        //@RequiresApi(api = Build.VERSION_CODES.O)
         @Override
         public void onBindViewHolder(@NonNull ScheduleViewHolder holder, int position) {
             final UserSchedule schedule = mSchedule.get(position);
@@ -394,9 +384,8 @@ public class ScheduleFragment extends Fragment {
                             break;
                         }
                     }
-                    String namedis = groupAdapter.namedis;
-                    Log.e("schedule", namedis);
-                    ((Router) context).onGroupSelected(tempSchedule.get(posScheduleViewHolder).getGroups().get(pos).getId());
+                    List<UserSchedule.Group> t = tempSchedule.get(posScheduleViewHolder).getGroups();
+                    ((Router) context).onGroupSelected(t.get(pos).getId());
                 }
             });
         }

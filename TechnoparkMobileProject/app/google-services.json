@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "119277947606",
+    "firebase_url": "https://technoparkapp-f8d1b.firebaseio.com",
+    "project_id": "technoparkapp-f8d1b",
+    "storage_bucket": "technoparkapp-f8d1b.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:119277947606:android:e7fb77ff3f5806eb251777",
+        "android_client_info": {
+          "package_name": "com.example.technoparkmobileproject"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "119277947606-g83eik938ebrgj41vt6obv195i6dbad9.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBjOkNbK7rj66LxTb7eQk5WUsGP1WGZZQ0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "119277947606-g83eik938ebrgj41vt6obv195i6dbad9.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

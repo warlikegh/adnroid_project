@@ -8,8 +8,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Group"
-        android:background="@drawable/ripple_white"
         android:padding="8dp"
         android:textColor="@color/colorTextBlue"
-        android:textSize="16sp" />
+        android:textSize="16sp"
+        android:background="@drawable/ripple_white"
+        android:scrollbars = "vertical"/>
+        <!---->
+
 </LinearLayout>
