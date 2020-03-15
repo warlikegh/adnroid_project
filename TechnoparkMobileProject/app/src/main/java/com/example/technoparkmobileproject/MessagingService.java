@@ -2,6 +2,7 @@ package com.example.technoparkmobileproject;
 
 import android.app.NotificationManager;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.util.Log;
 
 import androidx.core.app.NotificationCompat;
@@ -42,14 +43,11 @@ public class MessagingService extends FirebaseMessagingService {
         super.onNewToken(token);
         Log.d(MessagingService.TAG, "Refreshed token: " + token);
 
-        // отправляем токен на наш сервер
-        sendRegistrationToServer(token);
-
+        getSharedPreferences("fireBase", MODE_PRIVATE).edit().putString("fireBaseToken", token).apply();
     }
 
-
-    private void sendRegistrationToServer(String refreshedToken) {
-        Log.d(MessagingService.TAG, "Should send token to out server " + refreshedToken);
+    public static String getToken(Context context) {
+        return context.getSharedPreferences("fireBase", MODE_PRIVATE).getString("fireBaseToken", "empty");
     }
 
 
@@ -68,4 +66,7 @@ public class MessagingService extends FirebaseMessagingService {
 
         manager.notify(NOTIFICATION_ID_SIMPLE, builder.build());
     }
+
+
 }
+

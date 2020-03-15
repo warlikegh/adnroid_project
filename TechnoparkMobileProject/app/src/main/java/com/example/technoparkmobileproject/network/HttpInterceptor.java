@@ -17,6 +17,7 @@ import okhttp3.Response;
 import retrofit2.Call;
 import retrofit2.Callback;
 
+import static com.example.technoparkmobileproject.auth.AuthRepo.sendTokenToServer;
 import static com.example.technoparkmobileproject.auth.AuthRepo.sha256;
 
 public class HttpInterceptor implements Interceptor {
@@ -58,6 +59,7 @@ public class HttpInterceptor implements Interceptor {
                             if (response.isSuccessful() && response.body() != null) {
                                 AuthApi.UserAuth user = response.body();
                                 editor.putString(AUTH_TOKEN, user.getAuthToken()).apply();
+                                sendTokenToServer(mContext);
                             } else {
                                 mContext.startActivity(new Intent(mContext, AuthActivity.class)
                                         .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)

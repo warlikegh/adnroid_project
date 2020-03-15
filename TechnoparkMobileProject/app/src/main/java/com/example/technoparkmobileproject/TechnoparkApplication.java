@@ -22,7 +22,7 @@ public class TechnoparkApplication extends Application {
 
         mSecretSettings = new SecretData().getSecretData(getApplicationContext());
         mSecretEditor = mSecretSettings.edit();
-        mSecretEditor.putString(SALT, "there should be salt").apply();
+        mSecretEditor.putString(SALT, "HERE MUST BE SALT").apply();
 
         mApiRepo = new ApiRepo(getApplicationContext());
         mAuthRepo = new AuthRepo(mApiRepo);

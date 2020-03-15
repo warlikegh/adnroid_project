@@ -38,6 +38,7 @@ public interface PushApi {
         public UserPush(String deviceId, String deviceToken) {
             this.deviceId = deviceId;
             this.deviceToken = deviceToken;
+            this.type = "android";
         }
 
         @SerializedName("device_id")
@@ -46,6 +47,9 @@ public interface PushApi {
         @SerializedName("device_token")
         @Expose
         private String deviceToken;
+        @SerializedName("type")
+        @Expose
+        private String type;
 
         public String getDeviceId() {
             return deviceId;

@@ -12,13 +12,17 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
+import com.example.technoparkmobileproject.MessagingService;
 import com.example.technoparkmobileproject.SecretData;
 import com.example.technoparkmobileproject.TechnoparkApplication;
 import com.example.technoparkmobileproject.network.ApiRepo;
 import com.example.technoparkmobileproject.network.AuthApi;
 import com.example.technoparkmobileproject.network.PushApi;
+import com.google.firebase.iid.FirebaseInstanceId;
 
+import java.io.IOException;
 import java.security.MessageDigest;
+import java.util.UUID;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -78,6 +82,9 @@ public class AuthRepo {
                                     .putString(PASSWORD, password)
                                     .putInt(SITE, index).apply();
 
+                            sendTokenToServer(context);
+
+
                             progress.postValue(AuthProgress.SUCCESS);
                         } else {
                             progress.postValue(AuthProgress.FAILED);
@@ -114,6 +121,39 @@ public class AuthRepo {
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
+    }
+
+    public static void sendTokenToServer(Context context) {
+        PushApi mPushApi = ApiRepo.from(context).getPushApi(new SecretData().getSecretData(context).getInt(SITE, 0));
+        SharedPreferences mSettings = new SecretData().getSecretData(context);
+
+        mPushApi.registerAPN(" Token " + mSettings.getString(AUTH_TOKEN, ""), getUserPush(context))
+                .enqueue(new Callback<PushApi.PushSuccess>() {
+                    @Override
+                    public void onResponse(Call<PushApi.PushSuccess> call,
+                                           Response<PushApi.PushSuccess> response) {
+                        if (response.isSuccessful() && response.body() != null)
+                            Log.d("wasPushTokenRegister", response.body().getMessage());
+                        else
+                            Log.d("wasPushTokenRegister", "No");
+                    }
+
+                    @Override
+                    public void onFailure(Call<PushApi.PushSuccess> call, Throwable t) {
+                        Log.d("wasPushTokenRegister", "NoInternet");
+                    }
+                });
+
+    }
+
+    static PushApi.UserPush getUserPush(Context context) {
+        String token = MessagingService.getToken(context);
+        String id = UUID.randomUUID().toString();
+
+        Log.d("wasPushTokenRegister", id);
+        Log.d("wasPushTokenRegister", token);
+
+        return (new PushApi.UserPush(id, token));
     }
 
 }

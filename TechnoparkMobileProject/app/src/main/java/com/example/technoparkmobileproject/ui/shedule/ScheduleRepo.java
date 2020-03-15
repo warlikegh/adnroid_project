@@ -183,7 +183,6 @@ public class ScheduleRepo {
     }
 
     private void postList(Collection<Schedule> collection) {
-        List<Schedule> data = new ArrayList();
         Comparator<Schedule> comp = new Comparator<Schedule>() {
             @Override
             public int compare(Schedule a, Schedule b) {
@@ -197,8 +196,10 @@ public class ScheduleRepo {
                 }
             }
         };
+
+        List<Schedule> data = new ArrayList(collection);
         Collections.sort(data, comp);
-        data.addAll(collection);
+
         List<UserSchedule> tempResult = new ArrayList<>();
         for (int i = 0; i < data.size(); i++) {
             UserSchedule temp = new UserSchedule(data.get(i).id, data.get(i).discipline,
