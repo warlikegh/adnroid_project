@@ -11,6 +11,7 @@ import androidx.navigation.Navigation;
 import androidx.navigation.ui.NavigationUI;
 
 public class MainActivity extends FragmentActivity implements Router {
+    public static final String CHANNEL_DEFAULT = "default";
 
     NavController navController;
 

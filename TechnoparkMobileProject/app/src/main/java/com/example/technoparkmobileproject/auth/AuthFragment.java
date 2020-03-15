@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModelProvider;
 
 import android.content.Context;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -92,6 +93,11 @@ public class AuthFragment extends Fragment {
                     Snackbar.make(viewAll, R.string.load, Snackbar.LENGTH_LONG)
                             .show();
                 } else if (authState == AuthViewModel.AuthState.SUCCESS) {
+                    SharedPreferences mSettings = getContext().getSharedPreferences("createFirst", Context.MODE_PRIVATE);
+                    SharedPreferences.Editor editor = mSettings.edit();
+                    editor.putBoolean("isFirstSchedule", true);
+                    editor.apply();
+
                     Router router = (Router) getActivity();
                     if (router != null) {
                         router.openMain();

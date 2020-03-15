@@ -23,7 +23,7 @@
                 <ImageView
                     android:id="@+id/background"
                     android:layout_width="match_parent"
-                    android:layout_height="160dp"
+                    android:layout_height="152dp"
                     android:scaleType="centerCrop"
                     android:elevation="1dp"
                     android:layout_gravity="center_horizontal"
@@ -37,14 +37,14 @@
                     android:scaleType="centerCrop"
                     android:layout_marginTop="8dp"
                     android:layout_centerHorizontal="true"
-                    android:elevation="2dp" />
+                    android:elevation="8dp" />
 
                 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
                     android:id="@+id/about_layout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@color/colorWhite"
-                    android:elevation="2dp"
+                    android:elevation="4dp"
                     android:layout_marginTop="8dp"
                     android:layout_below="@+id/photo"
                     android:orientation="vertical">
@@ -56,6 +56,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="@dimen/margin_ava"
                         android:layout_marginEnd="@dimen/margin_ava"
+                        android:layout_marginTop="8dp"
                         android:layout_toEndOf="@+id/photo"
                         android:text="fullName"
                         android:textColor="@color/colorTextBlue"
@@ -146,7 +147,7 @@
                     android:layout_below="@+id/about_layout"
                     android:layout_marginTop="8dp"
                     android:background="@color/colorWhite"
-                    android:elevation="2dp"
+                    android:elevation="4dp"
                     android:orientation="vertical">
 
                     <TextView
@@ -177,7 +178,7 @@
                     android:layout_below="@+id/groups_layout"
                     android:layout_marginTop="8dp"
                     android:background="@color/colorWhite"
-                    android:elevation="2dp"
+                    android:elevation="4dp"
                     android:orientation="vertical">
 
                     <TextView
@@ -257,7 +258,7 @@
                     android:layout_below="@+id/contacts_layout"
                     android:layout_marginTop="8dp"
                     android:background="@color/colorWhite"
-                    android:elevation="2dp"
+                    android:elevation="4dp"
                     android:orientation="vertical">
 
                     <TextView
@@ -302,7 +303,7 @@
                     android:text="@string/Out_of_account"
                     android:textColor="@color/colorRed"
                     android:visibility="visible"
-                    android:elevation="2dp"/>
+                    android:elevation="4dp"/>
             </RelativeLayout>
 
         </androidx.core.widget.NestedScrollView>

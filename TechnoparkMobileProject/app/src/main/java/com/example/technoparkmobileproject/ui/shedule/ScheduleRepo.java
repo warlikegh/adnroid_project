@@ -36,7 +36,6 @@ public class ScheduleRepo {
     private static String AUTH_TOKEN = "auth_token";
     private static String SITE = "site";
     private int key = 0;
-    private final Executor executor = Executors.newSingleThreadExecutor();
 
     private final ScheduleDbManager.ReadAllListener<Schedule> readListener = new ScheduleDbManager.ReadAllListener<Schedule>() {
         @Override
@@ -183,8 +182,7 @@ public class ScheduleRepo {
 
     }
 
-    private void postList(Collection<Schedule> list) {
-        List<Schedule> data = new ArrayList();
+    private void postList(Collection<Schedule> collection) {
         Comparator<Schedule> comp = new Comparator<Schedule>() {
             @Override
             public int compare(Schedule a, Schedule b) {
@@ -198,8 +196,10 @@ public class ScheduleRepo {
                 }
             }
         };
-        data.addAll(list);
+
+        List<Schedule> data = new ArrayList(collection);
         Collections.sort(data, comp);
+
         List<UserSchedule> tempResult = new ArrayList<>();
         for (int i = 0; i < data.size(); i++) {
             UserSchedule temp = new UserSchedule(data.get(i).id, data.get(i).discipline,
