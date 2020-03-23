@@ -10,6 +10,11 @@ import androidx.core.app.NotificationCompat;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
+import java.util.UUID;
+
+import static com.example.technoparkmobileproject.auth.AuthRepo.IS_AUTHORISED;
+import static com.example.technoparkmobileproject.auth.AuthRepo.sendTokenToServer;
+
 public class MessagingService extends FirebaseMessagingService {
 
     public static final String TAG = "Firebase";
@@ -43,11 +48,25 @@ public class MessagingService extends FirebaseMessagingService {
         super.onNewToken(token);
         Log.d(MessagingService.TAG, "Refreshed token: " + token);
 
-        getSharedPreferences("fireBase", MODE_PRIVATE).edit().putString("fireBaseToken", token).apply();
+        SharedPreferences mSettings =  getSharedPreferences("fireBase", MODE_PRIVATE);
+        SharedPreferences.Editor editor = mSettings.edit();
+
+        editor.putString("fireBaseToken", token).apply();
+
+        if (!mSettings.contains("fireBaseID"))
+            editor.putString("fireBaseID", UUID.randomUUID().toString()).apply();
+
+        SharedPreferences mSecretSettings = new SecretData().getSecretData(this);
+        if (mSecretSettings.getBoolean(IS_AUTHORISED, false))
+            sendTokenToServer(this);
     }
 
     public static String getToken(Context context) {
         return context.getSharedPreferences("fireBase", MODE_PRIVATE).getString("fireBaseToken", "empty");
+    }
+
+    public static String getID(Context context) {
+        return context.getSharedPreferences("fireBase", MODE_PRIVATE).getString("fireBaseID", "empty");
     }
 
 

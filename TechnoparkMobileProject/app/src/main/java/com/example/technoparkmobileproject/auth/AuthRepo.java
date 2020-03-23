@@ -41,6 +41,7 @@ public class AuthRepo {
     static String LOGIN = "login";
     static String PASSWORD = "password";
     private static String SITE = "site";
+    public static String IS_AUTHORISED = "is_authorised";
     private static Context context;
 
     public AuthRepo(ApiRepo apiRepo) {
@@ -80,7 +81,8 @@ public class AuthRepo {
                             editor.putString(AUTH_TOKEN, user.getAuthToken())
                                     .putString(LOGIN, login)
                                     .putString(PASSWORD, password)
-                                    .putInt(SITE, index).apply();
+                                    .putInt(SITE, index)
+                                    .putBoolean(IS_AUTHORISED, true).apply();
 
                             sendTokenToServer(context);
 
@@ -148,7 +150,7 @@ public class AuthRepo {
 
     static PushApi.UserPush getUserPush(Context context) {
         String token = MessagingService.getToken(context);
-        String id = UUID.randomUUID().toString();
+        String id = MessagingService.getID(context);
 
         Log.d("wasPushTokenRegister", id);
         Log.d("wasPushTokenRegister", token);
