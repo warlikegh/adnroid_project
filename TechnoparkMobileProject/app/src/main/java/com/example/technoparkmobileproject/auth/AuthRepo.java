@@ -41,6 +41,7 @@ public class AuthRepo {
     static String LOGIN = "login";
     static String PASSWORD = "password";
     private static String SITE = "site";
+    static String IS_DELETED = "is_deleted";
     public static String IS_AUTHORISED = "is_authorised";
     private static Context context;
 
@@ -84,8 +85,9 @@ public class AuthRepo {
                                     .putInt(SITE, index)
                                     .putBoolean(IS_AUTHORISED, true).apply();
 
+                            if (!mSettings.getBoolean(IS_DELETED, true))
+                                deleteTokenFromServer(context);
                             sendTokenToServer(context);
-
 
                             progress.postValue(AuthProgress.SUCCESS);
                         } else {
@@ -112,13 +114,11 @@ public class AuthRepo {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
             byte[] hash = digest.digest(base.getBytes("UTF-8"));
             StringBuffer hexString = new StringBuffer();
-
             for (int i = 0; i < hash.length; i++) {
                 String hex = Integer.toHexString(0xff & hash[i]);
                 if (hex.length() == 1) hexString.append('0');
                 hexString.append(hex);
             }
-
             return hexString.toString();
         } catch (Exception ex) {
             throw new RuntimeException(ex);
@@ -134,10 +134,6 @@ public class AuthRepo {
                     @Override
                     public void onResponse(Call<PushApi.PushSuccess> call,
                                            Response<PushApi.PushSuccess> response) {
-                        if (response.isSuccessful() && response.body() != null)
-                            Log.d("wasPushTokenRegister", response.body().getMessage());
-                        else
-                            Log.d("wasPushTokenRegister", "No");
                     }
 
                     @Override
@@ -156,6 +152,36 @@ public class AuthRepo {
         Log.d("wasPushTokenRegister", token);
 
         return (new PushApi.UserPush(id, token));
+    }
+
+    public static void deleteTokenFromServer(Context context) {
+        PushApi mPushApi = ApiRepo.from(context).getPushApi(new SecretData().getSecretData(context).getInt(SITE, 0));
+        final SharedPreferences mSettings = new SecretData().getSecretData(context);
+
+        mPushApi.deleteToken(" Token " + mSettings.getString(AUTH_TOKEN, ""), getUserToken(context))
+                .enqueue(new Callback<PushApi.PushSuccess>() {
+                    @Override
+                    public void onResponse(Call<PushApi.PushSuccess> call,
+                                           Response<PushApi.PushSuccess> response) {
+                        if (response.isSuccessful())
+                            mSettings.edit().putBoolean(IS_DELETED, true).apply();
+                        else
+                            mSettings.edit().putBoolean(IS_DELETED, true).apply();
+                    }
+
+                    @Override
+                    public void onFailure(Call<PushApi.PushSuccess> call, Throwable t) {
+                        mSettings.edit().putBoolean(IS_DELETED, false).apply();
+                    }
+                });
+    }
+
+    static PushApi.UserToken getUserToken(Context context) {
+        String token = MessagingService.getToken(context);
+
+        Log.d("wasPushTokenDelete", token);
+
+        return (new PushApi.UserToken(token));
     }
 
 }

@@ -5,12 +5,24 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.util.Log;
 
+import com.example.technoparkmobileproject.MessagingService;
 import com.example.technoparkmobileproject.R;
 import com.example.technoparkmobileproject.SecretData;
 import com.example.technoparkmobileproject.TechnoparkApplication;
 import com.example.technoparkmobileproject.auth.AuthActivity;
+import com.example.technoparkmobileproject.network.ApiRepo;
+import com.example.technoparkmobileproject.network.PushApi;
 import com.example.technoparkmobileproject.ui.shedule.ScheduleViewModel;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+import static android.content.Context.MODE_PRIVATE;
+import static com.example.technoparkmobileproject.auth.AuthRepo.IS_AUTHORISED;
+import static com.example.technoparkmobileproject.auth.AuthRepo.deleteTokenFromServer;
 
 public class DialogLogOut {
 
@@ -30,15 +42,17 @@ public class DialogLogOut {
         builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
+                deleteTokenFromServer(context);
+
                 SharedPreferences mSecretSettings = new SecretData().getSecretData(context);
                 SharedPreferences.Editor mSecretEditor = mSecretSettings.edit();
                 mSecretEditor.remove(LOGIN)
                         .remove(PASSWORD)
-                        .remove(AUTH_TOKEN)
                         .remove(SITE)
+                        .putBoolean(IS_AUTHORISED, false)
                         .apply();
 
-                SharedPreferences mSettings = context.getSharedPreferences("createFirst", Context.MODE_PRIVATE);
+                SharedPreferences mSettings = context.getSharedPreferences("createFirst", MODE_PRIVATE);
                 SharedPreferences.Editor mEditor = mSettings.edit();
                 mEditor.putBoolean("isFirstNews", true)
                         .putBoolean("isFirstSchedule", true)
@@ -62,6 +76,5 @@ public class DialogLogOut {
             }
         });
         return builder.create();
-
     }
 }

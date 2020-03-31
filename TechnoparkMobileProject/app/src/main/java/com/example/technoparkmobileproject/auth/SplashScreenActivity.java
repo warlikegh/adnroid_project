@@ -15,10 +15,12 @@ import com.example.technoparkmobileproject.SecretData;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 
+import static com.example.technoparkmobileproject.auth.AuthRepo.IS_AUTHORISED;
+import static com.example.technoparkmobileproject.auth.AuthRepo.LOGIN;
+
 public class SplashScreenActivity extends AppCompatActivity {
 
     SharedPreferences mSettings;
-    SharedPreferences.Editor editor;
     static String AUTH_TOKEN = "auth_token";
 
     @Override
@@ -27,7 +29,7 @@ public class SplashScreenActivity extends AppCompatActivity {
         setContentView(R.layout.activity_splash_screen);
         mSettings = new SecretData().getSecretData(this);
 
-        if (!mSettings.getString(AUTH_TOKEN, "").isEmpty()) {
+        if (mSettings.getBoolean(IS_AUTHORISED, false)) {
             startActivity(new Intent(getApplicationContext(), MainActivity.class)
                     .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
                     .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));

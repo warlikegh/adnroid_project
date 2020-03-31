@@ -13,6 +13,7 @@ import com.google.firebase.messaging.RemoteMessage;
 import java.util.UUID;
 
 import static com.example.technoparkmobileproject.auth.AuthRepo.IS_AUTHORISED;
+import static com.example.technoparkmobileproject.auth.AuthRepo.deleteTokenFromServer;
 import static com.example.technoparkmobileproject.auth.AuthRepo.sendTokenToServer;
 
 public class MessagingService extends FirebaseMessagingService {
@@ -38,10 +39,7 @@ public class MessagingService extends FirebaseMessagingService {
             showMessageNotification(title, body);
 
         }
-
-
     }
-
 
     @Override
     public void onNewToken(final String token) {
@@ -57,8 +55,10 @@ public class MessagingService extends FirebaseMessagingService {
             editor.putString("fireBaseID", UUID.randomUUID().toString()).apply();
 
         SharedPreferences mSecretSettings = new SecretData().getSecretData(this);
-        if (mSecretSettings.getBoolean(IS_AUTHORISED, false))
+        if (mSecretSettings.getBoolean(IS_AUTHORISED, false)) {
+            deleteTokenFromServer(this);
             sendTokenToServer(this);
+        }
     }
 
     public static String getToken(Context context) {
@@ -81,7 +81,6 @@ public class MessagingService extends FirebaseMessagingService {
                 .setContentTitle(title)
                 .setContentText(message)
                 .setAutoCancel(true);
-
 
         manager.notify(NOTIFICATION_ID_SIMPLE, builder.build());
     }
