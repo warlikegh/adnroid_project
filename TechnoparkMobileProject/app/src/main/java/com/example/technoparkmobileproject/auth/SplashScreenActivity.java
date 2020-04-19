@@ -1,9 +1,6 @@
 package com.example.technoparkmobileproject.auth;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.security.crypto.EncryptedSharedPreferences;
-import androidx.security.crypto.MasterKeys;
-
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -12,16 +9,11 @@ import com.example.technoparkmobileproject.MainActivity;
 import com.example.technoparkmobileproject.R;
 import com.example.technoparkmobileproject.SecretData;
 
-import java.io.IOException;
-import java.security.GeneralSecurityException;
-
-import static com.example.technoparkmobileproject.auth.AuthRepo.IS_AUTHORISED;
-import static com.example.technoparkmobileproject.auth.AuthRepo.LOGIN;
+import static com.example.technoparkmobileproject.TechnoparkApplication.IS_AUTHORISED;
 
 public class SplashScreenActivity extends AppCompatActivity {
 
     SharedPreferences mSettings;
-    static String AUTH_TOKEN = "auth_token";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

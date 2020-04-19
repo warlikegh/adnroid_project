@@ -29,6 +29,14 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 import static android.content.Context.TELEPHONY_SERVICE;
+import static com.example.technoparkmobileproject.TechnoparkApplication.AUTH_TOKEN;
+import static com.example.technoparkmobileproject.TechnoparkApplication.IS_AUTHORISED;
+import static com.example.technoparkmobileproject.TechnoparkApplication.IS_DELETED;
+import static com.example.technoparkmobileproject.TechnoparkApplication.LOGIN;
+import static com.example.technoparkmobileproject.TechnoparkApplication.PASSWORD;
+import static com.example.technoparkmobileproject.TechnoparkApplication.SALT;
+import static com.example.technoparkmobileproject.TechnoparkApplication.SITE;
+import static com.example.technoparkmobileproject.TechnoparkApplication.TOKEN;
 
 @SuppressWarnings("WeakerAccess")
 public class AuthRepo {
@@ -36,13 +44,6 @@ public class AuthRepo {
     private final ApiRepo mApiRepo;
     static SharedPreferences mSettings;
     static SharedPreferences.Editor editor;
-    static String SALT = "salt";
-    static String AUTH_TOKEN = "auth_token";
-    static String LOGIN = "login";
-    static String PASSWORD = "password";
-    private static String SITE = "site";
-    static String IS_DELETED = "is_deleted";
-    public static String IS_AUTHORISED = "is_authorised";
     private static Context context;
 
     public AuthRepo(ApiRepo apiRepo) {
@@ -129,7 +130,7 @@ public class AuthRepo {
         PushApi mPushApi = ApiRepo.from(context).getPushApi(new SecretData().getSecretData(context).getInt(SITE, 0));
         SharedPreferences mSettings = new SecretData().getSecretData(context);
 
-        mPushApi.registerAPN(" Token " + mSettings.getString(AUTH_TOKEN, ""), getUserPush(context))
+        mPushApi.registerAPN(TOKEN + mSettings.getString(AUTH_TOKEN, ""), getUserPush(context))
                 .enqueue(new Callback<PushApi.PushSuccess>() {
                     @Override
                     public void onResponse(Call<PushApi.PushSuccess> call,
@@ -158,7 +159,7 @@ public class AuthRepo {
         PushApi mPushApi = ApiRepo.from(context).getPushApi(new SecretData().getSecretData(context).getInt(SITE, 0));
         final SharedPreferences mSettings = new SecretData().getSecretData(context);
 
-        mPushApi.deleteToken(" Token " + mSettings.getString(AUTH_TOKEN, ""), getUserToken(context))
+        mPushApi.deleteToken(TOKEN + mSettings.getString(AUTH_TOKEN, ""), getUserToken(context))
                 .enqueue(new Callback<PushApi.PushSuccess>() {
                     @Override
                     public void onResponse(Call<PushApi.PushSuccess> call,

@@ -42,6 +42,10 @@ import java.util.List;
 import java.util.Objects;
 
 import static android.view.View.GONE;
+import static com.example.technoparkmobileproject.TechnoparkApplication.CREATE_FIRST_SETTINGS;
+import static com.example.technoparkmobileproject.TechnoparkApplication.DEFAULT_TWO_WEEK;
+import static com.example.technoparkmobileproject.TechnoparkApplication.DISCIPLINE;
+import static com.example.technoparkmobileproject.TechnoparkApplication.IS_FIRST_SCHEDULE;
 
 public class ScheduleFragment extends Fragment {
     private List<UserSchedule> mSchedule = new ArrayList<>();
@@ -49,7 +53,6 @@ public class ScheduleFragment extends Fragment {
     private ScheduleRepo.ScheduleProgress mScheduleProgress;
     private ScheduleRepo.CheckProgress mCheckProgress;
     private List<UserSchedule> tempSchedule = new ArrayList<>();
- //   static GroupAdapter groupAdapter;
     final ScheduleAdapter scheduleAdapter = new ScheduleAdapter();
     String ALL_DISCIPLINES;
     String disciplineText;
@@ -66,9 +69,9 @@ public class ScheduleFragment extends Fragment {
         context = getContext();
         mScheduleViewModel = new ViewModelProvider(Objects.requireNonNull(getActivity()))
                 .get(ScheduleViewModel.class);
-        mSettings = Objects.requireNonNull(getContext()).getSharedPreferences("createFirst", Context.MODE_PRIVATE);
+        mSettings = Objects.requireNonNull(getContext()).getSharedPreferences(CREATE_FIRST_SETTINGS, Context.MODE_PRIVATE);
         mEditor = mSettings.edit();
-        if (mSettings.getBoolean("isFirstSchedule", true))
+        if (mSettings.getBoolean(IS_FIRST_SCHEDULE, true))
             mScheduleViewModel.refresh();
         else
             mScheduleViewModel.pullFromDB();
@@ -111,8 +114,8 @@ public class ScheduleFragment extends Fragment {
             }
         });
 
-        disciplineText = mSettings.getString("discipline", ALL_DISCIPLINES);
-        isDefault[0] = mSettings.getBoolean("default", true);
+        disciplineText = mSettings.getString(DISCIPLINE, ALL_DISCIPLINES);
+        isDefault[0] = mSettings.getBoolean(DEFAULT_TWO_WEEK, true);
         final Spinner spinner = view.findViewById(R.id.spinner_discipline);
         final List<String> disciplines = new ArrayList<>();
         final ArrayAdapter<String>[] adapter = new ArrayAdapter[]{new ArrayAdapter<String>(context, android.R.layout.simple_spinner_item, disciplines)};
@@ -125,14 +128,14 @@ public class ScheduleFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 allSemesters.setClickable(false);
-                allSemesters.setBackgroundColor(getResources().getColor(R.color.colorAccent));
-                allSemesters.setTextColor(getResources().getColor(R.color.colorGrey));
+                allSemesters.setBackgroundColor(getResources().getColor(R.color.colorAccent, null));
+                allSemesters.setTextColor(getResources().getColor(R.color.colorGrey, null));
                 twoWeeks.setClickable(true);
-                twoWeeks.setBackgroundColor(getResources().getColor(R.color.colorGrey));
-                twoWeeks.setTextColor(getResources().getColor(R.color.colorAccent));
+                twoWeeks.setBackgroundColor(getResources().getColor(R.color.colorGrey, null));
+                twoWeeks.setTextColor(getResources().getColor(R.color.colorAccent, null));
                 isDefault[0] = false;
                 scheduleAdapter.setTime(isDefault[0]);
-                mEditor.putBoolean("default", isDefault[0]).commit();
+                mEditor.putBoolean(DEFAULT_TWO_WEEK, isDefault[0]).commit();
             }
         });
 
@@ -141,14 +144,14 @@ public class ScheduleFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 twoWeeks.setClickable(false);
-                twoWeeks.setBackgroundColor(getResources().getColor(R.color.colorAccent));
-                twoWeeks.setTextColor(getResources().getColor(R.color.colorGrey));
+                twoWeeks.setBackgroundColor(getResources().getColor(R.color.colorAccent, null));
+                twoWeeks.setTextColor(getResources().getColor(R.color.colorGrey, null));
                 allSemesters.setClickable(true);
-                allSemesters.setBackgroundColor(getResources().getColor(R.color.colorGrey));
-                allSemesters.setTextColor(getResources().getColor(R.color.colorAccent));
+                allSemesters.setBackgroundColor(getResources().getColor(R.color.colorGrey, null));
+                allSemesters.setTextColor(getResources().getColor(R.color.colorAccent, null));
                 isDefault[0] = true;
                 scheduleAdapter.setTime(isDefault[0]);
-                mEditor.putBoolean("default", isDefault[0]).commit();
+                mEditor.putBoolean(DEFAULT_TWO_WEEK, isDefault[0]).commit();
             }
         });
 
@@ -188,7 +191,7 @@ public class ScheduleFragment extends Fragment {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 String item = (String) parent.getItemAtPosition(position);
-                mEditor.putString("discipline", item).commit();
+                mEditor.putString(DISCIPLINE, item).commit();
                 disciplineText = item;
                 scheduleAdapter.setDiscipline(disciplineText);
             }
@@ -285,12 +288,11 @@ public class ScheduleFragment extends Fragment {
                         Date localDate = new SecretData().getDate(mWholeSchedule.get(i).getDate());
 
                         Calendar instance = Calendar.getInstance();
-                        instance.setTime(localDate); //устанавливаем дату, с которой будет производить операции
-                        instance.add(Calendar.DAY_OF_MONTH, 1);// прибавляем 3 дня к установленной дате
-                        Date newDate = instance.getTime(); // получаем измененную дату
+                        instance.setTime(localDate);
+                        instance.add(Calendar.DAY_OF_MONTH, 1);
+                        Date newDate = instance.getTime();
 
                         Date today = new Date();
-                       // Calendar instance = Calendar.getInstance();
                         instance.setTime(today);
                         instance.add(Calendar.DAY_OF_MONTH, 14);
                         Date daysBefore = instance.getTime();
@@ -328,11 +330,6 @@ public class ScheduleFragment extends Fragment {
             holder.mTime.setText(time);
             holder.mTitle.setText(schedule.getTitle());
             holder.mDiscipline.setText(schedule.getDiscipline());
-
-          /*  groupAdapter = new GroupAdapter();
-            groupAdapter.setGroup(schedule.getGroups(), schedule.getDiscipline() + " " + schedule.getTitle());
-            holder.mGroups.setAdapter(groupAdapter);
-            holder.mGroups.setLayoutManager(new LinearLayoutManager(getContext()));*/
 
             if (schedule.getAttended()) {
                 holder.mCheckButton.setVisibility(View.VISIBLE);

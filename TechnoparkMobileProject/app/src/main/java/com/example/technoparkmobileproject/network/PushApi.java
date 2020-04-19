@@ -5,18 +5,20 @@ import com.google.gson.annotations.SerializedName;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
-import retrofit2.http.DELETE;
 import retrofit2.http.HTTP;
 import retrofit2.http.Header;
 import retrofit2.http.POST;
 
+import static com.example.technoparkmobileproject.TechnoparkApplication.AUTHORISATION;
+import static com.example.technoparkmobileproject.TechnoparkApplication.PUSH_PATH_URL;
+
 public interface PushApi {
 
-    @POST("device_token/")
-    Call<PushSuccess> registerAPN(@Header("Authorization") String auth_token, @Body UserPush data);
+    @POST(PUSH_PATH_URL)
+    Call<PushSuccess> registerAPN(@Header(AUTHORISATION) String auth_token, @Body UserPush data);
 
-    @HTTP(method = "DELETE", path = "device_token/", hasBody = true)
-    Call<PushSuccess> deleteToken(@Header("Authorization") String auth_token, @Body UserToken data);
+    @HTTP(method = "DELETE", path = PUSH_PATH_URL, hasBody = true)
+    Call<PushSuccess> deleteToken(@Header(AUTHORISATION) String auth_token, @Body UserToken data);
 
     class PushSuccess {
 

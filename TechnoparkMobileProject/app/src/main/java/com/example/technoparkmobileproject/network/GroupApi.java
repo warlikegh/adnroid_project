@@ -10,11 +10,13 @@ import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.Url;
 
+import static com.example.technoparkmobileproject.TechnoparkApplication.AUTHORISATION;
+
 public interface GroupApi {
 
 
     @GET
-    Call<StudentGroupPlain> getStudentsGroup(@Header("Authorization") String auth_token, @Url String url);
+    Call<StudentGroupPlain> getStudentsGroup(@Header(AUTHORISATION) String auth_token, @Url String url);
 
     class StudentGroupPlain {
 

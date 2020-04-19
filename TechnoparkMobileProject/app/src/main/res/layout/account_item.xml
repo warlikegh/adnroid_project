@@ -26,7 +26,8 @@
             android:background="@drawable/shape_white_round"
             android:linksClickable="true"
             android:padding="8dp"
-            android:textSize="20sp" />
+            android:textSize="20sp"
+            android:hapticFeedbackEnabled="true"/>
     </RelativeLayout>
 
     <View

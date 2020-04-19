@@ -23,6 +23,14 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import static com.example.technoparkmobileproject.TechnoparkApplication.AUTH_TOKEN;
+import static com.example.technoparkmobileproject.TechnoparkApplication.CHECK_PATH_URL;
+import static com.example.technoparkmobileproject.TechnoparkApplication.CREATE_FIRST_SETTINGS;
+import static com.example.technoparkmobileproject.TechnoparkApplication.IS_FIRST_SCHEDULE;
+import static com.example.technoparkmobileproject.TechnoparkApplication.SCHEDULE_PATH_URL;
+import static com.example.technoparkmobileproject.TechnoparkApplication.SITE;
+import static com.example.technoparkmobileproject.TechnoparkApplication.TOKEN;
+
 public class ScheduleRepo {
     private final static MutableLiveData<List<UserSchedule>> mSchedule = new MutableLiveData<>();
     private final static MutableLiveData<CheckApi.UserCheck> mFeedback = new MutableLiveData<>();
@@ -32,8 +40,6 @@ public class ScheduleRepo {
     private final Context mContext;
     private ScheduleApi mScheduleApi;
     private CheckApi mCheckApi;
-    private static String AUTH_TOKEN = "auth_token";
-    private static String SITE = "site";
     private int key = 0;
 
     private final ScheduleDbManager.ReadAllListener<Schedule> readListener = new ScheduleDbManager.ReadAllListener<Schedule>() {
@@ -57,9 +63,9 @@ public class ScheduleRepo {
         mContext = context;
 
         SharedPreferences mSettings;
-        mSettings = mContext.getSharedPreferences("createFirst", Context.MODE_PRIVATE);
+        mSettings = mContext.getSharedPreferences(CREATE_FIRST_SETTINGS, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = mSettings.edit();
-        editor.putBoolean("isFirstSchedule", false);
+        editor.putBoolean(IS_FIRST_SCHEDULE, false);
         editor.apply();
 
         mScheduleApi = ApiRepo.from(mContext).getScheduleApi(new SecretData().getSecretData(mContext).getInt(SITE, 0));
@@ -86,7 +92,7 @@ public class ScheduleRepo {
         mScheduleProgress.postValue(ScheduleProgress.IN_PROGRESS);
         final ScheduleDbManager manager = ScheduleDbManager.getInstance(mContext);
         mSettings = new SecretData().getSecretData(mContext);
-        mScheduleApi.getUserSchedule(" Token " + mSettings.getString(AUTH_TOKEN, "")).enqueue(new Callback<List<ScheduleApi.UserSchedulePlain>>() {
+        mScheduleApi.getUserSchedule(TOKEN + mSettings.getString(AUTH_TOKEN, "")).enqueue(new Callback<List<ScheduleApi.UserSchedulePlain>>() {
             @Override
             public void onResponse(Call<List<ScheduleApi.UserSchedulePlain>> call,
                                    Response<List<ScheduleApi.UserSchedulePlain>> response) {
@@ -236,8 +242,8 @@ public class ScheduleRepo {
         mCheckProgress.postValue(CheckProgress.IN_PROGRESS);
         final ScheduleDbManager manager = ScheduleDbManager.getInstance(mContext);   /**/
         mSettings = new SecretData().getSecretData(mContext);            /*       schedule/9101/check/          */
-        mCheckApi.checkUser(" Token " + mSettings.getString(AUTH_TOKEN, ""),
-                " schedule/" + lessonID.toString() + "/check/", new CheckApi.Nothing())
+        mCheckApi.checkUser(TOKEN + mSettings.getString(AUTH_TOKEN, ""),
+                SCHEDULE_PATH_URL + lessonID.toString() + CHECK_PATH_URL, new CheckApi.Nothing())
                 .enqueue(new Callback<CheckApi.UserCheck>() {
                     @Override
                     public void onResponse(Call<CheckApi.UserCheck> call,

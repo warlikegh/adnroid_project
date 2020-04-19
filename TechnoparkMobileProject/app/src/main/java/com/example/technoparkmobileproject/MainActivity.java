@@ -10,8 +10,12 @@ import androidx.navigation.NavOptions;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.NavigationUI;
 
+import static com.example.technoparkmobileproject.TechnoparkApplication.GROUP_ID;
+import static com.example.technoparkmobileproject.TechnoparkApplication.PROFILE_ID;
+import static com.example.technoparkmobileproject.TechnoparkApplication.PROFILE_USERNAME;
+
 public class MainActivity extends FragmentActivity implements Router {
-    public static final String CHANNEL_DEFAULT = "default";
+    public static final String CHANNEL_DEFAULT = "default"; // MessagingService.java
 
     NavController navController;
 
@@ -28,8 +32,8 @@ public class MainActivity extends FragmentActivity implements Router {
     @Override
     public void onProfileSelected(int id, String username) {
         Bundle bundle = new Bundle();
-        bundle.putString("username", username);
-        bundle.putInt("id", id);
+        bundle.putString(PROFILE_USERNAME, username);
+        bundle.putInt(PROFILE_ID, id);
         NavOptions.Builder builder = new NavOptions.Builder();
         builder.setLaunchSingleTop(true);
         NavOptions navOptions = builder.setEnterAnim(R.anim.nav_default_enter_anim).setExitAnim(R.anim.nav_default_exit_anim).build();
@@ -39,7 +43,7 @@ public class MainActivity extends FragmentActivity implements Router {
     @Override
     public void onGroupSelected(Integer id) {
         Bundle bundle = new Bundle();
-        bundle.putInt("id", id);
+        bundle.putInt(GROUP_ID, id);
         NavOptions.Builder builder = new NavOptions.Builder();
         builder.setLaunchSingleTop(true);
         NavOptions navOptions = builder.setEnterAnim(R.anim.nav_default_enter_anim)

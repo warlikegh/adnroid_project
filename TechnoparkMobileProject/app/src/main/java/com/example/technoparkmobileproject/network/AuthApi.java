@@ -7,9 +7,11 @@ import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.POST;
 
+import static com.example.technoparkmobileproject.TechnoparkApplication.AUTH_PATH_URL;
+
 public interface AuthApi {
 
-    @POST("auth/")
+    @POST(AUTH_PATH_URL)
     Call<UserAuth> getAuth(@Body ProfileAuth data);
 
     class ProfileAuth {

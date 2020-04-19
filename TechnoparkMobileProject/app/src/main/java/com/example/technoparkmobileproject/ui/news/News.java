@@ -1,17 +1,12 @@
 package com.example.technoparkmobileproject.ui.news;
 
-import android.util.Log;
-
-import androidx.room.Embedded;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
 import com.example.technoparkmobileproject.SecretData;
-import com.example.technoparkmobileproject.network.NewsApi;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 @Entity(tableName = "News")
 public class News {

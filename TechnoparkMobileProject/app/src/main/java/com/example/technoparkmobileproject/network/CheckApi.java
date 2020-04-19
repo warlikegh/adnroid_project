@@ -10,9 +10,11 @@ import retrofit2.http.Header;
 import retrofit2.http.POST;
 import retrofit2.http.Url;
 
+import static com.example.technoparkmobileproject.TechnoparkApplication.AUTHORISATION;
+
 public interface CheckApi {
-    @POST              /*       schedule/9101/check/          */
-    Call<UserCheck> checkUser(@Header("Authorization") String auth_token, @Url String url, @Body Nothing nothing);
+    @POST
+    Call<UserCheck> checkUser(@Header(AUTHORISATION) String auth_token, @Url String url, @Body Nothing nothing);
 
     class Nothing {
         public Nothing() {

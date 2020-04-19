@@ -1,18 +1,16 @@
 package com.example.technoparkmobileproject.auth;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentActivity;
 
 import com.example.technoparkmobileproject.MainActivity;
 import com.example.technoparkmobileproject.R;
 import com.example.technoparkmobileproject.SecretData;
 
-import static com.example.technoparkmobileproject.auth.AuthRepo.IS_AUTHORISED;
+import static com.example.technoparkmobileproject.TechnoparkApplication.IS_AUTHORISED;
 
 
 public class AuthActivity extends FragmentActivity implements Router {
@@ -28,7 +26,7 @@ public class AuthActivity extends FragmentActivity implements Router {
 
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.fragment_container, new AuthFragment(), "Login")
+                    .replace(R.id.fragment_container, new AuthFragment())
                     .commit();
         }
     }

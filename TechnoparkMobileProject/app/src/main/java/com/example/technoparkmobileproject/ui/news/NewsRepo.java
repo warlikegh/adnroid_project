@@ -22,14 +22,18 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import static com.example.technoparkmobileproject.TechnoparkApplication.AUTH_TOKEN;
+import static com.example.technoparkmobileproject.TechnoparkApplication.CREATE_FIRST_SETTINGS;
+import static com.example.technoparkmobileproject.TechnoparkApplication.IS_FIRST_NEWS;
+import static com.example.technoparkmobileproject.TechnoparkApplication.SITE;
+import static com.example.technoparkmobileproject.TechnoparkApplication.TOKEN;
+
 
 class NewsRepo {
     private final static MutableLiveData<UserNews> mNews = new MutableLiveData<>();
     private SharedPreferences mSettings;
     private final Context mContext;
     private NewsApi mNewsApi;
-    private static String AUTH_TOKEN = "auth_token";
-    private static String SITE = "site";
     private int key = 0;
 
     private final NewsDbManager.ReadAllListener<News> readListener = new NewsDbManager.ReadAllListener<News>() {
@@ -60,14 +64,14 @@ class NewsRepo {
 
     public void refresh() {
         SharedPreferences mSettings;
-        mSettings = mContext.getSharedPreferences("createFirst", Context.MODE_PRIVATE);
+        mSettings = mContext.getSharedPreferences(CREATE_FIRST_SETTINGS, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = mSettings.edit();
-        editor.putBoolean("isFirstNews", false);
+        editor.putBoolean(IS_FIRST_NEWS, false);
         editor.apply();
 
         final NewsDbManager manager = NewsDbManager.getInstance(mContext);
         mSettings = new SecretData().getSecretData(mContext);
-        mNewsApi.getUserNews(" Token " + mSettings.getString(AUTH_TOKEN, "")).enqueue(new Callback<NewsApi.UserNewsPlain>() {
+        mNewsApi.getUserNews(TOKEN + mSettings.getString(AUTH_TOKEN, "")).enqueue(new Callback<NewsApi.UserNewsPlain>() {
             @Override
             public void onResponse(Call<NewsApi.UserNewsPlain> call,
                                    Response<NewsApi.UserNewsPlain> response) {
@@ -106,7 +110,7 @@ class NewsRepo {
 
     public void setNextNews(String url) {
         mSettings = new SecretData().getSecretData(mContext);
-        mNewsApi.getReUserNews(" Token " + mSettings.getString(AUTH_TOKEN, ""), url).enqueue(new Callback<NewsApi.UserNewsPlain>() {
+        mNewsApi.getReUserNews(TOKEN + mSettings.getString(AUTH_TOKEN, ""), url).enqueue(new Callback<NewsApi.UserNewsPlain>() {
             @Override
             public void onResponse(Call<NewsApi.UserNewsPlain> call,
                                    Response<NewsApi.UserNewsPlain> response) {

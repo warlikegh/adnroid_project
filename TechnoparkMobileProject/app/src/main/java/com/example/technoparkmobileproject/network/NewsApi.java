@@ -10,13 +10,16 @@ import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.Url;
 
+import static com.example.technoparkmobileproject.TechnoparkApplication.AUTHORISATION;
+import static com.example.technoparkmobileproject.TechnoparkApplication.NEWS_PATH_URL;
+
 public interface NewsApi {
 
-    @GET("topics/subscribed/")
-    Call<UserNewsPlain> getUserNews(@Header("Authorization") String auth_token);
+    @GET(NEWS_PATH_URL)
+    Call<UserNewsPlain> getUserNews(@Header(AUTHORISATION) String auth_token);
 
     @GET
-    Call<UserNewsPlain> getReUserNews(@Header("Authorization") String auth_token, @Url String url);
+    Call<UserNewsPlain> getReUserNews(@Header(AUTHORISATION) String auth_token, @Url String url);
 
     class UserNewsPlain {
 

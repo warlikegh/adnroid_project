@@ -33,6 +33,8 @@ import java.util.List;
 import java.util.Objects;
 
 import static android.view.View.GONE;
+import static com.example.technoparkmobileproject.TechnoparkApplication.GROUP_ID;
+import static com.example.technoparkmobileproject.TechnoparkApplication.GROUP_SEARCH;
 
 public class GroupFragment extends Fragment {
 
@@ -56,14 +58,14 @@ public class GroupFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-        id = getArguments().getInt("id");
+        id = getArguments().getInt(GROUP_ID);
         mGroupViewModel.pullFromDB(id);
     }
 
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putString("search", searchSave);
+        outState.putString(GROUP_SEARCH, searchSave);
     }
 
     @Nullable
@@ -90,7 +92,7 @@ public class GroupFragment extends Fragment {
             }
         });
         if (savedInstanceState != null) {
-            searchSave = savedInstanceState.getString("search");
+            searchSave = savedInstanceState.getString(GROUP_SEARCH);
         }
         searchView.setQuery(searchSave, true);
 

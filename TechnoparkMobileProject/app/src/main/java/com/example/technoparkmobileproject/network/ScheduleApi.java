@@ -9,9 +9,12 @@ import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
 
+import static com.example.technoparkmobileproject.TechnoparkApplication.AUTHORISATION;
+import static com.example.technoparkmobileproject.TechnoparkApplication.SCHEDULE_PATH_URL;
+
 public interface ScheduleApi {
-    @GET("schedule/")
-    Call<List<UserSchedulePlain>> getUserSchedule(@Header("Authorization") String auth_token);
+    @GET(SCHEDULE_PATH_URL)
+    Call<List<UserSchedulePlain>> getUserSchedule(@Header(AUTHORISATION) String auth_token);
 
     class UserSchedulePlain {
         public UserSchedulePlain(Integer mId, String mDiscipline, String mTitle, String mShortTitle, String mSuperShortTitle,

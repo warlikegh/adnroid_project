@@ -8,8 +8,6 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MediatorLiveData;
 import androidx.lifecycle.Observer;
 
-import com.example.technoparkmobileproject.auth.AuthRepo;
-
 public class AuthViewModel extends AndroidViewModel {
 
     private MediatorLiveData<AuthState> mAuthState = new MediatorLiveData<>();

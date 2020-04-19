@@ -4,15 +4,14 @@ import android.app.AlertDialog;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.VibrationEffect;
-import android.os.Vibrator;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -41,8 +40,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import static android.content.Context.VIBRATOR_SERVICE;
+import static android.view.HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING;
+import static android.view.HapticFeedbackConstants.KEYBOARD_TAP;
 import static android.view.View.GONE;
+import static com.example.technoparkmobileproject.TechnoparkApplication.CREATE_FIRST_SETTINGS;
+import static com.example.technoparkmobileproject.TechnoparkApplication.IS_FIRST_PROFILE;
+import static com.example.technoparkmobileproject.TechnoparkApplication.PROFILE_ID;
+import static com.example.technoparkmobileproject.TechnoparkApplication.PROFILE_USERNAME;
 
 public class ProfileFragment extends Fragment {
     static GroupAdapter groupAdapter;
@@ -53,8 +57,8 @@ public class ProfileFragment extends Fragment {
     static Context context;
     static SharedPreferences.Editor mEditor;
 
+    String username = "";
     int id;
-    String username;
     Boolean isOther;
     static FragmentManager fragmentManager;
     int[] background = {R.color.colorWhite,
@@ -99,7 +103,6 @@ public class ProfileFragment extends Fragment {
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
-        Log.d(getLogTag(), "onCreate");
         super.onCreate(savedInstanceState);
         context = getContext();
         mProfileViewModel = new ViewModelProvider(Objects.requireNonNull(getActivity()))
@@ -110,15 +113,14 @@ public class ProfileFragment extends Fragment {
 
     @Override
     public void onStart() {
-        Log.d(getLogTag(), "onStart");
         super.onStart();
-        mSettings = Objects.requireNonNull(getContext()).getSharedPreferences("createFirst", Context.MODE_PRIVATE);
+        mSettings = Objects.requireNonNull(getContext()).getSharedPreferences(CREATE_FIRST_SETTINGS, Context.MODE_PRIVATE);
         mEditor = mSettings.edit();
 
-        id = getArguments().getInt("id");
-        username = getArguments().getString("username");
+        id = getArguments().getInt(PROFILE_ID);
+        username = getArguments().getString(PROFILE_USERNAME);
         if (id == -1) {
-            if (mSettings.getBoolean("isFirstProfile", true)) {
+            if (mSettings.getBoolean(IS_FIRST_PROFILE, true)) {
                 mProfileViewModel.refreshMe();
             } else {
                 mProfileViewModel.pullMeFromDB();
@@ -135,7 +137,6 @@ public class ProfileFragment extends Fragment {
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        Log.d(getLogTag(), "onCreateView");
         final View view = inflater.inflate(R.layout.fragment_profile, container, false);
 
         mSeparator1 = view.findViewById(R.id.separator1);
@@ -195,8 +196,8 @@ public class ProfileFragment extends Fragment {
             @Override
             public void onRefresh() {
                 assert getArguments() != null;
-                id = getArguments().getInt("id");
-                username = getArguments().getString("username");
+                id = getArguments().getInt(PROFILE_ID);
+                username = getArguments().getString(PROFILE_USERNAME);
                 if (id == -1) {
                     mProfileViewModel.refreshMe();
                     isOther = false;
@@ -276,7 +277,6 @@ public class ProfileFragment extends Fragment {
                     mContactsString.setVisibility(View.VISIBLE);
                     mGroupsString.setVisibility(View.VISIBLE);
                     mAccountsString.setVisibility(View.VISIBLE);
-
                 }
                 if (isOther) {
                     mButton.setVisibility(GONE);
@@ -306,15 +306,11 @@ public class ProfileFragment extends Fragment {
 
         mProfileViewModel
                 .getProfile()
-                .
-
-                        observe(getViewLifecycleOwner(), observer);
+                .observe(getViewLifecycleOwner(), observer);
 
         mProfileViewModel
                 .getProfileProgress()
-                .
-
-                        observe(getViewLifecycleOwner(), observerProgress);
+                .observe(getViewLifecycleOwner(), observerProgress);
 
         return view;
     }
@@ -345,20 +341,16 @@ public class ProfileFragment extends Fragment {
         mAbout.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
     }
 
-    void clipAndVibrate(View view, TextView textView) {
-        Vibrator vibrator = (Vibrator) context.getSystemService(VIBRATOR_SERVICE);
-        if (Build.VERSION.SDK_INT >= 26) {
-            vibrator.vibrate(VibrationEffect.createOneShot(150, VibrationEffect.DEFAULT_AMPLITUDE));
-        } else {
-            vibrator.vibrate(150);
-        }
-
+    private void clipAndVibrate(View view, TextView textView) {
         ClipboardManager clipboard = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
         ClipData clip = ClipData.newPlainText("", textView.getText());
+        assert clipboard != null;
         clipboard.setPrimaryClip(clip);
 
         Snackbar.make(view, R.string.copied, Snackbar.LENGTH_LONG)
                 .show();
+
+        view.performHapticFeedback(KEYBOARD_TAP, FLAG_IGNORE_GLOBAL_SETTING);
     }
 
     private class GroupAdapter extends RecyclerView.Adapter<GroupViewHolder> {
@@ -427,53 +419,48 @@ public class ProfileFragment extends Fragment {
 
         @Override
         public void onBindViewHolder(@NonNull AccountViewHolder holder, int position) {
-            final UserProfile.Account group = mAccount.get(position);
-            if (group.getName().equals("vkontakte")) {
+            final UserProfile.Account account = mAccount.get(position);
+            if (account.getName().equals("vkontakte")) {
                 holder.mImage.setImageBitmap(BitmapFactory.decodeResource(context.getResources(), R.mipmap.vk_logo));
             }
-            if (group.getName().equals("odnoklassniki")) {
+            if (account.getName().equals("odnoklassniki")) {
                 holder.mImage.setImageBitmap(BitmapFactory.decodeResource(context.getResources(), R.mipmap.ok_logo));
             }
-            if (group.getName().equals("github")) {
+            if (account.getName().equals("github")) {
                 holder.mImage.setImageBitmap(BitmapFactory.decodeResource(context.getResources(), R.mipmap.github_logo));
             }
-            if (group.getName().equals("facebook")) {
+            if (account.getName().equals("facebook")) {
                 holder.mImage.setImageBitmap(BitmapFactory.decodeResource(context.getResources(), R.mipmap.facebook_logo));
             }
-            if (group.getName().equals("agent")) {
+            if (account.getName().equals("agent")) {
                 holder.mImage.setImageBitmap(BitmapFactory.decodeResource(context.getResources(), R.mipmap.mailru_agent_logo));
             }
-            if (group.getName().equals("telegram")) {
+            if (account.getName().equals("telegram")) {
                 holder.mImage.setImageBitmap(BitmapFactory.decodeResource(context.getResources(), R.mipmap.telegram_logo));
             }
-            if (group.getName().equals("tamtam")) {
+            if (account.getName().equals("tamtam")) {
                 holder.mImage.setImageBitmap(BitmapFactory.decodeResource(context.getResources(), R.mipmap.tam_tam_logo));
             }
-            if (group.getName().equals("skype")) {
+            if (account.getName().equals("skype")) {
                 holder.mImage.setImageBitmap(BitmapFactory.decodeResource(context.getResources(), R.mipmap.skype_logo));
             }
-            if (group.getName().equals("icq")) {
+            if (account.getName().equals("icq")) {
                 holder.mImage.setImageBitmap(BitmapFactory.decodeResource(context.getResources(), R.mipmap.icq_logo));
             }
-            if (group.getName().equals("bitbucket")) {
+            if (account.getName().equals("bitbucket")) {
                 holder.mImage.setImageBitmap(BitmapFactory.decodeResource(context.getResources(), R.mipmap.bitbucket_logo));
             }
-            if (group.getName().equals("myworld")) {
+            if (account.getName().equals("myworld")) {
                 holder.mImage.setImageBitmap(BitmapFactory.decodeResource(context.getResources(), R.mipmap.my_world_logo));
             }
-            if (group.getName().equals("linkedin")) {
+            if (account.getName().equals("linkedin")) {
                 holder.mImage.setImageBitmap(BitmapFactory.decodeResource(context.getResources(), R.mipmap.linkedin_logo));
             }
-            if (group.getName().equals("jabber")) {
+            if (account.getName().equals("jabber")) {
                 holder.mImage.setImageBitmap(BitmapFactory.decodeResource(context.getResources(), R.mipmap.jabber_logo));
             }
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                holder.mAccount.setText(Html.fromHtml(group.getValue(), Html.FROM_HTML_MODE_COMPACT));
-            } else {
-                holder.mAccount.setText(Html.fromHtml(group.getValue()));
-            }
-            holder.mAccount.setMovementMethod(LinkMovementMethod.getInstance());
+            holder.mAccount.setText(account.getValue());
 
         }
 
@@ -494,24 +481,19 @@ public class ProfileFragment extends Fragment {
             mAccount = itemView.findViewById(R.id.account);
             mImage = itemView.findViewById(R.id.account_image);
 
+            mAccount.setOnClickListener((new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(AccountViewHolder.this.mAccount.getText().toString()));
+                    startActivity(browserIntent);
+                }
+            }));
+
             mAccount.setOnLongClickListener((new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {
-                    Vibrator vibrator = (Vibrator) context.getSystemService(VIBRATOR_SERVICE);
-                    if (Build.VERSION.SDK_INT >= 26) {
-                        vibrator.vibrate(VibrationEffect.createOneShot(150, VibrationEffect.DEFAULT_AMPLITUDE));
-                    } else {
-                        vibrator.vibrate(150);
-                    }
-
-                    ClipboardManager clipboard = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
-                    ClipData clip = ClipData.newPlainText("", AccountViewHolder.this.mAccount.getText());
-                    clipboard.setPrimaryClip(clip);
-
-                    Snackbar.make(itemView, R.string.copied, Snackbar.LENGTH_LONG)
-                            .show();
-
-                    return false;
+                   clipAndVibrate(v, AccountViewHolder.this.mAccount);
+                   return true;
                 }
             }));
         }
@@ -519,7 +501,4 @@ public class ProfileFragment extends Fragment {
     }
 
 
-    protected String getLogTag() {
-        return getClass().getSimpleName();
-    }
 }

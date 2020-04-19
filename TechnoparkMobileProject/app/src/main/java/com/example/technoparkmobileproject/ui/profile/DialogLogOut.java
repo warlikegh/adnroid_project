@@ -5,31 +5,25 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.util.Log;
 
-import com.example.technoparkmobileproject.MessagingService;
 import com.example.technoparkmobileproject.R;
 import com.example.technoparkmobileproject.SecretData;
 import com.example.technoparkmobileproject.TechnoparkApplication;
 import com.example.technoparkmobileproject.auth.AuthActivity;
-import com.example.technoparkmobileproject.network.ApiRepo;
-import com.example.technoparkmobileproject.network.PushApi;
 import com.example.technoparkmobileproject.ui.shedule.ScheduleViewModel;
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-
 import static android.content.Context.MODE_PRIVATE;
-import static com.example.technoparkmobileproject.auth.AuthRepo.IS_AUTHORISED;
+import static com.example.technoparkmobileproject.TechnoparkApplication.CREATE_FIRST_SETTINGS;
+import static com.example.technoparkmobileproject.TechnoparkApplication.IS_AUTHORISED;
+import static com.example.technoparkmobileproject.TechnoparkApplication.IS_FIRST_NEWS;
+import static com.example.technoparkmobileproject.TechnoparkApplication.IS_FIRST_PROFILE;
+import static com.example.technoparkmobileproject.TechnoparkApplication.IS_FIRST_SCHEDULE;
+import static com.example.technoparkmobileproject.TechnoparkApplication.LOGIN;
+import static com.example.technoparkmobileproject.TechnoparkApplication.PASSWORD;
+import static com.example.technoparkmobileproject.TechnoparkApplication.SITE;
 import static com.example.technoparkmobileproject.auth.AuthRepo.deleteTokenFromServer;
 
 public class DialogLogOut {
-
-    static String AUTH_TOKEN = "auth_token";
-    static String LOGIN = "login";
-    static String PASSWORD = "password";
-    private static String SITE = "site";
     private static ProfileViewModel mProfileViewModel;
     private static ScheduleViewModel mScheduleViewModel;
 
@@ -52,11 +46,11 @@ public class DialogLogOut {
                         .putBoolean(IS_AUTHORISED, false)
                         .apply();
 
-                SharedPreferences mSettings = context.getSharedPreferences("createFirst", MODE_PRIVATE);
+                SharedPreferences mSettings = context.getSharedPreferences(CREATE_FIRST_SETTINGS, MODE_PRIVATE);
                 SharedPreferences.Editor mEditor = mSettings.edit();
-                mEditor.putBoolean("isFirstNews", true)
-                        .putBoolean("isFirstSchedule", true)
-                        .putBoolean("isFirstProfile", true)
+                mEditor.putBoolean(IS_FIRST_NEWS, true)
+                        .putBoolean(IS_FIRST_SCHEDULE, true)
+                        .putBoolean(IS_FIRST_PROFILE, true)
                         .apply();
 
                 // mProfileViewModel.cleanDB();
