@@ -151,7 +151,6 @@ public class ProfileFragment extends Fragment {
         mAva = view.findViewById(R.id.photo);
         mBackground = view.findViewById(R.id.background);
         mFullName = view.findViewById(R.id.full_name);
-       // https://park.mail.ru/profile/a.katnov/    "https://park.mail.ru/api/mobile/v1/"
         mFullName.setOnClickListener((new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -208,6 +207,9 @@ public class ProfileFragment extends Fragment {
                 .into(mBackground);
 
         final SwipeRefreshLayout pullToRefresh = view.findViewById(R.id.pullToRefresh);
+        pullToRefresh.setColorSchemeColors(
+                getResources().getColor(R.color.colorAccent, null), getResources().getColor(R.color.colorBlueBackgroungIS, null),
+                getResources().getColor(R.color.colorGradientBottomAuth, null), getResources().getColor(R.color.colorGradientTopAuth, null));
         pullToRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -242,7 +244,6 @@ public class ProfileFragment extends Fragment {
                     mAva.setVisibility(View.VISIBLE);
                     mFullName.setText(mProfile.getFullname());
                     mFullName.setVisibility(View.VISIBLE);
-                    //mFullName.setTextIsSelectable(true);
                     username = mProfile.getUsername();
                     mMainGroup.setText(mProfile.getMainGroup());
                     mMainGroup.setVisibility(View.VISIBLE);
