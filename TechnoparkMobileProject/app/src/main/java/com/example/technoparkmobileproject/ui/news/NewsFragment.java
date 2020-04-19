@@ -324,9 +324,9 @@ public class NewsFragment extends Fragment {
             if (type.equals("p") || type.equals("ul") || type.equals("code") || type.equals("ol") || type.equals("blockquote")
                     || type.equals("h4") || type.equals("h5") || type.equals("h6") || type.equals("pre")/* || type.equals("iframe")*/) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                    holder.mTextNews.setText(Html.fromHtml(text, Html.FROM_HTML_MODE_COMPACT));
+                    holder.mTextNews.setText(Html.fromHtml(secretData.deleteEnter(text), Html.FROM_HTML_MODE_COMPACT));
                 } else {
-                    holder.mTextNews.setText(Html.fromHtml(text));
+                    holder.mTextNews.setText(Html.fromHtml(secretData.deleteEnter(text)));
                 }
                 holder.mTextNews.setMovementMethod(LinkMovementMethod.getInstance());
             } else if (type.equals("img")) {
