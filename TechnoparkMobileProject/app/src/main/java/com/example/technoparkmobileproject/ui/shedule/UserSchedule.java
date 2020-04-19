@@ -8,7 +8,8 @@ import java.util.List;
 public class UserSchedule {
 
     public UserSchedule(Integer mId, String mDiscipline, String mTitle, String mShortTitle, String mSuperShortTitle,
-                        String mDate, String mStartTime, String mEndTime, String mLocation, List<Group> mGroups) {
+                        String mDate, String mStartTime, String mEndTime, String mLocation, List<Group> mGroups,
+                        Boolean checkingOpened, Boolean attended, String feedbackUrl) {
         this.id = mId;
         this.discipline = mDiscipline;
         this.title = mTitle;
@@ -19,6 +20,9 @@ public class UserSchedule {
         this.endTime = mEndTime;
         this.location = mLocation;
         this.groups = mGroups;
+        this.checkingOpened = checkingOpened;
+        this.attended = attended;
+        this.feedbackUrl = feedbackUrl;
     }
 
     public UserSchedule() {
@@ -57,13 +61,13 @@ public class UserSchedule {
     private List<Group> groups = null;
     @SerializedName("checkin_opened")
     @Expose
-    private Boolean checkinOpened;
+    private Boolean checkingOpened;
     @SerializedName("attended")
     @Expose
     private Boolean attended;
     @SerializedName("feedback_url")
     @Expose
-    private Object feedbackUrl;
+    private String feedbackUrl;
 
     public Integer getId() {
         return id;
@@ -145,12 +149,12 @@ public class UserSchedule {
         this.groups = groups;
     }
 
-    public Boolean getCheckinOpened() {
-        return checkinOpened;
+    public Boolean getCheckingOpened() {
+        return checkingOpened;
     }
 
-    public void setCheckinOpened(Boolean checkinOpened) {
-        this.checkinOpened = checkinOpened;
+    public void setCheckingOpened(Boolean checkingOpened) {
+        this.checkingOpened = checkingOpened;
     }
 
     public Boolean getAttended() {
@@ -161,11 +165,11 @@ public class UserSchedule {
         this.attended = attended;
     }
 
-    public Object getFeedbackUrl() {
+    public String getFeedbackUrl() {
         return feedbackUrl;
     }
 
-    public void setFeedbackUrl(Object feedbackUrl) {
+    public void setFeedbackUrl(String feedbackUrl) {
         this.feedbackUrl = feedbackUrl;
     }
 

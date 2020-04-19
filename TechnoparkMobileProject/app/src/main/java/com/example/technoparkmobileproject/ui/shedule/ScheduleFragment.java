@@ -1,7 +1,10 @@
 package com.example.technoparkmobileproject.ui.shedule;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,7 +30,11 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.example.technoparkmobileproject.R;
 import com.example.technoparkmobileproject.Router;
 import com.example.technoparkmobileproject.SecretData;
+import com.example.technoparkmobileproject.network.CheckApi;
+import com.google.android.material.snackbar.BaseTransientBottomBar;
+import com.google.android.material.snackbar.Snackbar;
 
+import java.sql.Time;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -38,9 +45,11 @@ import static android.view.View.GONE;
 
 public class ScheduleFragment extends Fragment {
     private List<UserSchedule> mSchedule = new ArrayList<>();
+    private CheckApi.UserCheck mFeedback;
     private ScheduleRepo.ScheduleProgress mScheduleProgress;
+    private ScheduleRepo.CheckProgress mCheckProgress;
     private List<UserSchedule> tempSchedule = new ArrayList<>();
-    static GroupAdapter groupAdapter;
+ //   static GroupAdapter groupAdapter;
     final ScheduleAdapter scheduleAdapter = new ScheduleAdapter();
     String ALL_DISCIPLINES;
     String disciplineText;
@@ -68,7 +77,7 @@ public class ScheduleFragment extends Fragment {
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_schedule, container, false);
+        final View view = inflater.inflate(R.layout.fragment_schedule, container, false);
 
         final ProgressBar mProgressBar = view.findViewById(R.id.progress_bar);
         final SwipeRefreshLayout pullToRefresh = view.findViewById(R.id.pullToRefresh);
@@ -213,6 +222,26 @@ public class ScheduleFragment extends Fragment {
                 .getScheduleProgress()
                 .observe(getViewLifecycleOwner(), observerProgress);
 
+        Observer<ScheduleRepo.CheckProgress> observerCheckProgress = new Observer<ScheduleRepo.CheckProgress>() {
+            @Override
+            public void onChanged(ScheduleRepo.CheckProgress checkProgress) {
+                if (checkProgress != null) {
+                    mCheckProgress = checkProgress;
+                    if (mCheckProgress == ScheduleRepo.CheckProgress.SUCCESS) {
+                        Snackbar.make(view, R.string.check_success, BaseTransientBottomBar.LENGTH_SHORT);
+                    } else if (mCheckProgress == ScheduleRepo.CheckProgress.FAILED) {
+                        Snackbar.make(view, R.string.error, BaseTransientBottomBar.LENGTH_SHORT);
+                    } else if (mCheckProgress == ScheduleRepo.CheckProgress.FAILED_NET) {
+                        Snackbar.make(view, R.string.http_failed, BaseTransientBottomBar.LENGTH_SHORT);
+                    }
+                }
+            }
+        };
+
+        mScheduleViewModel
+                .getCheckProgress()
+                .observe(getViewLifecycleOwner(), observerCheckProgress);
+
         return view;
     }
 
@@ -253,14 +282,20 @@ public class ScheduleFragment extends Fragment {
                                 mSchedule.add(item);
                 } else {
                     for (int i = 0; i < mWholeSchedule.size(); i++) {
-                        Date localDate = new SecretData().getDate(mWholeSchedule.get(i).getEndTime());
-                        Date today = new Date();
+                        Date localDate = new SecretData().getDate(mWholeSchedule.get(i).getDate());
+
                         Calendar instance = Calendar.getInstance();
+                        instance.setTime(localDate); //устанавливаем дату, с которой будет производить операции
+                        instance.add(Calendar.DAY_OF_MONTH, 1);// прибавляем 3 дня к установленной дате
+                        Date newDate = instance.getTime(); // получаем измененную дату
+
+                        Date today = new Date();
+                       // Calendar instance = Calendar.getInstance();
                         instance.setTime(today);
                         instance.add(Calendar.DAY_OF_MONTH, 14);
                         Date daysBefore = instance.getTime();
 
-                        if (localDate.compareTo(today) >= 0 && daysBefore.compareTo(localDate) >= 0)
+                        if (newDate.compareTo(today) >= 0 && daysBefore.compareTo(newDate) >= 0)
                             if (mWholeSchedule.get(i).getDiscipline().equals(text) || text.equals(ALL_DISCIPLINES))
                                 mSchedule.add(mWholeSchedule.get(i));
                     }
@@ -278,6 +313,7 @@ public class ScheduleFragment extends Fragment {
         }
 
         //@RequiresApi(api = Build.VERSION_CODES.O)
+        @SuppressLint("ResourceAsColor")
         @Override
         public void onBindViewHolder(@NonNull ScheduleViewHolder holder, int position) {
             final UserSchedule schedule = mSchedule.get(position);
@@ -293,10 +329,32 @@ public class ScheduleFragment extends Fragment {
             holder.mTitle.setText(schedule.getTitle());
             holder.mDiscipline.setText(schedule.getDiscipline());
 
-            groupAdapter = new GroupAdapter();
+          /*  groupAdapter = new GroupAdapter();
             groupAdapter.setGroup(schedule.getGroups(), schedule.getDiscipline() + " " + schedule.getTitle());
             holder.mGroups.setAdapter(groupAdapter);
-            holder.mGroups.setLayoutManager(new LinearLayoutManager(getContext()));
+            holder.mGroups.setLayoutManager(new LinearLayoutManager(getContext()));*/
+
+            if (schedule.getAttended()) {
+                holder.mCheckButton.setVisibility(View.VISIBLE);
+                holder.mCheckButton.setText(R.string.checked);
+                holder.mCheckButton.setEnabled(false);
+                holder.mCheckButton.setTextColor(getResources().getColor(R.color.colorGradientBottomAuth, null));
+                if (schedule.getFeedbackUrl() != null) {
+                    holder.mFeedbackButton.setVisibility(View.VISIBLE);
+                } else{
+                    holder.mFeedbackButton.setVisibility(GONE);
+                }
+            } else {
+                holder.mFeedbackButton.setVisibility(GONE);
+                if (schedule.getCheckingOpened()) {
+                    holder.mCheckButton.setVisibility(View.VISIBLE);
+                    holder.mCheckButton.setEnabled(true);
+                    holder.mCheckButton.setText(R.string.check);
+                    holder.mCheckButton.setTextColor(getResources().getColor(R.color.colorAccent, null));
+                } else {
+                    holder.mCheckButton.setVisibility(View.INVISIBLE);
+                }
+            }
         }
 
         @Override
@@ -310,26 +368,48 @@ public class ScheduleFragment extends Fragment {
 
         protected TextView mDateSchedule;
         protected TextView mDiscipline;
-        protected RecyclerView mGroups;
+      //  protected RecyclerView mGroups;
         protected TextView mShortTitle;
         protected TextView mLocation;
         protected TextView mTime;
         protected TextView mTitle;
+        protected TextView mCheckButton;
+        protected TextView mFeedbackButton;
 
         public ScheduleViewHolder(@NonNull View itemView) {
             super(itemView);
             mDateSchedule = itemView.findViewById(R.id.date_schedule);
             mDiscipline = itemView.findViewById(R.id.discipline);
-            mGroups = itemView.findViewById(R.id.groups);
+        //    mGroups = itemView.findViewById(R.id.groups);
             mShortTitle = itemView.findViewById(R.id.short_title);
             mLocation = itemView.findViewById(R.id.location);
             mTime = itemView.findViewById(R.id.time);
             mTitle = itemView.findViewById(R.id.title);
+            mCheckButton = itemView.findViewById(R.id.check_button);
+            mFeedbackButton = itemView.findViewById(R.id.feedback_button);
+
+            mCheckButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    int pos = ScheduleViewHolder.this.getAdapterPosition();
+                    mScheduleViewModel.check(tempSchedule.get(pos).getId());
+                    Snackbar.make(view, R.string.checking, BaseTransientBottomBar.LENGTH_SHORT);
+                }
+            });
+
+            mFeedbackButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    int pos = ScheduleViewHolder.this.getAdapterPosition();
+                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(tempSchedule.get(pos).getFeedbackUrl()));
+                    startActivity(browserIntent);
+                }
+            });
         }
     }
 
 
-    private class GroupAdapter extends RecyclerView.Adapter<GroupViewHolder> {
+  /*  private class GroupAdapter extends RecyclerView.Adapter<GroupViewHolder> {
 
         private List<UserSchedule.Group> mGroup = new ArrayList<>();
         String namedis;
@@ -389,6 +469,6 @@ public class ScheduleFragment extends Fragment {
                 }
             });
         }
-    }
+    }*/
 
 }

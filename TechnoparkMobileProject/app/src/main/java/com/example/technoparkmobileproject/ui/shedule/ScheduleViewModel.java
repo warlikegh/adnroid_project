@@ -10,6 +10,8 @@ import androidx.lifecycle.AndroidViewModel;
 
 import androidx.lifecycle.LiveData;
 
+import com.example.technoparkmobileproject.network.CheckApi;
+
 import java.util.List;
 
 public class ScheduleViewModel extends AndroidViewModel {
@@ -17,6 +19,8 @@ public class ScheduleViewModel extends AndroidViewModel {
     private ScheduleRepo mRepo = new ScheduleRepo(getApplication());
     private LiveData<List<UserSchedule>> mSchedule = mRepo.getSchedule();
     private LiveData<ScheduleRepo.ScheduleProgress> mScheduleProgress = mRepo.getScheduleProgress();
+    private LiveData<CheckApi.UserCheck> mFeedback = mRepo.getFeedback();
+    private LiveData<ScheduleRepo.CheckProgress> mCheckProgress = mRepo.getCheckProgress();
 
     public ScheduleViewModel(@NonNull Application application) {
         super(application);
@@ -30,6 +34,14 @@ public class ScheduleViewModel extends AndroidViewModel {
         return mScheduleProgress;
     }
 
+    public LiveData<CheckApi.UserCheck> getFeedback() {
+        return mFeedback;
+    }
+
+    public LiveData<ScheduleRepo.CheckProgress> getCheckProgress() {
+        return mCheckProgress;
+    }
+
     public void refresh() {
         mRepo.refresh();
     }
@@ -40,6 +52,10 @@ public class ScheduleViewModel extends AndroidViewModel {
 
     public void cleanDB() {
         mRepo.cleanDB();
+    }
+
+    public void check(Integer lessonID) {
+        mRepo.check(lessonID);
     }
 
 }

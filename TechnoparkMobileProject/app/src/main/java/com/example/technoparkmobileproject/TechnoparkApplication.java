@@ -15,22 +15,26 @@ public class TechnoparkApplication extends Application {
     static SharedPreferences mSecretSettings;
     static SharedPreferences.Editor mSecretEditor;
     static String SALT = "salt";
+    String ALL_DISCIPLINES;
 
     @Override
     public void onCreate() {
         super.onCreate();
-
+        ALL_DISCIPLINES = getResources().getString(R.string.all_disciplines);
         mSecretSettings = new SecretData().getSecretData(getApplicationContext());
         mSecretEditor = mSecretSettings.edit();
-        mSecretEditor.putString(SALT, "HERE MUST BE SALT").apply();
+        mSecretEditor.putString(SALT, "here must be salt").apply();
 
         mApiRepo = new ApiRepo(getApplicationContext());
         mAuthRepo = new AuthRepo(mApiRepo);
 
         SharedPreferences mSettings = getApplicationContext().getSharedPreferences("createFirst", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = mSettings.edit();
-        editor.putBoolean("isFirstNews", true);
-        editor.putBoolean("isFirstProfile", true);
+        editor.putBoolean("isFirstNews", true)
+                .putBoolean("isFirstProfile", true)
+                .putBoolean("default", true)
+                .putString("discipline", ALL_DISCIPLINES);
+
         editor.apply();
     }
 

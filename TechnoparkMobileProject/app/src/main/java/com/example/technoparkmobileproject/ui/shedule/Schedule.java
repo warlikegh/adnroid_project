@@ -25,6 +25,10 @@ public class Schedule {
     String groups;
     String groupid;
 
+    public Boolean checkingOpened;
+    public Boolean attended;
+    public String feedbackUrl;
+
     Integer textSize;
     public int textShortSize;
 
@@ -32,7 +36,8 @@ public class Schedule {
     }
 
     public Schedule(int key, String mTitle, String mDiscipline, String mShortTitle, String mSuperShortTitle, String mDate,
-                    String mStartTime, String mEndTime, List<UserSchedule.Group> mGroups, String mLocation) {
+                    String mStartTime, String mEndTime, List<UserSchedule.Group> mGroups, String mLocation,
+                    Boolean checkingOpened, Boolean attended, String feedbackUrl) {
         this.id = key;
         this.discipline = mDiscipline;
         this.title = mTitle;
@@ -53,6 +58,10 @@ public class Schedule {
         groupid = new SecretData().parseListToString(tempId, mGroups.size());
 
         textSize = mGroups.size();
+
+        this.checkingOpened = checkingOpened;
+        this.attended = attended;
+        this.feedbackUrl = feedbackUrl;
 
     }
 

@@ -8,20 +8,16 @@ import androidx.lifecycle.MutableLiveData;
 
 import com.example.technoparkmobileproject.SecretData;
 import com.example.technoparkmobileproject.network.ApiRepo;
+import com.example.technoparkmobileproject.network.CheckApi;
 import com.example.technoparkmobileproject.network.ScheduleApi;
 
-import java.text.DateFormat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -29,10 +25,13 @@ import retrofit2.Response;
 
 public class ScheduleRepo {
     private final static MutableLiveData<List<UserSchedule>> mSchedule = new MutableLiveData<>();
+    private final static MutableLiveData<CheckApi.UserCheck> mFeedback = new MutableLiveData<>();
     private final static MutableLiveData<ScheduleProgress> mScheduleProgress = new MutableLiveData<>();
+    private final static MutableLiveData<CheckProgress> mCheckProgress = new MutableLiveData<>();
     private SharedPreferences mSettings;
     private final Context mContext;
     private ScheduleApi mScheduleApi;
+    private CheckApi mCheckApi;
     private static String AUTH_TOKEN = "auth_token";
     private static String SITE = "site";
     private int key = 0;
@@ -64,6 +63,7 @@ public class ScheduleRepo {
         editor.apply();
 
         mScheduleApi = ApiRepo.from(mContext).getScheduleApi(new SecretData().getSecretData(mContext).getInt(SITE, 0));
+        mCheckApi = ApiRepo.from(mContext).getCheckApi(new SecretData().getSecretData(mContext).getInt(SITE, 0));
     }
 
     public LiveData<List<UserSchedule>> getSchedule() {
@@ -72,6 +72,14 @@ public class ScheduleRepo {
 
     public LiveData<ScheduleProgress> getScheduleProgress() {
         return mScheduleProgress;
+    }
+
+    public LiveData<CheckProgress> getCheckProgress() {
+        return mCheckProgress;
+    }
+
+    public LiveData<CheckApi.UserCheck> getFeedback() {
+        return mFeedback;
     }
 
     public void refresh() {
@@ -161,7 +169,10 @@ public class ScheduleRepo {
                 resultPlain.getStartTime(),
                 resultPlain.getEndTime(),
                 resultPlain.getLocation(),
-                groups);
+                groups,
+                resultPlain.getCheckingOpened(),
+                resultPlain.getAttended(),
+                resultPlain.getFeedbackUrl());
     }
 
 
@@ -175,9 +186,11 @@ public class ScheduleRepo {
 
     private void savedata(List<UserSchedule> result) {
         for (int i = 0; i < result.size(); i++) {
-            ScheduleDbManager.getInstance(mContext).insert(result.get(i).getId(), result.get(i).getTitle(), result.get(i).getDiscipline(),
-                    result.get(i).getShortTitle(), result.get(i).getSuperShortTitle(), result.get(i).getDate(), result.get(i).getStartTime(),
-                    result.get(i).getEndTime(), result.get(i).getGroups(), result.get(i).getLocation());
+            ScheduleDbManager.getInstance(mContext).insert(result.get(i).getId(), result.get(i).getTitle(),
+                    result.get(i).getDiscipline(), result.get(i).getShortTitle(), result.get(i).getSuperShortTitle(),
+                    result.get(i).getDate(), result.get(i).getStartTime(), result.get(i).getEndTime(),
+                    result.get(i).getGroups(), result.get(i).getLocation(), result.get(i).getCheckingOpened(),
+                    result.get(i).getAttended(), result.get(i).getFeedbackUrl());
         }
 
     }
@@ -204,7 +217,8 @@ public class ScheduleRepo {
         for (int i = 0; i < data.size(); i++) {
             UserSchedule temp = new UserSchedule(data.get(i).id, data.get(i).discipline,
                     data.get(i).title, data.get(i).shortTitle, data.get(i).superShortTitle, data.get(i).date,
-                    data.get(i).startTime, data.get(i).endTime, data.get(i).location, data.get(i).getGroup());
+                    data.get(i).startTime, data.get(i).endTime, data.get(i).location, data.get(i).getGroup(),
+                    data.get(i).checkingOpened, data.get(i).attended, data.get(i).feedbackUrl);
             tempResult.add(temp);
         }
         mSchedule.postValue(tempResult);
@@ -212,6 +226,40 @@ public class ScheduleRepo {
     }
 
     public enum ScheduleProgress {
+        IN_PROGRESS,
+        SUCCESS,
+        FAILED,
+        FAILED_NET
+    }
+
+    public void check(Integer lessonID) {
+        mCheckProgress.postValue(CheckProgress.IN_PROGRESS);
+        final ScheduleDbManager manager = ScheduleDbManager.getInstance(mContext);   /**/
+        mSettings = new SecretData().getSecretData(mContext);            /*       schedule/9101/check/          */
+        mCheckApi.checkUser(" Token " + mSettings.getString(AUTH_TOKEN, ""),
+                " schedule/" + lessonID.toString() + "/check/", new CheckApi.Nothing())
+                .enqueue(new Callback<CheckApi.UserCheck>() {
+                    @Override
+                    public void onResponse(Call<CheckApi.UserCheck> call,
+                                           Response<CheckApi.UserCheck> response) {
+                        if (response.isSuccessful() && response.body() != null) {
+                            CheckApi.UserCheck result = response.body();
+                            mFeedback.postValue(result);
+                            refresh();
+                            mCheckProgress.postValue(CheckProgress.SUCCESS);
+                        } else {
+                            mCheckProgress.postValue(CheckProgress.FAILED);
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<CheckApi.UserCheck> call, Throwable t) {
+                        mCheckProgress.postValue(CheckProgress.FAILED_NET);
+                    }
+                });
+    }
+
+    public enum CheckProgress {
         IN_PROGRESS,
         SUCCESS,
         FAILED,

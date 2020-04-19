@@ -20,7 +20,7 @@
     <string name="password">Password</string>
     <string name="error_400">Something wrong! Check your login/password</string>
     <string name="http_failed">No network!</string>
-    <string name="load">Loading…</string>
+    <string name="load">Loading...</string>
     <string name="disciplines">Disciplines</string>
     <string name="all_disciplines">All disciplines</string>
     <string name="all_semester">Whole semester</string>
@@ -29,4 +29,10 @@
     <string name="phone_string">Mobile phone</string>
     <string name="mail_string">Mail</string>
     <string name="birthday_string">Birthday</string>
+    <string name="feedback">LEAVE FEEDBACK</string>
+    <string name="check">CHECK</string>
+    <string name="checked">CHECKED ✓</string>
+    <string name="checking">Checking...</string>
+    <string name="check_success">You`ve successfully checked in!</string>
+    <string name="error">Something wrong! Please, try later.</string>
 </resources>
