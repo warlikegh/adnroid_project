@@ -368,7 +368,6 @@ public class ScheduleFragment extends Fragment {
 
         protected TextView mDateSchedule;
         protected TextView mDiscipline;
-      //  protected RecyclerView mGroups;
         protected TextView mShortTitle;
         protected TextView mLocation;
         protected TextView mTime;
@@ -380,7 +379,6 @@ public class ScheduleFragment extends Fragment {
             super(itemView);
             mDateSchedule = itemView.findViewById(R.id.date_schedule);
             mDiscipline = itemView.findViewById(R.id.discipline);
-        //    mGroups = itemView.findViewById(R.id.groups);
             mShortTitle = itemView.findViewById(R.id.short_title);
             mLocation = itemView.findViewById(R.id.location);
             mTime = itemView.findViewById(R.id.time);
@@ -407,68 +405,4 @@ public class ScheduleFragment extends Fragment {
             });
         }
     }
-
-
-  /*  private class GroupAdapter extends RecyclerView.Adapter<GroupViewHolder> {
-
-        private List<UserSchedule.Group> mGroup = new ArrayList<>();
-        String namedis;
-
-        public void setGroup(List<UserSchedule.Group> group, String string) {
-            mGroup = group;
-            namedis = string;
-            notifyDataSetChanged();
-        }
-
-        @NonNull
-        @Override
-        public GroupViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            return new GroupViewHolder(LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.schedule_group, parent, false));
-        }
-
-        @Override
-        public void onBindViewHolder(@NonNull GroupViewHolder holder, int position) {
-            final UserSchedule.Group group = mGroup.get(position);
-            holder.mGroup.setText(group.getName());
-        }
-
-        @Override
-        public int getItemCount() {
-            return mGroup.size();
-        }
-
-    }
-
-    class GroupViewHolder extends RecyclerView.ViewHolder {
-
-        protected TextView mGroup;
-
-        public GroupViewHolder(@NonNull View itemView) {
-            super(itemView);
-            mGroup = itemView.findViewById(R.id.group_schedule);
-            mGroup.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    int pos = GroupViewHolder.this.getAdapterPosition();
-                    int posScheduleViewHolder = 0;
-                    boolean isFind = false;
-                    for (int i = 0; i < tempSchedule.size(); i++) {
-                        for (int j = 0; j < tempSchedule.get(i).getGroups().size(); j++) {
-                            if (mGroup.getText().equals(tempSchedule.get(i).getGroups().get(j).getName())) {
-                                posScheduleViewHolder = i;
-                                isFind = true;
-                            }
-                        }
-                        if (isFind) {
-                            break;
-                        }
-                    }
-                    List<UserSchedule.Group> t = tempSchedule.get(posScheduleViewHolder).getGroups();
-                    ((Router) context).onGroupSelected(t.get(pos).getId());
-                }
-            });
-        }
-    }*/
-
 }

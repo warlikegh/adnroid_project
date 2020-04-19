@@ -4,7 +4,9 @@ import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.Html;
@@ -177,12 +179,7 @@ public class NewsFragment extends Fragment {
         public void onBindViewHolder(@NonNull NewsViewHolder holder, int position) {
             positionSave = position;
             final UserNews.Result news = mNews.get(position);
-            String url = "<a href=\"" + news.getUrl() + "\" target=\"_blank\">" + news.getTitle() + "</a>";
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                holder.mTitle.setText(Html.fromHtml(url, Html.FROM_HTML_MODE_COMPACT));
-            } else {
-                holder.mTitle.setText(Html.fromHtml(url));
-            }
+            holder.mTitle.setText(news.getTitle());
 
             holder.mTitle.setMovementMethod(LinkMovementMethod.getInstance());
             holder.mBlog.setText(news.getBlog());
@@ -191,19 +188,22 @@ public class NewsFragment extends Fragment {
             String date = new SecretData().getDateString(news.getPublishDate());
             holder.mDate.setText(date);
             String rating = "";
-            if (news.getRating()>0)
+            if (news.getRating() > 0)
                 rating = "+";
-            rating += ((Integer)news.getRating().intValue()).toString();
+            rating += ((Integer) news.getRating().intValue()).toString();
             holder.mRating.setText(rating);
 
             boolean buttonIsActive = false;
             holder.mCommentsCount.setText(news.getCommentsCount().toString());
-            if (news.getText().size() > 1 ||
-                    (!(news.getText().get(0).getContent().equals(news.getTextShort().get(0).getContent())))) {
+            if ((news.getText().size() > 1 ||
+                    (!(news.getText().get(0).getContent().equals(news.getTextShort().get(0).getContent())))) && !news.getOpen())
+            {
                 holder.mNext.setVisibility(View.VISIBLE);
                 holder.mNext.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
                 buttonIsActive = true;
             }
+            if (!buttonIsActive)
+                holder.mNext.setVisibility(View.GONE);
 
             final ContentAdapter contentAdapter = new ContentAdapter();
             List<UserNews.TextShort> textShort = new ArrayList<UserNews.TextShort>();
@@ -233,7 +233,7 @@ public class NewsFragment extends Fragment {
         }
     }
 
-    static class NewsViewHolder extends RecyclerView.ViewHolder {
+    class NewsViewHolder extends RecyclerView.ViewHolder {
         protected TextView mTitle;
         protected TextView mBlog;
         protected RecyclerView mContent;
@@ -248,6 +248,13 @@ public class NewsFragment extends Fragment {
         public NewsViewHolder(@NonNull View itemView) {
             super(itemView);
             mTitle = itemView.findViewById(R.id.title);
+            mTitle.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    int pos = NewsViewHolder.this.getAdapterPosition();
+                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(mNews.getResults().get(pos).getUrl()));
+                    startActivity(browserIntent);
+                }});
             mBlog = itemView.findViewById(R.id.blog);
             mContent = itemView.findViewById(R.id.content);
             mAuthor = itemView.findViewById(R.id.author);
@@ -274,6 +281,7 @@ public class NewsFragment extends Fragment {
                     mNext.setVisibility(View.GONE);
                     int pos = NewsViewHolder.this.getAdapterPosition();
                     adapter.setDisactive(NewsViewHolder.this, pos);
+                    mNewsViewModel.openNews(mNews.getResults().get(pos).getId());
                 }
 
             });

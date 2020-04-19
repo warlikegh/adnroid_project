@@ -33,6 +33,7 @@ public class News {
     public String contentShort;
     public String typeShort;
     public String url;
+    public Boolean isOpen;
 
     public String next;
 
@@ -44,7 +45,7 @@ public class News {
 
     public News(int key, String mTitle, String mBlog, String mAuthorName, Integer mAuthorId, String mAuthorUsername,
                 String mAuthorAva, Integer mCommentsCount, String mPublishDate, Double mRating, List<UserNews.Text> mText,
-                List<UserNews.TextShort> mTextShort, String mUrl, String mNext) {
+                List<UserNews.TextShort> mTextShort, String mUrl, String mNext, Boolean mIsOpen) {
         id = key;
         title = mTitle;
         blog = mBlog;
@@ -78,6 +79,8 @@ public class News {
 
         textSize = mText.size();
         textShortSize = mTextShort.size();
+
+        isOpen = mIsOpen;
     }
 
     public List<UserNews.Text> getText() {

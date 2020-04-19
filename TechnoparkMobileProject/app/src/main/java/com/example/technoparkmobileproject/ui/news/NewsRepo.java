@@ -94,6 +94,10 @@ class NewsRepo {
         });
     }
 
+    public void openNews(int pos) {
+        NewsDbManager.getInstance(mContext).openNews(pos);
+    }
+
     public void pullFromDB() {
         NewsDbManager manager = NewsDbManager.getInstance(mContext);
         manager.readAll(readListener);
@@ -190,7 +194,8 @@ class NewsRepo {
                 resultPlain.commentsCount,
                 resultPlain.id,
                 textShort,
-                resultPlain.url);
+                resultPlain.url,
+                false);
     }
 
     private static UserNews.Author mapAuthor(NewsApi.UserNewsPlain.Author authorPlain) throws ParseException {
@@ -219,27 +224,28 @@ class NewsRepo {
         );
     }
 
-    private void savedata(UserNews result) {
+    private void savedata(UserNews news) {
         UserNews temp = new UserNews();
 
-        for (int i = 0; i < result.getResults().size(); i++) {
-            UserNews.Result result1 = temp.new Result();
-            result1 = result.getResults().get(i);
+        for (int i = 0; i < news.getResults().size(); i++) {
+            UserNews.Result result = temp.new Result();
+            result = news.getResults().get(i);
             NewsDbManager.getInstance(mContext).insert(
-                    result1.getId(),
-                    result1.getTitle(),
-                    result1.getBlog(),
-                    result1.getAuthor().getFullname(),
-                    result1.getAuthor().getId(),
-                    result1.getAuthor().getUsername(),
-                    result1.getAuthor().getAvatarUrl(),
-                    result1.getCommentsCount(),
-                    result1.getPublishDate(),
-                    result1.getRating(),
-                    result1.getText(),
-                    result1.getTextShort(),
-                    result1.getUrl(),
-                    result.getNext());
+                    result.getId(),
+                    result.getTitle(),
+                    result.getBlog(),
+                    result.getAuthor().getFullname(),
+                    result.getAuthor().getId(),
+                    result.getAuthor().getUsername(),
+                    result.getAuthor().getAvatarUrl(),
+                    result.getCommentsCount(),
+                    result.getPublishDate(),
+                    result.getRating(),
+                    result.getText(),
+                    result.getTextShort(),
+                    result.getUrl(),
+                    news.getNext(),
+                    result.getOpen());
         }
 
     }
@@ -271,12 +277,11 @@ class NewsRepo {
                     data.get(i).authorId);
             tempResult.add(temp.new Result(tempAuthor, data.get(i).blog, data.get(i).title, data.get(i).rating,
                     data.get(i).publishDate, data.get(i).getText(), data.get(i).commentsCount, data.get(i).id,
-                    data.get(i).getTextShort(), data.get(i).url));
+                    data.get(i).getTextShort(), data.get(i).url, data.get(i).isOpen));
         }
         UserNews temp = new UserNews(null, data.get(data.size() - 1).next,
                 null, tempResult);
         mNews.postValue(temp);
-
     }
 
 }

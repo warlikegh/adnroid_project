@@ -34,4 +34,10 @@ public class NewsViewModel extends AndroidViewModel {
     public void pullFromDB() {
         mRepo.pullFromDB();
     }
+
+    public void openNews(int pos) {
+        mRepo.openNews(pos);
+    }
+
+    ;
 }
