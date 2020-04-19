@@ -34,6 +34,8 @@ import com.example.technoparkmobileproject.R;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.technoparkmobileproject.Router;
+import com.example.technoparkmobileproject.SecretData;
+import com.example.technoparkmobileproject.network.ApiRepo;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.util.ArrayList;
@@ -46,7 +48,9 @@ import static android.view.View.GONE;
 import static com.example.technoparkmobileproject.TechnoparkApplication.CREATE_FIRST_SETTINGS;
 import static com.example.technoparkmobileproject.TechnoparkApplication.IS_FIRST_PROFILE;
 import static com.example.technoparkmobileproject.TechnoparkApplication.PROFILE_ID;
+import static com.example.technoparkmobileproject.TechnoparkApplication.PROFILE_PATH_URL;
 import static com.example.technoparkmobileproject.TechnoparkApplication.PROFILE_USERNAME;
+import static com.example.technoparkmobileproject.TechnoparkApplication.SITE;
 
 public class ProfileFragment extends Fragment {
     static GroupAdapter groupAdapter;
@@ -138,6 +142,7 @@ public class ProfileFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         final View view = inflater.inflate(R.layout.fragment_profile, container, false);
+        final SharedPreferences mSecretSettings = new SecretData().getSecretData(getContext());
 
         mSeparator1 = view.findViewById(R.id.separator1);
         mSeparator2 = view.findViewById(R.id.separator2);
@@ -146,6 +151,17 @@ public class ProfileFragment extends Fragment {
         mAva = view.findViewById(R.id.photo);
         mBackground = view.findViewById(R.id.background);
         mFullName = view.findViewById(R.id.full_name);
+       // https://park.mail.ru/profile/a.katnov/    "https://park.mail.ru/api/mobile/v1/"
+        mFullName.setOnClickListener((new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                int pos = mSecretSettings.getInt(SITE, 0);
+                String base = ApiRepo.from(getContext()).getBaseURL(pos);
+                String baseSite = base.substring(0, base.indexOf('/', 9) + 1);
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(baseSite + PROFILE_PATH_URL + username + "/"));
+                startActivity(browserIntent);
+            }
+        }));
         mMainGroup = view.findViewById(R.id.main_group);
         mGroups = view.findViewById(R.id.subgroups);
         mAbout = view.findViewById(R.id.about);
@@ -226,7 +242,8 @@ public class ProfileFragment extends Fragment {
                     mAva.setVisibility(View.VISIBLE);
                     mFullName.setText(mProfile.getFullname());
                     mFullName.setVisibility(View.VISIBLE);
-                    mFullName.setTextIsSelectable(true);
+                    //mFullName.setTextIsSelectable(true);
+                    username = mProfile.getUsername();
                     mMainGroup.setText(mProfile.getMainGroup());
                     mMainGroup.setVisibility(View.VISIBLE);
                     mMainGroup.setTextIsSelectable(true);

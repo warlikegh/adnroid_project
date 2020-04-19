@@ -60,7 +60,6 @@
                         android:layout_toEndOf="@+id/photo"
                         android:text="fullName"
                         android:textColor="@color/colorTextBlue"
-                        android:textIsSelectable="true"
                         android:textSize="20sp"
                         android:visibility="invisible" />
 
