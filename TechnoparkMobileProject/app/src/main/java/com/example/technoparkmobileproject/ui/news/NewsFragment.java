@@ -20,6 +20,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -197,10 +198,12 @@ public class NewsFragment extends Fragment {
             positionSave = position;
             final UserNews.Result news = mNews.get(position);
             holder.mTitle.setText(news.getTitle());
-
-            holder.mTitle.setMovementMethod(LinkMovementMethod.getInstance());
             holder.mBlog.setText(news.getBlog());
             holder.mAuthor.setText(news.getAuthor().getFullname());
+
+            if (news.getAuthor().getFullname().length() < 25)
+                holder.mAuthor.setPadding(0,12,0,0);
+
 
             String date = new SecretData().getDateString(news.getPublishDate());
             holder.mDate.setText(date);
@@ -260,12 +263,15 @@ public class NewsFragment extends Fragment {
         protected TextView mCommentsCount;
         private final TextView mNext;
         protected ImageView mAvatar;
+        protected RelativeLayout mTitleLayout;
+        protected RelativeLayout mAuthorLayout;
 
 
         public NewsViewHolder(@NonNull View itemView) {
             super(itemView);
             mTitle = itemView.findViewById(R.id.title);
-            mTitle.setOnClickListener(new View.OnClickListener() {
+            mTitleLayout = itemView.findViewById(R.id.title_layout);
+            mTitleLayout.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     int pos = NewsViewHolder.this.getAdapterPosition();
@@ -275,8 +281,9 @@ public class NewsFragment extends Fragment {
             mBlog = itemView.findViewById(R.id.blog);
             mContent = itemView.findViewById(R.id.content);
             mAuthor = itemView.findViewById(R.id.author);
+            mAuthorLayout = itemView.findViewById(R.id.author_layout);
 
-            mAuthor.setOnClickListener(new View.OnClickListener() {
+            mAuthorLayout.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     int pos = NewsViewHolder.this.getAdapterPosition();
@@ -298,6 +305,7 @@ public class NewsFragment extends Fragment {
                     mNext.setVisibility(View.GONE);
                     int pos = NewsViewHolder.this.getAdapterPosition();
                     adapter.setDisactive(NewsViewHolder.this, pos);
+                    mNews.getResults().get(pos).setOpen(true);
                     mNewsViewModel.openNews(mNews.getResults().get(pos).getId());
                 }
 

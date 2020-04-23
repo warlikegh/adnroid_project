@@ -12,6 +12,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -65,20 +66,7 @@ public class ProfileFragment extends Fragment {
     int id;
     Boolean isOther;
     static FragmentManager fragmentManager;
-    int[] background = {R.color.colorWhite,
-            R.mipmap.profile_background01,
-            R.mipmap.profile_background02,
-            R.mipmap.profile_background03,
-            R.mipmap.profile_background04,
-            R.mipmap.profile_background05,
-            R.mipmap.profile_background06,
-            R.mipmap.profile_background07,
-            R.mipmap.profile_background08,
-            R.mipmap.profile_background09,
-            R.mipmap.profile_background10,
-            R.mipmap.profile_background11,
-            R.mipmap.profile_background12,
-            R.mipmap.profile_background13};
+
     int backgroundNumber = 0;
 
     protected ImageView mAva;
@@ -112,7 +100,6 @@ public class ProfileFragment extends Fragment {
         mProfileViewModel = new ViewModelProvider(Objects.requireNonNull(getActivity()))
                 .get(ProfileViewModel.class);
         fragmentManager = getChildFragmentManager();
-
     }
 
     @Override
@@ -143,6 +130,37 @@ public class ProfileFragment extends Fragment {
                              ViewGroup container, Bundle savedInstanceState) {
         final View view = inflater.inflate(R.layout.fragment_profile, container, false);
         final SharedPreferences mSecretSettings = new SecretData().getSecretData(getContext());
+        final int[] background = {R.color.colorWhite,
+                R.color.black,
+                getResources().getColor(R.color.colorAccent, null),
+                getResources().getColor(R.color.colorBlueBackgroungIS, getContext().getTheme()),
+                getResources().getColor(R.color.colorButtonAuth, getContext().getTheme()),
+                getResources().getColor(R.color.colorDarkGrey, getContext().getTheme()),
+                getResources().getColor(R.color.colorGradientBottomAuth, getContext().getTheme()),
+                getResources().getColor(R.color.colorGradientTopAuth, getContext().getTheme()),
+                getResources().getColor(R.color.colorGrey, getContext().getTheme()),
+                getResources().getColor(R.color.colorOrange, getContext().getTheme()),
+                getResources().getColor(R.color.colorPrimary, getContext().getTheme()),
+                getResources().getColor(R.color.colorPrimaryDark, getContext().getTheme()),
+                getResources().getColor(R.color.colorRed, getContext().getTheme()),
+                getResources().getColor(R.color.colorRedMadeAuth, getContext().getTheme()),
+                getResources().getColor(R.color.colorText, getContext().getTheme()),
+                getResources().getColor(R.color.colorTextBlue, getContext().getTheme()),
+                getResources().getColor(R.color.colorWindow, getContext().getTheme()),
+                getResources().getColor(R.color.colorWindowSplashScreen, getContext().getTheme())
+                /*    R.mipmap.profile_background01,
+                    R.mipmap.profile_background02,
+                    R.mipmap.profile_background03,
+                    R.mipmap.profile_background04,
+                    R.mipmap.profile_background05,
+                    R.mipmap.profile_background06,
+                    R.mipmap.profile_background07,
+                    R.mipmap.profile_background08,
+                    R.mipmap.profile_background09,
+                    R.mipmap.profile_background10,
+                    R.mipmap.profile_background11,
+                    R.mipmap.profile_background12,
+                    R.mipmap.profile_background13*/};
 
         mSeparator1 = view.findViewById(R.id.separator1);
         mSeparator2 = view.findViewById(R.id.separator2);
@@ -224,8 +242,9 @@ public class ProfileFragment extends Fragment {
                     mProfileViewModel.refresh(username, id);
                 }
                 Glide.with(Objects.requireNonNull(getContext()))
-                        .load(background[(++backgroundNumber) % 14])
+                        .load(background[(++backgroundNumber) % background.length])
                         .into(mBackground);
+                Log.d("okhttp", ((Integer) (background[(backgroundNumber) % background.length])).toString() + " " + ((Integer) (backgroundNumber % background.length)).toString());
                 pullToRefresh.setRefreshing(false);
             }
         });
@@ -510,8 +529,8 @@ public class ProfileFragment extends Fragment {
             mAccount.setOnLongClickListener((new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {
-                   clipAndVibrate(v, AccountViewHolder.this.mAccount);
-                   return true;
+                    clipAndVibrate(v, AccountViewHolder.this.mAccount);
+                    return true;
                 }
             }));
         }
