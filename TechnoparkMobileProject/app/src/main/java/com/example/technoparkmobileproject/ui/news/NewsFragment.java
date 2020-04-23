@@ -359,7 +359,7 @@ public class NewsFragment extends Fragment {
                         .load(text)
                         .placeholder(R.drawable.ic_restore_black_24dp)
                         .into(holder.mImageNews);
-                holder.mTextNews.setEnabled(true);
+                holder.mTextNews.setVisibility(View.GONE);
             } else {
                 holder.mTextNews.setText("Here must be " + type);
             }

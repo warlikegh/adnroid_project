@@ -25,6 +25,7 @@
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
             android:text="Title"
+            android:textColor="@color/black"
             android:textAlignment="textStart"
             android:textSize="20sp" />
 
@@ -53,6 +54,7 @@
         android:layout_below="@id/separator1"
         android:layout_centerHorizontal="true"
         android:background="@color/colorWhite"
+        android:paddingTop="8dp"
         tools:context=".ArticleFragment"
         android:paddingStart="16dp"
         android:paddingEnd="16dp"
@@ -102,6 +104,7 @@
             android:layout_marginTop="8dp"
             android:layout_toEndOf="@+id/photo"
             android:text="Author"
+            android:textColor="@color/black"
             android:textSize="16sp" />
 
         <TextView
