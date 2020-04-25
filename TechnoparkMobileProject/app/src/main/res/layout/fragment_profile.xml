@@ -55,7 +55,7 @@
                         android:text="full_Name"
                         android:fontFamily="@font/mem"
                         android:textAlignment="textStart"
-                        android:textColor="@color/colorTextBlue"
+                        android:textColor="@color/colorAccent"
                         android:textSize="20sp"
                         android:visibility="invisible" />
 
@@ -194,7 +194,7 @@
                         android:layout_marginStart="@dimen/margin_ava"
                         android:layout_marginTop="@dimen/margin_ava"
                         android:text="@string/contacts_string"
-                        android:textColor="@color/colorTextBlue"
+                        android:textColor="@color/colorAccent"
                         android:textSize="12sp" />
 
                     <TextView

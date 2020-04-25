@@ -69,7 +69,7 @@
             android:layout_marginRight="64dp"
             android:backgroundTint="@color/colorButtonAuth"
             android:text="@string/log_in"
-            android:textColor="@color/colorGrey"
+            android:textColor="@color/colorWhite"
             />
 
     </LinearLayout>

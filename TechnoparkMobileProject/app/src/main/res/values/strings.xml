@@ -29,9 +29,9 @@
     <string name="phone_string">Mobile phone</string>
     <string name="mail_string">Mail</string>
     <string name="birthday_string">Birthday</string>
-    <string name="feedback">LEAVE FEEDBACK</string>
-    <string name="check">CHECK</string>
-    <string name="checked">CHECKED ✓</string>
+    <string name="feedback">Leave feedback</string>
+    <string name="check">Check</string>
+    <string name="checked">Checked✓</string>
     <string name="checking">Checking...</string>
     <string name="check_success">You`ve successfully checked in!</string>
     <string name="error">Something wrong! Please, try later.</string>

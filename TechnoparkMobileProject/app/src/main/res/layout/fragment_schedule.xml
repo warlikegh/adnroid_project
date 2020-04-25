@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical">
 
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -13,11 +14,6 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
 
                 <RelativeLayout
                     android:id="@+id/layout_head"
@@ -30,8 +26,10 @@
                         android:id="@+id/text_discipline"
                         android:layout_width="match_parent"
                         android:layout_height="32dp"
-                        android:layout_margin="8dp"
-                        android:layout_marginTop="24dp"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginEnd="16dp"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginBottom="8dp"
                         android:gravity="center_vertical"
                         android:text="@string/disciplines"
                         android:textAlignment="center"
@@ -41,41 +39,44 @@
                     <Spinner
                         android:id="@+id/spinner_discipline"
                         android:layout_width="match_parent"
-                        android:layout_height="40dp"
+                        android:layout_height="wrap_content"
                         android:layout_below="@+id/text_discipline"
-                        android:layout_marginLeft="8dp"
-                        android:layout_marginRight="8dp"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginEnd="16dp"
                         android:layout_marginBottom="8dp"
+                        android:padding="8dp"
                         android:background="@drawable/shape_white_round"
                         android:elevation="2dp"
                         android:outlineAmbientShadowColor="@color/colorWindow" />
 
                     <Button
                         android:id="@+id/all_semester"
-                        style="@style/RoundedCornerButton"
+                        android:background="@drawable/schedule_selector_button_left"
                         android:layout_width="128dp"
-                        android:layout_height="40dp"
+                        android:layout_height="32dp"
                         android:layout_below="@+id/spinner_discipline"
-                        android:layout_alignParentStart="true"
-                        android:layout_marginStart="8dp"
+                        android:layout_marginStart="16dp"
                         android:layout_marginBottom="8dp"
                         android:elevation="1dp"
-                        android:paddingTop="8dp"
                         android:text="@string/all_semester"
+                        android:textAlignment="center"
+                        android:textAllCaps="false"
+                        android:textColor="@color/colorItemBlueDark"
                         android:textSize="12sp" />
 
                     <Button
                         android:id="@+id/two_week"
-                        style="@style/RoundedCornerButton"
                         android:layout_width="wrap_content"
-                        android:layout_height="40dp"
+                        android:layout_height="32dp"
                         android:layout_below="@+id/spinner_discipline"
                         android:layout_alignParentEnd="true"
-                        android:layout_marginEnd="8dp"
+                        android:layout_marginEnd="16dp"
                         android:layout_toEndOf="@id/all_semester"
                         android:elevation="1dp"
-                        android:paddingTop="8dp"
+                        android:background="@drawable/schedule_selector_button_right"
                         android:text="@string/two_week"
+                        android:textAllCaps="false"
+                        android:textColor="@color/colorItemBlueDark"
                         android:textSize="12sp" />
 
 
@@ -85,10 +86,12 @@
                     android:id="@+id/schedule"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_below="@+id/all_semester"
-                    android:splitMotionEvents="true" />
+                    android:layout_below="@+id/layout_head"
+                    android:splitMotionEvents="true"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginEnd="16dp"
+                    tools:context=".ScheduleFragment"/>
 
-            </LinearLayout>
         </RelativeLayout>
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 

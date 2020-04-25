@@ -1,6 +1,5 @@
 package com.example.technoparkmobileproject.ui.shedule;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -28,13 +27,10 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.technoparkmobileproject.R;
-import com.example.technoparkmobileproject.Router;
 import com.example.technoparkmobileproject.SecretData;
-import com.example.technoparkmobileproject.network.CheckApi;
 import com.google.android.material.snackbar.BaseTransientBottomBar;
 import com.google.android.material.snackbar.Snackbar;
 
-import java.sql.Time;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -42,6 +38,7 @@ import java.util.List;
 import java.util.Objects;
 
 import static android.view.View.GONE;
+import static android.view.View.INVISIBLE;
 import static com.example.technoparkmobileproject.TechnoparkApplication.CREATE_FIRST_SETTINGS;
 import static com.example.technoparkmobileproject.TechnoparkApplication.DEFAULT_TWO_WEEK;
 import static com.example.technoparkmobileproject.TechnoparkApplication.DISCIPLINE;
@@ -49,10 +46,10 @@ import static com.example.technoparkmobileproject.TechnoparkApplication.IS_FIRST
 
 public class ScheduleFragment extends Fragment {
     private List<UserSchedule> mSchedule = new ArrayList<>();
-    private CheckApi.UserCheck mFeedback;
     private ScheduleRepo.ScheduleProgress mScheduleProgress;
     private ScheduleRepo.CheckProgress mCheckProgress;
     private List<UserSchedule> tempSchedule = new ArrayList<>();
+    final List<String> disciplines = new ArrayList<>();
     final ScheduleAdapter scheduleAdapter = new ScheduleAdapter();
     String ALL_DISCIPLINES;
     String disciplineText;
@@ -120,7 +117,6 @@ public class ScheduleFragment extends Fragment {
         disciplineText = mSettings.getString(DISCIPLINE, ALL_DISCIPLINES);
         isDefault[0] = mSettings.getBoolean(DEFAULT_TWO_WEEK, true);
         final Spinner spinner = view.findViewById(R.id.spinner_discipline);
-        final List<String> disciplines = new ArrayList<>();
         final ArrayAdapter<String>[] adapter = new ArrayAdapter[]{new ArrayAdapter<String>(context, android.R.layout.simple_spinner_item, disciplines)};
 
         adapter[0].setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -130,11 +126,15 @@ public class ScheduleFragment extends Fragment {
         allSemesters.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                allSemesters.setClickable(false);
+                /*allSemesters.setClickable(false);
                 allSemesters.setBackgroundColor(getResources().getColor(R.color.colorAccent, null));
                 allSemesters.setTextColor(getResources().getColor(R.color.colorGrey, null));
                 twoWeeks.setClickable(true);
                 twoWeeks.setBackgroundColor(getResources().getColor(R.color.colorGrey, null));
+                twoWeeks.setTextColor(getResources().getColor(R.color.colorAccent, null));*/
+                allSemesters.setEnabled(false);
+                twoWeeks.setEnabled(true);
+                allSemesters.setTextColor(getResources().getColor(R.color.colorWhite, null));
                 twoWeeks.setTextColor(getResources().getColor(R.color.colorAccent, null));
                 isDefault[0] = false;
                 scheduleAdapter.setTime(isDefault[0]);
@@ -143,15 +143,18 @@ public class ScheduleFragment extends Fragment {
         });
 
         twoWeeks.setOnClickListener(new View.OnClickListener() {
-            //@RequiresApi(api = Build.VERSION_CODES.O)
             @Override
             public void onClick(View view) {
-                twoWeeks.setClickable(false);
+                /*twoWeeks.setClickable(false);
                 twoWeeks.setBackgroundColor(getResources().getColor(R.color.colorAccent, null));
                 twoWeeks.setTextColor(getResources().getColor(R.color.colorGrey, null));
                 allSemesters.setClickable(true);
                 allSemesters.setBackgroundColor(getResources().getColor(R.color.colorGrey, null));
+                allSemesters.setTextColor(getResources().getColor(R.color.colorAccent, null));*/
+                twoWeeks.setEnabled(false);
+                allSemesters.setEnabled(true);
                 allSemesters.setTextColor(getResources().getColor(R.color.colorAccent, null));
+                twoWeeks.setTextColor(getResources().getColor(R.color.colorWhite, null));
                 isDefault[0] = true;
                 scheduleAdapter.setTime(isDefault[0]);
                 mEditor.putBoolean(DEFAULT_TWO_WEEK, isDefault[0]).commit();
@@ -257,6 +260,12 @@ public class ScheduleFragment extends Fragment {
         private List<UserSchedule> mWholeSchedule = new ArrayList<>();
         private boolean isDefaultTime;
         private String discipline = "";
+        int[] drawableStart = {R.drawable.shape_blue_start,
+                R.drawable.shape_pink_start,
+                R.drawable.shape_green_dark_start,
+                R.drawable.shape_purple_start,
+                R.drawable.shape_red_dark_start,
+                R.drawable.shape_blue_dark_start};
 
         public void setSchedule(List<UserSchedule> schedule, String disciplineText, boolean defaultTime) {
             mWholeSchedule = schedule;
@@ -317,8 +326,6 @@ public class ScheduleFragment extends Fragment {
                     .inflate(R.layout.schedule_item, parent, false));
         }
 
-        //@RequiresApi(api = Build.VERSION_CODES.O)
-        @SuppressLint("ResourceAsColor")
         @Override
         public void onBindViewHolder(@NonNull ScheduleViewHolder holder, int position) {
             final UserSchedule schedule = mSchedule.get(position);
@@ -328,6 +335,15 @@ public class ScheduleFragment extends Fragment {
             holder.mDiscipline.setText(schedule.getDiscipline());
             holder.mShortTitle.setText(schedule.getShortTitle());
             holder.mLocation.setText(schedule.getLocation());
+
+
+            Date now = new Date();
+            Date end = new SecretData().getDate(schedule.getEndTime());
+            if (now.after(end))
+                holder.mSeparator1.setBackground(getResources().getDrawable(R.drawable.shape_done_start, null));
+            else
+                holder.mSeparator1.setBackground(getResources()
+                        .getDrawable(drawableStart[(disciplines.indexOf(schedule.getDiscipline()) - 1) % drawableStart.length], null));
 
             String time = new SecretData().getTimeString(schedule.getStartTime());
             holder.mTime.setText(time);
@@ -352,7 +368,7 @@ public class ScheduleFragment extends Fragment {
                     holder.mCheckButton.setText(R.string.check);
                     holder.mCheckButton.setTextColor(getResources().getColor(R.color.colorAccent, null));
                 } else {
-                    holder.mCheckButton.setVisibility(View.INVISIBLE);
+                    holder.mCheckButton.setVisibility(INVISIBLE);
                 }
             }
         }
@@ -374,6 +390,8 @@ public class ScheduleFragment extends Fragment {
         protected TextView mTitle;
         protected TextView mCheckButton;
         protected TextView mFeedbackButton;
+
+        protected View mSeparator1;
 
         public ScheduleViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -403,6 +421,8 @@ public class ScheduleFragment extends Fragment {
                     startActivity(browserIntent);
                 }
             });
+
+            mSeparator1 =  itemView.findViewById(R.id.separator1);
         }
     }
 }

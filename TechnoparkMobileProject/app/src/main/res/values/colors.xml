@@ -5,7 +5,6 @@
     <color name="colorAccent">#5994cc</color>
     <color name="colorWindow">#ecedf1</color>
     <color name="black">#090909</color>
-    <color name="colorGrey">#ffffff</color>
     <color name="colorWhite">#ffffff</color>
     <color name="colorText">#8b8a90</color>
     <color name="colorRed">#c0474e</color>
@@ -17,6 +16,13 @@
     <color name="colorGradientBottomAuth">#29a78e</color>
     <color name="colorBlueBackgroungIS">#1e92fc</color>
     <color name="colorRedMadeAuth">#fc2c38</color>
-    <color name="colorTextBlue">#4193c0</color>
+    <color name="colorPlaceBlue">#4193c0</color>
     <color name="colorGreySeparator">#f4f4f4</color>
+    <color name="colorItemBlueDark">#0c43a0</color>
+    <color name="colorItemSea">#30d5c7</color>
+    <color name="colorItemPurple">#933da8</color>
+    <color name="colorThemeGreenDark">#3f9185</color>
+    <color name="colorThemePink">#ff94c2</color>
+    <color name="colorThemeDarkBlue">#0078c3</color>
+    <color name="colorThemeRedDark">#cd322e</color>
 </resources>
