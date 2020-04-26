@@ -17,47 +17,58 @@
 
             <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <ImageView
-                    android:layout_width="match_parent"
-                    android:layout_height="76dp"
-                    android:background="@color/colorGradientTopAuth"
-                    android:id="@+id/background"
-                    android:scaleType="centerCrop" />
-
-                <ImageView
-                    android:id="@+id/photo"
-                    android:layout_width="136dp"
-                    android:layout_height="136dp"
-                    android:scaleType="centerCrop"
-                    android:layout_marginTop="8dp"
-                    android:layout_alignParentEnd="true"
-                    android:layout_marginEnd="16dp"
-                    android:elevation="8dp" />
+                android:layout_height="wrap_content"
+                android:paddingStart="16dp"
+                android:paddingTop="16dp"
+                android:paddingEnd="16dp"
+                android:paddingBottom="8dp">
 
                 <RelativeLayout
-                    android:id="@+id/name_layout"
+                    android:id="@+id/person_layout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@color/colorWhite"
-                    android:layout_below="@id/background"
-                    android:elevation="4dp"
-                    android:orientation="vertical">
+                    android:layout_marginBottom="8dp"
+                    android:background="@drawable/shape_white_round">
+
+                    <ImageView
+                        android:id="@+id/background"
+                        android:layout_width="match_parent"
+                        android:layout_height="40dp"
+                        android:background="@drawable/profile_background"
+                        android:scaleType="centerCrop" />
+
+                    <ImageView
+                        android:id="@+id/photo"
+                        android:layout_width="136dp"
+                        android:layout_height="136dp"
+                        android:layout_alignParentEnd="true"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginEnd="16dp"
+                        android:layout_marginBottom="8dp"
+                        android:elevation="8dp"
+                        android:scaleType="centerCrop" />
+
+                    <View
+                        android:id="@+id/separator0"
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_below="@+id/background"
+                        android:background="@drawable/separator_grey" />
 
                     <TextView
                         android:id="@+id/full_name"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_below="@+id/separator0"
                         android:layout_marginStart="@dimen/margin_ava"
-                        android:layout_marginEnd="160dp"
                         android:layout_marginTop="8dp"
+                        android:layout_marginEnd="160dp"
                         android:text="full_Name"
-                        android:fontFamily="@font/mem"
                         android:textAlignment="textStart"
-                        android:textColor="@color/colorAccent"
+                        android:textColor="@color/black"
                         android:textSize="20sp"
                         android:visibility="invisible" />
+                    <!--android:visibility="invisible"-->
 
                     <TextView
                         android:id="@+id/main_group"
@@ -66,104 +77,109 @@
                         android:layout_below="@+id/full_name"
                         android:layout_marginStart="@dimen/margin_ava"
                         android:layout_marginEnd="160dp"
+                        android:layout_marginBottom="8dp"
+                        android:elevation="4dp"
                         android:text="mainGroup"
                         android:textAlignment="textStart"
                         android:textIsSelectable="true"
-                        android:textSize="16sp"
-                        android:elevation="4dp"
+                        android:textSize="12sp"
                         android:visibility="invisible" />
+                    <!--android:visibility="invisible"-->
+                    <RelativeLayout
+                        android:id="@+id/birthday_layout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/main_group">
 
+                        <View
+                            android:id="@+id/separator1"
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:background="@drawable/separator_grey" />
+
+                        <TextView
+                            android:id="@+id/birthday_string"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@+id/separator1"
+                            android:layout_marginStart="@dimen/margin_ava"
+                            android:layout_marginTop="8dp"
+                            android:text="@string/birthday_string"
+                            android:textSize="12sp" />
+
+                        <TextView
+                            android:id="@+id/birthday"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@id/birthday_string"
+                            android:layout_marginStart="@dimen/margin_ava"
+                            android:layout_marginEnd="@dimen/margin_ava"
+                            android:layout_marginBottom="8dp"
+                            android:text="00.00.0000"
+                            android:textColor="@color/black"
+                            android:textIsSelectable="true"
+                            android:textSize="16sp"
+                            android:visibility="invisible" />
+                        <!--android:visibility="invisible"-->
+                    </RelativeLayout>
+
+                    <RelativeLayout
+                        android:id="@+id/about_layout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/birthday_layout">
+
+                        <View
+                            android:id="@+id/separator2"
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+
+
+                            android:background="@drawable/separator_grey" />
+
+                        <TextView
+                            android:id="@+id/about_string"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@+id/separator2"
+                            android:layout_marginStart="@dimen/margin_ava"
+                            android:layout_marginTop="8dp"
+                            android:text="@string/about_string"
+                            android:textSize="12sp" />
+
+                        <TextView
+                            android:id="@+id/about"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@+id/about_string"
+                            android:layout_marginStart="@dimen/margin_ava"
+                            android:layout_marginEnd="@dimen/margin_ava"
+                            android:layout_marginBottom="8dp"
+                            android:background="@drawable/shape_white_round"
+                            android:text="text_about"
+                            android:textColor="@color/black"
+                            android:textSize="16sp"
+                            android:visibility="invisible" />
+                        <!--  -->
+                    </RelativeLayout>
                 </RelativeLayout>
 
-                <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                    android:id="@+id/about_layout"
+                <RelativeLayout
+                    android:id="@+id/group_layout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@color/colorWhite"
-                    android:elevation="4dp"
-                    android:layout_below="@+id/name_layout"
-                    android:orientation="vertical">
-
-                    <View
-                        android:id="@+id/separator1"
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:layout_marginTop="8dp"
-                        android:layout_below="@id/main_group"
-                        android:background="@drawable/separator_grey" />
-
-                    <TextView
-                        android:id="@+id/about_string"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="@dimen/margin_ava"
-                        android:layout_marginTop="8dp"
-                        android:text="@string/about_string"
-                        android:textSize="12sp" />
-
-                    <TextView
-                        android:id="@+id/about"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="@dimen/margin_ava"
-                        android:layout_marginEnd="@dimen/margin_ava"
-                        android:background="@drawable/shape_white_round"
-                        android:text="text_about"
-                        android:textColor="@color/black"
-                        android:textSize="16sp"
-                        android:visibility="invisible" />
-
-                    <View
-                        android:id="@+id/separator2"
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:layout_marginTop="8dp"
-                        android:background="@drawable/separator_grey" />
-
-                    <TextView
-                        android:id="@+id/birthday_string"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_below="@+id/groups_layout"
-                        android:layout_marginStart="@dimen/margin_ava"
-                        android:layout_marginTop="8dp"
-                        android:text="@string/birthday_string"
-                        android:textSize="12sp" />
-
-                    <TextView
-                        android:id="@+id/birthday"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_below="@id/main_group"
-                        android:layout_marginStart="@dimen/margin_ava"
-                        android:layout_marginEnd="@dimen/margin_ava"
-                        android:layout_marginBottom="8dp"
-                        android:text="Birthday"
-                        android:textColor="@color/black"
-                        android:textIsSelectable="true"
-                        android:textSize="16sp"
-                        android:visibility="invisible" />
-                </LinearLayout>
-
-                <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                    android:id="@+id/groups_layout"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@+id/about_layout"
-                    android:layout_marginTop="8dp"
-                    android:background="@color/colorWhite"
-                    android:elevation="4dp"
-                    android:orientation="vertical">
+                    android:layout_below="@+id/accounts_layout"
+                    android:layout_marginBottom="8dp"
+                    android:background="@drawable/shape_white_round">
 
                     <TextView
                         android:id="@+id/groups"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_below="@+id/about_layout"
                         android:layout_marginStart="@dimen/margin_ava"
-                        android:layout_marginTop="8dp"
+                        android:layout_marginTop="16dp"
                         android:text="@string/Groups"
-
+                        android:textColor="@color/colorAccent"
                         android:textSize="12sp" />
 
                     <androidx.recyclerview.widget.RecyclerView
@@ -171,109 +187,115 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_below="@id/groups"
+                        android:layout_centerHorizontal="true"
                         android:layout_marginTop="8dp"
                         android:layout_marginBottom="8dp" />
+                </RelativeLayout>
 
-                </LinearLayout>
-
-                <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                <RelativeLayout
                     android:id="@+id/contacts_layout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_below="@+id/groups_layout"
-                    android:layout_marginTop="8dp"
-                    android:background="@color/colorWhite"
-                    android:elevation="4dp"
-                    android:orientation="vertical">
+                    android:layout_below="@+id/person_layout"
+                    android:layout_marginBottom="8dp"
+                    android:background="@drawable/shape_white_round">
 
                     <TextView
                         android:id="@+id/contacts_string"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_below="@+id/groups_layout"
                         android:layout_marginStart="@dimen/margin_ava"
                         android:layout_marginTop="@dimen/margin_ava"
                         android:text="@string/contacts_string"
                         android:textColor="@color/colorAccent"
                         android:textSize="12sp" />
 
-                    <TextView
-                        android:id="@+id/phone_string"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_below="@+id/groups_layout"
-                        android:layout_marginStart="@dimen/margin_ava"
-                        android:layout_marginTop="@dimen/margin_ava"
-                        android:text="@string/phone_string"
-                        android:textSize="12sp" />
-
-
-                    <TextView
-                        android:id="@+id/phone"
+                    <RelativeLayout
+                        android:id="@+id/phone_layout"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_below="@id/contacts_string"
-                        android:layout_marginStart="@dimen/margin_ava"
-                        android:layout_marginEnd="@dimen/margin_ava"
-                        android:layout_toEndOf="@+id/phone_image"
-                        android:text="Phone"
-                        android:textColor="@color/black"
-                        android:textSize="16sp"
-                        android:hapticFeedbackEnabled="true"
-                        android:visibility="invisible" />
+                        android:layout_below="@+id/contacts_string">
 
-                    <View
-                        android:id="@+id/separator3"
+                        <TextView
+                            android:id="@+id/phone_string"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="@dimen/margin_ava"
+                            android:layout_marginTop="@dimen/margin_ava"
+                            android:text="@string/phone_string"
+                            android:textSize="12sp" />
+
+
+                        <TextView
+                            android:id="@+id/phone"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@id/phone_string"
+                            android:layout_marginStart="@dimen/margin_ava"
+                            android:layout_marginEnd="@dimen/margin_ava"
+                            android:hapticFeedbackEnabled="true"
+                            android:text="Phone"
+                            android:textColor="@color/black"
+                            android:textSize="16sp"
+                            android:visibility="invisible" />
+
+                        <View
+                            android:id="@+id/separator3"
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:layout_below="@+id/phone"
+                            android:layout_marginTop="8dp"
+                            android:background="@drawable/separator_grey" />
+                    </RelativeLayout>
+
+                    <RelativeLayout
+                        android:id="@+id/mail_layout"
                         android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:layout_marginTop="8dp"
-                        android:background="@drawable/separator_grey" />
-
-                    <TextView
-                        android:id="@+id/mail_string"
-                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_below="@+id/groups_layout"
-                        android:layout_marginStart="@dimen/margin_ava"
-                        android:layout_marginTop="8dp"
-                        android:text="@string/mail_string"
-                        android:textSize="12sp" />
+                        android:layout_below="@+id/phone_layout">
+
+                        <TextView
+                            android:id="@+id/mail_string"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="@dimen/margin_ava"
+                            android:layout_marginTop="8dp"
+                            android:text="@string/mail_string"
+                            android:textSize="12sp" />
 
 
-                    <TextView
-                        android:id="@+id/mail"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_below="@id/phone"
-                        android:layout_marginStart="@dimen/margin_ava"
-                        android:layout_marginEnd="@dimen/margin_ava"
-                        android:layout_marginBottom="8dp"
-                        android:layout_toEndOf="@+id/mail_image"
-                        android:text="Mail"
-                        android:textColor="@color/black"
-                        android:textSize="16sp"
-                        android:visibility="invisible"
-                        android:hapticFeedbackEnabled="true"/>
-                </LinearLayout>
+                        <TextView
+                            android:id="@+id/mail"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@id/mail_string"
+                            android:layout_marginStart="@dimen/margin_ava"
+                            android:layout_marginEnd="@dimen/margin_ava"
+                            android:layout_marginBottom="8dp"
+                            android:hapticFeedbackEnabled="true"
+                            android:text="Mail"
+                            android:textColor="@color/black"
+                            android:textSize="16sp"
+                            android:visibility="invisible" />
+                    </RelativeLayout>
+                </RelativeLayout>
 
-                <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                <RelativeLayout
                     android:id="@+id/accounts_layout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_below="@+id/contacts_layout"
-                    android:layout_marginTop="8dp"
-                    android:background="@color/colorWhite"
-                    android:elevation="4dp"
-                    android:orientation="vertical">
+                    android:layout_below="@id/contacts_layout"
+                    android:layout_marginBottom="8dp"
+                    android:background="@drawable/shape_white_round">
 
                     <TextView
                         android:id="@+id/accounts_string"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_below="@+id/contacts_layout"
                         android:layout_marginStart="@dimen/margin_ava"
                         android:layout_marginTop="@dimen/margin_ava"
                         android:text="@string/accounts_string"
+                        android:textColor="@color/colorAccent"
                         android:textSize="12sp" />
 
                     <androidx.recyclerview.widget.RecyclerView
@@ -281,16 +303,16 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_below="@id/accounts_string"
-                        android:layout_marginStart="@dimen/margin_ava"
-                        android:layout_marginEnd="@dimen/margin_ava"
                         android:layout_marginBottom="8dp" />
-                </LinearLayout>
+
+                </RelativeLayout>
+
 
                 <ProgressBar
                     android:id="@+id/progress_bar"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_below="@id/accounts_layout"
+                    android:layout_below="@id/group_layout"
                     android:layout_centerHorizontal="true"
                     android:visibility="gone" />
 
@@ -302,15 +324,12 @@
                     android:layout_height="56dp"
                     android:layout_below="@+id/progress_bar"
                     android:layout_centerHorizontal="true"
-                    android:layout_marginTop="8dp"
                     android:layout_marginBottom="8dp"
-                    android:background="@drawable/ripple_rectangle_white"
+                    android:background="@drawable/shape_white_round"
                     android:text="@string/Out_of_account"
                     android:textColor="@color/colorRed"
-                    android:visibility="visible"
-                    android:elevation="4dp"/>
+                    android:visibility="visible" />
             </RelativeLayout>
-
         </androidx.core.widget.NestedScrollView>
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 </LinearLayout>

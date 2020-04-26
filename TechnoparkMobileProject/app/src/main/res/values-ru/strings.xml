@@ -34,4 +34,5 @@
     <string name="checking">Отмечаю...</string>
     <string name="check_success">Вы успешно отметились!</string>
     <string name="error">Что-то пошло не так! Повторите позднее.</string>
+    <string name="no_schedule">Нет расписания</string>
 </resources>

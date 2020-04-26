@@ -31,8 +31,9 @@
     <string name="birthday_string">Birthday</string>
     <string name="feedback">Leave feedback</string>
     <string name="check">Check</string>
-    <string name="checked">Checked✓</string>
+    <string name="checked">Checked ✓</string>
     <string name="checking">Checking...</string>
     <string name="check_success">You`ve successfully checked in!</string>
     <string name="error">Something wrong! Please, try later.</string>
+    <string name="no_schedule">There is no schedule</string>
 </resources>

@@ -12,6 +12,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -99,7 +100,7 @@ public class ScheduleFragment extends Fragment {
         recycler.setAdapter(scheduleAdapter);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
         recycler.setLayoutManager(linearLayoutManager);
-        recycler.addOnScrollListener(new RecyclerView.OnScrollListener(){
+        recycler.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 int topRowVerticalPosition =
@@ -126,12 +127,6 @@ public class ScheduleFragment extends Fragment {
         allSemesters.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                /*allSemesters.setClickable(false);
-                allSemesters.setBackgroundColor(getResources().getColor(R.color.colorAccent, null));
-                allSemesters.setTextColor(getResources().getColor(R.color.colorGrey, null));
-                twoWeeks.setClickable(true);
-                twoWeeks.setBackgroundColor(getResources().getColor(R.color.colorGrey, null));
-                twoWeeks.setTextColor(getResources().getColor(R.color.colorAccent, null));*/
                 allSemesters.setEnabled(false);
                 twoWeeks.setEnabled(true);
                 allSemesters.setTextColor(getResources().getColor(R.color.colorWhite, null));
@@ -145,12 +140,6 @@ public class ScheduleFragment extends Fragment {
         twoWeeks.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                /*twoWeeks.setClickable(false);
-                twoWeeks.setBackgroundColor(getResources().getColor(R.color.colorAccent, null));
-                twoWeeks.setTextColor(getResources().getColor(R.color.colorGrey, null));
-                allSemesters.setClickable(true);
-                allSemesters.setBackgroundColor(getResources().getColor(R.color.colorGrey, null));
-                allSemesters.setTextColor(getResources().getColor(R.color.colorAccent, null));*/
                 twoWeeks.setEnabled(false);
                 allSemesters.setEnabled(true);
                 allSemesters.setTextColor(getResources().getColor(R.color.colorAccent, null));
@@ -322,60 +311,71 @@ public class ScheduleFragment extends Fragment {
         @NonNull
         @Override
         public ScheduleViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            return new ScheduleViewHolder(LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.schedule_item, parent, false));
+                return new ScheduleViewHolder(LayoutInflater.from(parent.getContext())
+                        .inflate(R.layout.schedule_item, parent, false));
         }
 
         @Override
         public void onBindViewHolder(@NonNull ScheduleViewHolder holder, int position) {
-            final UserSchedule schedule = mSchedule.get(position);
+            if (mSchedule.size() > 0) {
+                holder.mNoSchedule.setVisibility(GONE);
+                holder.mScheduleLayout.setVisibility(View.VISIBLE);
+                final UserSchedule schedule = mSchedule.get(position);
 
-            String date = new SecretData().getDateString(schedule.getDate());
-            holder.mDateSchedule.setText(date);
-            holder.mDiscipline.setText(schedule.getDiscipline());
-            holder.mShortTitle.setText(schedule.getShortTitle());
-            holder.mLocation.setText(schedule.getLocation());
+                String date = new SecretData().getDateString(schedule.getDate());
+                holder.mDateSchedule.setText(date);
+                holder.mDiscipline.setText(schedule.getDiscipline());
+                holder.mShortTitle.setText(schedule.getShortTitle());
+                holder.mLocation.setText(schedule.getLocation());
 
 
-            Date now = new Date();
-            Date end = new SecretData().getDate(schedule.getEndTime());
-            if (now.after(end))
-                holder.mSeparator1.setBackground(getResources().getDrawable(R.drawable.shape_done_start, null));
-            else
-                holder.mSeparator1.setBackground(getResources()
-                        .getDrawable(drawableStart[(disciplines.indexOf(schedule.getDiscipline()) - 1) % drawableStart.length], null));
+                Date now = new Date();
+                Date end = new SecretData().getDate(schedule.getEndTime());
+                if (now.after(end))
+                    holder.mSeparator1.setBackground(getResources().getDrawable(R.drawable.shape_done_start, null));
+                else
+                    holder.mSeparator1.setBackground(getResources()
+                            .getDrawable(drawableStart[(disciplines.indexOf(schedule.getDiscipline()) - 1) % drawableStart.length], null));
 
-            String time = new SecretData().getTimeString(schedule.getStartTime());
-            holder.mTime.setText(time);
-            holder.mTitle.setText(schedule.getTitle());
-            holder.mDiscipline.setText(schedule.getDiscipline());
+                String time = new SecretData().getTimeString(schedule.getStartTime());
+                holder.mTime.setText(time);
+                holder.mTitle.setText(schedule.getTitle());
+                holder.mDiscipline.setText(schedule.getDiscipline());
 
-            if (schedule.getAttended()) {
-                holder.mCheckButton.setVisibility(View.VISIBLE);
-                holder.mCheckButton.setText(R.string.checked);
-                holder.mCheckButton.setEnabled(false);
-                holder.mCheckButton.setTextColor(getResources().getColor(R.color.colorGradientBottomAuth, null));
-                if (schedule.getFeedbackUrl() != null) {
-                    holder.mFeedbackButton.setVisibility(View.VISIBLE);
-                } else{
+                if (schedule.getAttended()) {
+                    holder.mCheckButton.setVisibility(View.VISIBLE);
+                    holder.mCheckButton.setText(R.string.checked);
+                    holder.mCheckButton.setEnabled(false);
+                    holder.mCheckButton.setTextColor(getResources().getColor(R.color.colorGradientBottomAuth, null));
+                    if (schedule.getFeedbackUrl() != null) {
+                        holder.mFeedbackButton.setVisibility(View.VISIBLE);
+                    } else {
+                        holder.mFeedbackButton.setVisibility(GONE);
+                    }
+                } else {
                     holder.mFeedbackButton.setVisibility(GONE);
+                    if (schedule.getCheckingOpened()) {
+                        holder.mCheckButton.setVisibility(View.VISIBLE);
+                        holder.mCheckButton.setEnabled(true);
+                        holder.mCheckButton.setText(R.string.check);
+                        holder.mCheckButton.setTextColor(getResources().getColor(R.color.colorAccent, null));
+                    } else {
+                        holder.mCheckButton.setVisibility(INVISIBLE);
+                    }
                 }
             } else {
-                holder.mFeedbackButton.setVisibility(GONE);
-                if (schedule.getCheckingOpened()) {
-                    holder.mCheckButton.setVisibility(View.VISIBLE);
-                    holder.mCheckButton.setEnabled(true);
-                    holder.mCheckButton.setText(R.string.check);
-                    holder.mCheckButton.setTextColor(getResources().getColor(R.color.colorAccent, null));
-                } else {
-                    holder.mCheckButton.setVisibility(INVISIBLE);
-                }
+                holder.mScheduleLayout.setVisibility(GONE);
+                holder.mNoSchedule.setVisibility(View.VISIBLE);
+
             }
         }
 
         @Override
         public int getItemCount() {
-            return mSchedule.size();
+            if (mSchedule.size() > 0)
+                return mSchedule.size();
+            else
+                return 1;
         }
 
     }
@@ -390,6 +390,8 @@ public class ScheduleFragment extends Fragment {
         protected TextView mTitle;
         protected TextView mCheckButton;
         protected TextView mFeedbackButton;
+        protected TextView mNoSchedule;
+        protected RelativeLayout mScheduleLayout;
 
         protected View mSeparator1;
 
@@ -403,6 +405,8 @@ public class ScheduleFragment extends Fragment {
             mTitle = itemView.findViewById(R.id.title);
             mCheckButton = itemView.findViewById(R.id.check_button);
             mFeedbackButton = itemView.findViewById(R.id.feedback_button);
+            mNoSchedule = itemView.findViewById(R.id.no_schedule);
+            mScheduleLayout = itemView.findViewById(R.id.layout_schedule);
 
             mCheckButton.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -422,7 +426,7 @@ public class ScheduleFragment extends Fragment {
                 }
             });
 
-            mSeparator1 =  itemView.findViewById(R.id.separator1);
+            mSeparator1 = itemView.findViewById(R.id.separator1);
         }
     }
 }

@@ -19,6 +19,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
@@ -70,7 +71,6 @@ public class ProfileFragment extends Fragment {
     int backgroundNumber = 0;
 
     protected ImageView mAva;
-    protected ImageView mBackground;
     protected TextView mFullName;
     protected TextView mMainGroup;
     protected RecyclerView mGroups;
@@ -92,6 +92,13 @@ public class ProfileFragment extends Fragment {
     protected View mSeparator1;
     protected View mSeparator2;
     protected View mSeparator3;
+    protected RelativeLayout birthdayLayout;
+    protected RelativeLayout aboutLayout;
+    protected RelativeLayout contactsLayout;
+    protected RelativeLayout phoneLayout;
+    protected RelativeLayout mailLayout;
+    protected RelativeLayout groupLayout;
+    protected RelativeLayout accountLayout;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -130,44 +137,12 @@ public class ProfileFragment extends Fragment {
                              ViewGroup container, Bundle savedInstanceState) {
         final View view = inflater.inflate(R.layout.fragment_profile, container, false);
         final SharedPreferences mSecretSettings = new SecretData().getSecretData(getContext());
-        final int[] background = {R.color.colorWhite,
-                R.color.black,
-                getResources().getColor(R.color.colorAccent, null),
-                getResources().getColor(R.color.colorBlueBackgroungIS, getContext().getTheme()),
-                getResources().getColor(R.color.colorButtonAuth, getContext().getTheme()),
-                getResources().getColor(R.color.colorDarkGrey, getContext().getTheme()),
-                getResources().getColor(R.color.colorGradientBottomAuth, getContext().getTheme()),
-                getResources().getColor(R.color.colorGradientTopAuth, getContext().getTheme()),
-                getResources().getColor(R.color.colorWhite, getContext().getTheme()),
-                getResources().getColor(R.color.colorOrange, getContext().getTheme()),
-                getResources().getColor(R.color.colorPrimary, getContext().getTheme()),
-                getResources().getColor(R.color.colorPrimaryDark, getContext().getTheme()),
-                getResources().getColor(R.color.colorRed, getContext().getTheme()),
-                getResources().getColor(R.color.colorRedMadeAuth, getContext().getTheme()),
-                getResources().getColor(R.color.colorText, getContext().getTheme()),
-                getResources().getColor(R.color.colorAccent, getContext().getTheme()),
-                getResources().getColor(R.color.colorWindow, getContext().getTheme()),
-                getResources().getColor(R.color.colorWindowSplashScreen, getContext().getTheme())
-                /*    R.mipmap.profile_background01,
-                    R.mipmap.profile_background02,
-                    R.mipmap.profile_background03,
-                    R.mipmap.profile_background04,
-                    R.mipmap.profile_background05,
-                    R.mipmap.profile_background06,
-                    R.mipmap.profile_background07,
-                    R.mipmap.profile_background08,
-                    R.mipmap.profile_background09,
-                    R.mipmap.profile_background10,
-                    R.mipmap.profile_background11,
-                    R.mipmap.profile_background12,
-                    R.mipmap.profile_background13*/};
 
         mSeparator1 = view.findViewById(R.id.separator1);
         mSeparator2 = view.findViewById(R.id.separator2);
         mSeparator3 = view.findViewById(R.id.separator3);
         mProgressBar = view.findViewById(R.id.progress_bar);
         mAva = view.findViewById(R.id.photo);
-        mBackground = view.findViewById(R.id.background);
         mFullName = view.findViewById(R.id.full_name);
         mFullName.setOnClickListener((new View.OnClickListener() {
             @Override
@@ -220,9 +195,13 @@ public class ProfileFragment extends Fragment {
         mContactsString = view.findViewById(R.id.contacts_string);
         mAccountsString = view.findViewById(R.id.accounts_string);
 
-        Glide.with(Objects.requireNonNull(getContext()))
-                .load(background[0])
-                .into(mBackground);
+        birthdayLayout = view.findViewById(R.id.birthday_layout);
+        aboutLayout = view.findViewById(R.id.about_layout);
+        contactsLayout = view.findViewById(R.id.contacts_layout);
+        phoneLayout = view.findViewById(R.id.phone_layout);
+        mailLayout = view.findViewById(R.id.mail_layout);
+        groupLayout = view.findViewById(R.id.group_layout);
+        accountLayout = view.findViewById(R.id.accounts_layout);
 
         final SwipeRefreshLayout pullToRefresh = view.findViewById(R.id.pullToRefresh);
         pullToRefresh.setColorSchemeColors(
@@ -241,10 +220,7 @@ public class ProfileFragment extends Fragment {
                     isOther = true;
                     mProfileViewModel.refresh(username, id);
                 }
-                Glide.with(Objects.requireNonNull(getContext()))
-                        .load(background[(++backgroundNumber) % background.length])
-                        .into(mBackground);
-                Log.d("okhttp", ((Integer) (background[(backgroundNumber) % background.length])).toString() + " " + ((Integer) (backgroundNumber % background.length)).toString());
+
                 pullToRefresh.setRefreshing(false);
             }
         });
@@ -314,6 +290,26 @@ public class ProfileFragment extends Fragment {
                     mContactsString.setVisibility(View.VISIBLE);
                     mGroupsString.setVisibility(View.VISIBLE);
                     mAccountsString.setVisibility(View.VISIBLE);
+
+                    if (mProfile.getBirthdate() == null)
+                        birthdayLayout.setVisibility(GONE);
+                    if (mProfile.getAbout() == null)
+                        aboutLayout.setVisibility(GONE);
+                    else if (mProfile.getAbout().equals(""))
+                        aboutLayout.setVisibility(GONE);
+                    if (mProfile.getSubgroups().size() == 0)
+                        groupLayout.setVisibility(GONE);
+                    if (mProfile.getAccounts().size() == 0)
+                        accountLayout.setVisibility(GONE);
+                    if ((mProfile.getContacts().get(0).getValue().equals("") || mProfile.getContacts().get(0).getValue().equals(" ")) &&
+                            (mProfile.getContacts().get(1).getValue().equals("") || mProfile.getContacts().get(1).getValue().equals(" "))) {
+                        contactsLayout.setVisibility(GONE);
+                    } else {
+                        if (mProfile.getContacts().get(0).getValue().equals("") || mProfile.getContacts().get(0).getValue().equals(" "))
+                            phoneLayout.setVisibility(GONE);
+                        if (mProfile.getContacts().get(1).getValue().equals("") || mProfile.getContacts().get(1).getValue().equals(" "))
+                            mailLayout.setVisibility(GONE);
+                    }
                 }
                 if (isOther) {
                     mButton.setVisibility(GONE);
@@ -348,7 +344,6 @@ public class ProfileFragment extends Fragment {
         mProfileViewModel
                 .getProfileProgress()
                 .observe(getViewLifecycleOwner(), observerProgress);
-
         return view;
     }
 
@@ -499,6 +494,9 @@ public class ProfileFragment extends Fragment {
 
             holder.mAccount.setText(account.getValue());
 
+            if (position == mAccount.size() - 1)
+                holder.mSeparator.setVisibility(GONE);
+
         }
 
         @Override
@@ -512,19 +510,13 @@ public class ProfileFragment extends Fragment {
 
         protected TextView mAccount;
         protected ImageView mImage;
+        protected View mSeparator;
 
         public AccountViewHolder(@NonNull final View itemView) {
             super(itemView);
             mAccount = itemView.findViewById(R.id.account);
             mImage = itemView.findViewById(R.id.account_image);
-
-            mAccount.setOnClickListener((new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(AccountViewHolder.this.mAccount.getText().toString()));
-                    startActivity(browserIntent);
-                }
-            }));
+            mSeparator = itemView.findViewById(R.id.separator1);
 
             mAccount.setOnLongClickListener((new View.OnLongClickListener() {
                 @Override

@@ -3,7 +3,8 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginTop="8dp"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:id="@+id/schedule_item">
 
     <View
         android:id="@+id/separator1"
@@ -152,4 +153,13 @@
             android:visibility="invisible" />
     </RelativeLayout>
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/no_schedule"
+        android:text="@string/no_schedule"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:textSize="20sp"
+        android:visibility="gone"/>
 </RelativeLayout>

@@ -14,6 +14,8 @@ import com.example.technoparkmobileproject.network.GroupApi;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import retrofit2.Call;
@@ -117,6 +119,12 @@ class GroupRepo {
                 e.printStackTrace();
             }
         }
+        Comparator<UserGroup.Student> comp = new Comparator<UserGroup.Student>() {
+            @Override
+            public int compare(UserGroup.Student a, UserGroup.Student b) {
+                return a.getFullname().compareToIgnoreCase(b.getFullname());
+            }};
+        Collections.sort(result, comp);
         return new UserGroup(plains.getId(), plains.getName(), result);
     }
 
