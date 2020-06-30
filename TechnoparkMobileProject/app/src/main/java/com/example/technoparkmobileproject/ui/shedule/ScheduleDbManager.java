@@ -26,12 +26,13 @@ class ScheduleDbManager {
 
     void insert(final int key, final String mTitle, final String mDiscipline, final String mShortTitle,
                 final String mSuperShortTitle, final String mDate, final String mStartTime, final String mEndTime,
-                final List<UserSchedule.Group> mGroups, final String mLocation) {
+                final List<UserSchedule.Group> mGroups, final String mLocation,
+                final Boolean mCheckingOpened, final Boolean mAttended, final String mFeedbackUrl) {
         executor.execute(new Runnable() {
             @Override
             public void run() {
                 insertRoom(key, mTitle, mDiscipline, mShortTitle, mSuperShortTitle, mDate,
-                        mStartTime, mEndTime, mGroups, mLocation);
+                        mStartTime, mEndTime, mGroups, mLocation, mCheckingOpened, mAttended, mFeedbackUrl);
             }
         });
     }
@@ -60,9 +61,10 @@ class ScheduleDbManager {
     }
 
     private void insertRoom(int key, String mTitle, String mDiscipline, String mShortTitle, String mSuperShortTitle, String mDate,
-                            String mStartTime, String mEndTime, List<UserSchedule.Group> mGroups, String mLocation) {
+                            String mStartTime, String mEndTime, List<UserSchedule.Group> mGroups, String mLocation,
+                            Boolean mCheckingOpened, Boolean mAttended, String mFeedbackUrl) {
         Schedule schedule = new Schedule(key, mTitle, mDiscipline, mShortTitle, mSuperShortTitle, mDate,
-                mStartTime, mEndTime, mGroups, mLocation);
+                mStartTime, mEndTime, mGroups, mLocation, mCheckingOpened, mAttended, mFeedbackUrl);
         ScheduleDataBase.getInstance(context).getScheduleDao().insert(schedule);
     }
 

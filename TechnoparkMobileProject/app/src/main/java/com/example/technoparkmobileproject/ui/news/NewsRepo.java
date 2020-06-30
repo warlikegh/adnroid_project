@@ -22,14 +22,18 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import static com.example.technoparkmobileproject.TechnoparkApplication.AUTH_TOKEN;
+import static com.example.technoparkmobileproject.TechnoparkApplication.CREATE_FIRST_SETTINGS;
+import static com.example.technoparkmobileproject.TechnoparkApplication.IS_FIRST_NEWS;
+import static com.example.technoparkmobileproject.TechnoparkApplication.SITE;
+import static com.example.technoparkmobileproject.TechnoparkApplication.TOKEN;
+
 
 class NewsRepo {
     private final static MutableLiveData<UserNews> mNews = new MutableLiveData<>();
     private SharedPreferences mSettings;
     private final Context mContext;
     private NewsApi mNewsApi;
-    private static String AUTH_TOKEN = "auth_token";
-    private static String SITE = "site";
     private int key = 0;
 
     private final NewsDbManager.ReadAllListener<News> readListener = new NewsDbManager.ReadAllListener<News>() {
@@ -60,14 +64,14 @@ class NewsRepo {
 
     public void refresh() {
         SharedPreferences mSettings;
-        mSettings = mContext.getSharedPreferences("createFirst", Context.MODE_PRIVATE);
+        mSettings = mContext.getSharedPreferences(CREATE_FIRST_SETTINGS, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = mSettings.edit();
-        editor.putBoolean("isFirstNews", false);
+        editor.putBoolean(IS_FIRST_NEWS, false);
         editor.apply();
 
         final NewsDbManager manager = NewsDbManager.getInstance(mContext);
         mSettings = new SecretData().getSecretData(mContext);
-        mNewsApi.getUserNews(" Token " + mSettings.getString(AUTH_TOKEN, "")).enqueue(new Callback<NewsApi.UserNewsPlain>() {
+        mNewsApi.getUserNews(TOKEN + mSettings.getString(AUTH_TOKEN, "")).enqueue(new Callback<NewsApi.UserNewsPlain>() {
             @Override
             public void onResponse(Call<NewsApi.UserNewsPlain> call,
                                    Response<NewsApi.UserNewsPlain> response) {
@@ -94,6 +98,10 @@ class NewsRepo {
         });
     }
 
+    public void openNews(int pos) {
+        NewsDbManager.getInstance(mContext).openNews(pos);
+    }
+
     public void pullFromDB() {
         NewsDbManager manager = NewsDbManager.getInstance(mContext);
         manager.readAll(readListener);
@@ -102,7 +110,7 @@ class NewsRepo {
 
     public void setNextNews(String url) {
         mSettings = new SecretData().getSecretData(mContext);
-        mNewsApi.getReUserNews(" Token " + mSettings.getString(AUTH_TOKEN, ""), url).enqueue(new Callback<NewsApi.UserNewsPlain>() {
+        mNewsApi.getReUserNews(TOKEN + mSettings.getString(AUTH_TOKEN, ""), url).enqueue(new Callback<NewsApi.UserNewsPlain>() {
             @Override
             public void onResponse(Call<NewsApi.UserNewsPlain> call,
                                    Response<NewsApi.UserNewsPlain> response) {
@@ -190,7 +198,8 @@ class NewsRepo {
                 resultPlain.commentsCount,
                 resultPlain.id,
                 textShort,
-                resultPlain.url);
+                resultPlain.url,
+                false);
     }
 
     private static UserNews.Author mapAuthor(NewsApi.UserNewsPlain.Author authorPlain) throws ParseException {
@@ -219,27 +228,28 @@ class NewsRepo {
         );
     }
 
-    private void savedata(UserNews result) {
+    private void savedata(UserNews news) {
         UserNews temp = new UserNews();
 
-        for (int i = 0; i < result.getResults().size(); i++) {
-            UserNews.Result result1 = temp.new Result();
-            result1 = result.getResults().get(i);
+        for (int i = 0; i < news.getResults().size(); i++) {
+            UserNews.Result result = temp.new Result();
+            result = news.getResults().get(i);
             NewsDbManager.getInstance(mContext).insert(
-                    result1.getId(),
-                    result1.getTitle(),
-                    result1.getBlog(),
-                    result1.getAuthor().getFullname(),
-                    result1.getAuthor().getId(),
-                    result1.getAuthor().getUsername(),
-                    result1.getAuthor().getAvatarUrl(),
-                    result1.getCommentsCount(),
-                    result1.getPublishDate(),
-                    result1.getRating(),
-                    result1.getText(),
-                    result1.getTextShort(),
-                    result1.getUrl(),
-                    result.getNext());
+                    result.getId(),
+                    result.getTitle(),
+                    result.getBlog(),
+                    result.getAuthor().getFullname(),
+                    result.getAuthor().getId(),
+                    result.getAuthor().getUsername(),
+                    result.getAuthor().getAvatarUrl(),
+                    result.getCommentsCount(),
+                    result.getPublishDate(),
+                    result.getRating(),
+                    result.getText(),
+                    result.getTextShort(),
+                    result.getUrl(),
+                    news.getNext(),
+                    result.getOpen());
         }
 
     }
@@ -271,12 +281,11 @@ class NewsRepo {
                     data.get(i).authorId);
             tempResult.add(temp.new Result(tempAuthor, data.get(i).blog, data.get(i).title, data.get(i).rating,
                     data.get(i).publishDate, data.get(i).getText(), data.get(i).commentsCount, data.get(i).id,
-                    data.get(i).getTextShort(), data.get(i).url));
+                    data.get(i).getTextShort(), data.get(i).url, data.get(i).isOpen));
         }
         UserNews temp = new UserNews(null, data.get(data.size() - 1).next,
                 null, tempResult);
         mNews.postValue(temp);
-
     }
 
 }

@@ -41,11 +41,11 @@
         android:label="@string/title_notifications"
         tools:layout="@layout/fragment_profile" >
         <argument
-            android:name="id"
+            android:name="profile_ID"
             app:argType="integer"
             android:defaultValue="-1" />
         <argument
-            android:name="usrname"
+            android:name="profile_username"
             app:argType="string"
             android:defaultValue='"my"' />
         <action
@@ -64,7 +64,7 @@
         android:label="fragment_group"
         tools:layout="@layout/fragment_group" >
         <argument
-            android:name="id"
+            android:name="group_ID"
             app:argType="integer" />
         <action
             android:id="@+id/action_groupFragment_to_navigation_notifications"

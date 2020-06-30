@@ -1,97 +1,165 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginTop="8dp"
-    android:layout_marginBottom="4dp"
     android:orientation="vertical"
-    android:background="@color/colorWhite"
-    android:padding="16dp"
-    android:elevation="2dp">
+    android:id="@+id/schedule_item">
+
+    <View
+        android:id="@+id/separator1"
+        android:layout_width="5dp"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/layout_schedule"
+        android:layout_alignParentTop="true"
+        android:background="@drawable/shape_pink_start" />
+
+    <View
+        android:id="@+id/separator3"
+        android:layout_width="1dp"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/layout_schedule"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="104dp"
+        android:background="@drawable/separator_grey"
+        android:visibility="visible" />
+
+    <RelativeLayout
+        android:id="@+id/layout_schedule"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_toEndOf="@+id/separator1"
+        android:background="@drawable/shape_white_end">
+
+        <TextView
+            android:id="@+id/date_schedule"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="16dp"
+            android:text="28.04.2020"
+            android:textColor="@color/black"
+            android:textIsSelectable="true"
+            android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/discipline"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="0dp"
+            android:text="Time"
+            android:textColor="@color/black"
+            android:textIsSelectable="true"
+            android:textSize="16sp" />
+
+        <ImageView
+            android:id="@+id/loc"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_below="@+id/short_title"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="32dp"
+            android:background="@drawable/ic_place_black_24dp" />
+
+        <TextView
+            android:id="@+id/location"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/short_title"
+            android:layout_marginTop="32dp"
+            android:layout_marginBottom="16dp"
+            android:layout_toStartOf="@+id/separator2"
+            android:layout_toEndOf="@+id/loc"
+            android:text="Loc"
+            android:textIsSelectable="true"
+            android:textSize="12sp" />
+
+        <View
+            android:id="@+id/separator2"
+            android:layout_width="1dp"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@+id/feedback_button"
+            android:layout_marginStart="14dp"
+            android:layout_toEndOf="@+id/date_schedule"
+            android:background="@drawable/separator_grey" />
+
+        <TextView
+            android:id="@+id/discipline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_toEndOf="@+id/separator2"
+            android:text="Discipline"
+            android:textIsSelectable="true"
+            android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/discipline"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="0dp"
+            android:layout_marginEnd="16dp"
+            android:layout_toEndOf="@+id/separator2"
+            android:text="Title"
+            android:textColor="@color/black"
+            android:textIsSelectable="true"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/short_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/title"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="8dp"
+            android:layout_toEndOf="@+id/separator2"
+            android:text="Short title"
+            android:textIsSelectable="true"
+            android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/check_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/short_title"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="24dp"
+            android:layout_toEndOf="@+id/separator2"
+            android:background="@drawable/ripple_white"
+            android:padding="8dp"
+            android:text="Check button"
+            android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/feedback_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/check_button"
+            android:layout_marginStart="8dp"
+            android:layout_marginBottom="8dp"
+            android:layout_toEndOf="@+id/separator2"
+            android:background="@drawable/ripple_white"
+            android:padding="8dp"
+            android:text="@string/feedback"
+            android:textColor="@color/colorGradientBottomAuth"
+            android:textSize="12sp"
+            android:visibility="invisible" />
+    </RelativeLayout>
 
     <TextView
-        android:id="@+id/date_schedule"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="Date"
-        android:textColor="@color/black"
-        android:textSize="16sp"
-        android:textIsSelectable="true"/>
-
-    <TextView
-        android:id="@+id/discipline"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/date_schedule"
-        android:layout_marginTop="8dp"
-        android:text="Discipline"
-        android:textSize="16sp"
-        android:textIsSelectable="true"/>
-
-    <TextView
-        android:id="@+id/short_title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/title"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:text="Short title"
-        android:layout_alignParentLeft="true"
-        android:layout_toStartOf="@+id/groups"
-        android:textSize="16sp"
-        android:textIsSelectable="true"/>
-
-    <ImageView
-        android:id="@+id/loc"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
-        android:layout_below="@id/short_title"
-        android:layout_marginTop="8dp"
-        android:background="@drawable/ic_place_black_24dp"
-        />
-
-    <TextView
-        android:id="@+id/location"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/short_title"
-        android:layout_margin="8dp"
-        android:layout_toEndOf="@+id/loc"
-        android:text="Location"
+        android:id="@+id/no_schedule"
+        android:text="@string/no_schedule"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
         android:textSize="20sp"
-        android:layout_toStartOf="@+id/groups"
-        android:textIsSelectable="true"/>
-
-    <TextView
-        android:id="@+id/time"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_marginTop="8dp"
-        android:text="Time"
-        android:textColor="@color/black"
-        android:textSize="16sp"
-        android:textIsSelectable="true"/>
-
-    <TextView
-        android:id="@+id/title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/discipline"
-        android:layout_marginTop="8dp"
-        android:text="Title"
-        android:textColor="@color/colorTextBlue"
-        android:textSize="20sp"
-        android:textIsSelectable="true"/>
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/groups"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/title"
-        android:layout_alignParentEnd="true"
-        />
+        android:visibility="gone"/>
 </RelativeLayout>

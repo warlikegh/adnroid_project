@@ -1,7 +1,9 @@
 package com.example.technoparkmobileproject.ui.shedule;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,6 +12,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -25,8 +28,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.technoparkmobileproject.R;
-import com.example.technoparkmobileproject.Router;
 import com.example.technoparkmobileproject.SecretData;
+import com.google.android.material.snackbar.BaseTransientBottomBar;
+import com.google.android.material.snackbar.Snackbar;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -35,12 +39,18 @@ import java.util.List;
 import java.util.Objects;
 
 import static android.view.View.GONE;
+import static android.view.View.INVISIBLE;
+import static com.example.technoparkmobileproject.TechnoparkApplication.CREATE_FIRST_SETTINGS;
+import static com.example.technoparkmobileproject.TechnoparkApplication.DEFAULT_TWO_WEEK;
+import static com.example.technoparkmobileproject.TechnoparkApplication.DISCIPLINE;
+import static com.example.technoparkmobileproject.TechnoparkApplication.IS_FIRST_SCHEDULE;
 
 public class ScheduleFragment extends Fragment {
     private List<UserSchedule> mSchedule = new ArrayList<>();
     private ScheduleRepo.ScheduleProgress mScheduleProgress;
+    private ScheduleRepo.CheckProgress mCheckProgress;
     private List<UserSchedule> tempSchedule = new ArrayList<>();
-    static GroupAdapter groupAdapter;
+    final List<String> disciplines = new ArrayList<>();
     final ScheduleAdapter scheduleAdapter = new ScheduleAdapter();
     String ALL_DISCIPLINES;
     String disciplineText;
@@ -57,9 +67,9 @@ public class ScheduleFragment extends Fragment {
         context = getContext();
         mScheduleViewModel = new ViewModelProvider(Objects.requireNonNull(getActivity()))
                 .get(ScheduleViewModel.class);
-        mSettings = Objects.requireNonNull(getContext()).getSharedPreferences("createFirst", Context.MODE_PRIVATE);
+        mSettings = Objects.requireNonNull(getContext()).getSharedPreferences(CREATE_FIRST_SETTINGS, Context.MODE_PRIVATE);
         mEditor = mSettings.edit();
-        if (mSettings.getBoolean("isFirstSchedule", true))
+        if (mSettings.getBoolean(IS_FIRST_SCHEDULE, true))
             mScheduleViewModel.refresh();
         else
             mScheduleViewModel.pullFromDB();
@@ -68,10 +78,13 @@ public class ScheduleFragment extends Fragment {
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_schedule, container, false);
+        final View view = inflater.inflate(R.layout.fragment_schedule, container, false);
 
         final ProgressBar mProgressBar = view.findViewById(R.id.progress_bar);
         final SwipeRefreshLayout pullToRefresh = view.findViewById(R.id.pullToRefresh);
+        pullToRefresh.setColorSchemeColors(
+                getResources().getColor(R.color.colorAccent, null), getResources().getColor(R.color.colorBlueBackgroungIS, null),
+                getResources().getColor(R.color.colorGradientBottomAuth, null), getResources().getColor(R.color.colorGradientTopAuth, null));
         pullToRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -87,7 +100,7 @@ public class ScheduleFragment extends Fragment {
         recycler.setAdapter(scheduleAdapter);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
         recycler.setLayoutManager(linearLayoutManager);
-        recycler.addOnScrollListener(new RecyclerView.OnScrollListener(){
+        recycler.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 int topRowVerticalPosition =
@@ -102,10 +115,9 @@ public class ScheduleFragment extends Fragment {
             }
         });
 
-        disciplineText = mSettings.getString("discipline", ALL_DISCIPLINES);
-        isDefault[0] = mSettings.getBoolean("default", true);
+        disciplineText = mSettings.getString(DISCIPLINE, ALL_DISCIPLINES);
+        isDefault[0] = mSettings.getBoolean(DEFAULT_TWO_WEEK, true);
         final Spinner spinner = view.findViewById(R.id.spinner_discipline);
-        final List<String> disciplines = new ArrayList<>();
         final ArrayAdapter<String>[] adapter = new ArrayAdapter[]{new ArrayAdapter<String>(context, android.R.layout.simple_spinner_item, disciplines)};
 
         adapter[0].setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -115,31 +127,26 @@ public class ScheduleFragment extends Fragment {
         allSemesters.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                allSemesters.setClickable(false);
-                allSemesters.setBackgroundColor(getResources().getColor(R.color.colorAccent));
-                allSemesters.setTextColor(getResources().getColor(R.color.colorGrey));
-                twoWeeks.setClickable(true);
-                twoWeeks.setBackgroundColor(getResources().getColor(R.color.colorGrey));
-                twoWeeks.setTextColor(getResources().getColor(R.color.colorAccent));
+                allSemesters.setEnabled(false);
+                twoWeeks.setEnabled(true);
+                allSemesters.setTextColor(getResources().getColor(R.color.colorWhite, null));
+                twoWeeks.setTextColor(getResources().getColor(R.color.colorAccent, null));
                 isDefault[0] = false;
                 scheduleAdapter.setTime(isDefault[0]);
-                mEditor.putBoolean("default", isDefault[0]).commit();
+                mEditor.putBoolean(DEFAULT_TWO_WEEK, isDefault[0]).commit();
             }
         });
 
         twoWeeks.setOnClickListener(new View.OnClickListener() {
-            //@RequiresApi(api = Build.VERSION_CODES.O)
             @Override
             public void onClick(View view) {
-                twoWeeks.setClickable(false);
-                twoWeeks.setBackgroundColor(getResources().getColor(R.color.colorAccent));
-                twoWeeks.setTextColor(getResources().getColor(R.color.colorGrey));
-                allSemesters.setClickable(true);
-                allSemesters.setBackgroundColor(getResources().getColor(R.color.colorGrey));
-                allSemesters.setTextColor(getResources().getColor(R.color.colorAccent));
+                twoWeeks.setEnabled(false);
+                allSemesters.setEnabled(true);
+                allSemesters.setTextColor(getResources().getColor(R.color.colorAccent, null));
+                twoWeeks.setTextColor(getResources().getColor(R.color.colorWhite, null));
                 isDefault[0] = true;
                 scheduleAdapter.setTime(isDefault[0]);
-                mEditor.putBoolean("default", isDefault[0]).commit();
+                mEditor.putBoolean(DEFAULT_TWO_WEEK, isDefault[0]).commit();
             }
         });
 
@@ -179,7 +186,7 @@ public class ScheduleFragment extends Fragment {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 String item = (String) parent.getItemAtPosition(position);
-                mEditor.putString("discipline", item).commit();
+                mEditor.putString(DISCIPLINE, item).commit();
                 disciplineText = item;
                 scheduleAdapter.setDiscipline(disciplineText);
             }
@@ -213,6 +220,26 @@ public class ScheduleFragment extends Fragment {
                 .getScheduleProgress()
                 .observe(getViewLifecycleOwner(), observerProgress);
 
+        Observer<ScheduleRepo.CheckProgress> observerCheckProgress = new Observer<ScheduleRepo.CheckProgress>() {
+            @Override
+            public void onChanged(ScheduleRepo.CheckProgress checkProgress) {
+                if (checkProgress != null) {
+                    mCheckProgress = checkProgress;
+                    if (mCheckProgress == ScheduleRepo.CheckProgress.SUCCESS) {
+                        Snackbar.make(view, R.string.check_success, BaseTransientBottomBar.LENGTH_SHORT);
+                    } else if (mCheckProgress == ScheduleRepo.CheckProgress.FAILED) {
+                        Snackbar.make(view, R.string.error, BaseTransientBottomBar.LENGTH_SHORT);
+                    } else if (mCheckProgress == ScheduleRepo.CheckProgress.FAILED_NET) {
+                        Snackbar.make(view, R.string.http_failed, BaseTransientBottomBar.LENGTH_SHORT);
+                    }
+                }
+            }
+        };
+
+        mScheduleViewModel
+                .getCheckProgress()
+                .observe(getViewLifecycleOwner(), observerCheckProgress);
+
         return view;
     }
 
@@ -222,6 +249,12 @@ public class ScheduleFragment extends Fragment {
         private List<UserSchedule> mWholeSchedule = new ArrayList<>();
         private boolean isDefaultTime;
         private String discipline = "";
+        int[] drawableStart = {R.drawable.shape_blue_start,
+                R.drawable.shape_pink_start,
+                R.drawable.shape_green_dark_start,
+                R.drawable.shape_purple_start,
+                R.drawable.shape_red_dark_start,
+                R.drawable.shape_blue_dark_start};
 
         public void setSchedule(List<UserSchedule> schedule, String disciplineText, boolean defaultTime) {
             mWholeSchedule = schedule;
@@ -253,14 +286,19 @@ public class ScheduleFragment extends Fragment {
                                 mSchedule.add(item);
                 } else {
                     for (int i = 0; i < mWholeSchedule.size(); i++) {
-                        Date localDate = new SecretData().getDate(mWholeSchedule.get(i).getEndTime());
-                        Date today = new Date();
+                        Date localDate = new SecretData().getDate(mWholeSchedule.get(i).getDate());
+
                         Calendar instance = Calendar.getInstance();
+                        instance.setTime(localDate);
+                        instance.add(Calendar.DAY_OF_MONTH, 1);
+                        Date newDate = instance.getTime();
+
+                        Date today = new Date();
                         instance.setTime(today);
                         instance.add(Calendar.DAY_OF_MONTH, 14);
                         Date daysBefore = instance.getTime();
 
-                        if (localDate.compareTo(today) >= 0 && daysBefore.compareTo(localDate) >= 0)
+                        if (newDate.compareTo(today) >= 0 && daysBefore.compareTo(newDate) >= 0)
                             if (mWholeSchedule.get(i).getDiscipline().equals(text) || text.equals(ALL_DISCIPLINES))
                                 mSchedule.add(mWholeSchedule.get(i));
                     }
@@ -273,35 +311,71 @@ public class ScheduleFragment extends Fragment {
         @NonNull
         @Override
         public ScheduleViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            return new ScheduleViewHolder(LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.schedule_item, parent, false));
+                return new ScheduleViewHolder(LayoutInflater.from(parent.getContext())
+                        .inflate(R.layout.schedule_item, parent, false));
         }
 
-        //@RequiresApi(api = Build.VERSION_CODES.O)
         @Override
         public void onBindViewHolder(@NonNull ScheduleViewHolder holder, int position) {
-            final UserSchedule schedule = mSchedule.get(position);
+            if (mSchedule.size() > 0) {
+                holder.mNoSchedule.setVisibility(GONE);
+                holder.mScheduleLayout.setVisibility(View.VISIBLE);
+                final UserSchedule schedule = mSchedule.get(position);
 
-            String date = new SecretData().getDateString(schedule.getDate());
-            holder.mDateSchedule.setText(date);
-            holder.mDiscipline.setText(schedule.getDiscipline());
-            holder.mShortTitle.setText(schedule.getShortTitle());
-            holder.mLocation.setText(schedule.getLocation());
+                String date = new SecretData().getDateString(schedule.getDate());
+                holder.mDateSchedule.setText(date);
+                holder.mDiscipline.setText(schedule.getDiscipline());
+                holder.mShortTitle.setText(schedule.getShortTitle());
+                holder.mLocation.setText(schedule.getLocation());
 
-            String time = new SecretData().getTimeString(schedule.getStartTime());
-            holder.mTime.setText(time);
-            holder.mTitle.setText(schedule.getTitle());
-            holder.mDiscipline.setText(schedule.getDiscipline());
 
-            groupAdapter = new GroupAdapter();
-            groupAdapter.setGroup(schedule.getGroups(), schedule.getDiscipline() + " " + schedule.getTitle());
-            holder.mGroups.setAdapter(groupAdapter);
-            holder.mGroups.setLayoutManager(new LinearLayoutManager(getContext()));
+                Date now = new Date();
+                Date end = new SecretData().getDate(schedule.getEndTime());
+                if (now.after(end))
+                    holder.mSeparator1.setBackground(getResources().getDrawable(R.drawable.shape_done_start, null));
+                else
+                    holder.mSeparator1.setBackground(getResources()
+                            .getDrawable(drawableStart[(disciplines.indexOf(schedule.getDiscipline()) - 1) % drawableStart.length], null));
+
+                String time = new SecretData().getTimeString(schedule.getStartTime());
+                holder.mTime.setText(time);
+                holder.mTitle.setText(schedule.getTitle());
+                holder.mDiscipline.setText(schedule.getDiscipline());
+
+                if (schedule.getAttended()) {
+                    holder.mCheckButton.setVisibility(View.VISIBLE);
+                    holder.mCheckButton.setText(R.string.checked);
+                    holder.mCheckButton.setEnabled(false);
+                    holder.mCheckButton.setTextColor(getResources().getColor(R.color.colorGradientBottomAuth, null));
+                    if (schedule.getFeedbackUrl() != null) {
+                        holder.mFeedbackButton.setVisibility(View.VISIBLE);
+                    } else {
+                        holder.mFeedbackButton.setVisibility(GONE);
+                    }
+                } else {
+                    holder.mFeedbackButton.setVisibility(GONE);
+                    if (schedule.getCheckingOpened()) {
+                        holder.mCheckButton.setVisibility(View.VISIBLE);
+                        holder.mCheckButton.setEnabled(true);
+                        holder.mCheckButton.setText(R.string.check);
+                        holder.mCheckButton.setTextColor(getResources().getColor(R.color.colorAccent, null));
+                    } else {
+                        holder.mCheckButton.setVisibility(INVISIBLE);
+                    }
+                }
+            } else {
+                holder.mScheduleLayout.setVisibility(GONE);
+                holder.mNoSchedule.setVisibility(View.VISIBLE);
+
+            }
         }
 
         @Override
         public int getItemCount() {
-            return mSchedule.size();
+            if (mSchedule.size() > 0)
+                return mSchedule.size();
+            else
+                return 1;
         }
 
     }
@@ -310,85 +384,49 @@ public class ScheduleFragment extends Fragment {
 
         protected TextView mDateSchedule;
         protected TextView mDiscipline;
-        protected RecyclerView mGroups;
         protected TextView mShortTitle;
         protected TextView mLocation;
         protected TextView mTime;
         protected TextView mTitle;
+        protected TextView mCheckButton;
+        protected TextView mFeedbackButton;
+        protected TextView mNoSchedule;
+        protected RelativeLayout mScheduleLayout;
+
+        protected View mSeparator1;
 
         public ScheduleViewHolder(@NonNull View itemView) {
             super(itemView);
             mDateSchedule = itemView.findViewById(R.id.date_schedule);
             mDiscipline = itemView.findViewById(R.id.discipline);
-            mGroups = itemView.findViewById(R.id.groups);
             mShortTitle = itemView.findViewById(R.id.short_title);
             mLocation = itemView.findViewById(R.id.location);
             mTime = itemView.findViewById(R.id.time);
             mTitle = itemView.findViewById(R.id.title);
-        }
-    }
+            mCheckButton = itemView.findViewById(R.id.check_button);
+            mFeedbackButton = itemView.findViewById(R.id.feedback_button);
+            mNoSchedule = itemView.findViewById(R.id.no_schedule);
+            mScheduleLayout = itemView.findViewById(R.id.layout_schedule);
 
-
-    private class GroupAdapter extends RecyclerView.Adapter<GroupViewHolder> {
-
-        private List<UserSchedule.Group> mGroup = new ArrayList<>();
-        String namedis;
-
-        public void setGroup(List<UserSchedule.Group> group, String string) {
-            mGroup = group;
-            namedis = string;
-            notifyDataSetChanged();
-        }
-
-        @NonNull
-        @Override
-        public GroupViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            return new GroupViewHolder(LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.schedule_group, parent, false));
-        }
-
-        @Override
-        public void onBindViewHolder(@NonNull GroupViewHolder holder, int position) {
-            final UserSchedule.Group group = mGroup.get(position);
-            holder.mGroup.setText(group.getName());
-        }
-
-        @Override
-        public int getItemCount() {
-            return mGroup.size();
-        }
-
-    }
-
-    class GroupViewHolder extends RecyclerView.ViewHolder {
-
-        protected TextView mGroup;
-
-        public GroupViewHolder(@NonNull View itemView) {
-            super(itemView);
-            mGroup = itemView.findViewById(R.id.group_schedule);
-            mGroup.setOnClickListener(new View.OnClickListener() {
+            mCheckButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    int pos = GroupViewHolder.this.getAdapterPosition();
-                    int posScheduleViewHolder = 0;
-                    boolean isFind = false;
-                    for (int i = 0; i < tempSchedule.size(); i++) {
-                        for (int j = 0; j < tempSchedule.get(i).getGroups().size(); j++) {
-                            if (mGroup.getText().equals(tempSchedule.get(i).getGroups().get(j).getName())) {
-                                posScheduleViewHolder = i;
-                                isFind = true;
-                            }
-                        }
-                        if (isFind) {
-                            break;
-                        }
-                    }
-                    List<UserSchedule.Group> t = tempSchedule.get(posScheduleViewHolder).getGroups();
-                    ((Router) context).onGroupSelected(t.get(pos).getId());
+                    int pos = ScheduleViewHolder.this.getAdapterPosition();
+                    mScheduleViewModel.check(tempSchedule.get(pos).getId());
+                    Snackbar.make(view, R.string.checking, BaseTransientBottomBar.LENGTH_SHORT);
                 }
             });
+
+            mFeedbackButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    int pos = ScheduleViewHolder.this.getAdapterPosition();
+                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(tempSchedule.get(pos).getFeedbackUrl()));
+                    startActivity(browserIntent);
+                }
+            });
+
+            mSeparator1 = itemView.findViewById(R.id.separator1);
         }
     }
-
 }

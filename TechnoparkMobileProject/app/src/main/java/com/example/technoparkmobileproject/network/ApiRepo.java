@@ -11,7 +11,6 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 
 public class ApiRepo {
-    private static final String TAG = "URL_Find";
     private final OkHttpClient mOkHttpClient;
     private String[] BASE_URL = new String[]{
             "https://park.mail.ru/api/mobile/v1/",
@@ -80,6 +79,10 @@ public class ApiRepo {
 
     public static ApiRepo from(Context context) {
         return TechnoparkApplication.from(context).getApis();
+    }
+
+    public String getBaseURL(int pos) {
+        return BASE_URL[pos % 9];
     }
 }
 

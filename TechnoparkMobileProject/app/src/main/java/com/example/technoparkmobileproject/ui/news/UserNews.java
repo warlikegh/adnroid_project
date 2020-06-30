@@ -149,7 +149,7 @@ class UserNews {
     public class Result {
 
         public Result(Author mAuthor, String mBlog, String mTitle, Double mRating, String mDate, List<Text> mText,
-                      int mCommentsCount, Integer mId, List<TextShort> mTextShort, String mUrl) {
+                      int mCommentsCount, Integer mId, List<TextShort> mTextShort, String mUrl, Boolean mIsOpen) {
             this.id = mId;
             this.blog = mBlog;
             this.author = mAuthor;
@@ -164,6 +164,7 @@ class UserNews {
             this.votesCount = null;
             this.forbidComment = null;
             this.favoritesCount = null;
+            this.isOpen = mIsOpen;
         }
 
         @SerializedName("id")
@@ -208,6 +209,8 @@ class UserNews {
         @SerializedName("url")
         @Expose
         private String url;
+
+        private Boolean isOpen;
 
         public Result() {
 
@@ -325,6 +328,13 @@ class UserNews {
             this.url = url;
         }
 
+        public Boolean getOpen() {
+            return isOpen;
+        }
+
+        public void setOpen(Boolean open) {
+            isOpen = open;
+        }
     }
 
     public class Author {

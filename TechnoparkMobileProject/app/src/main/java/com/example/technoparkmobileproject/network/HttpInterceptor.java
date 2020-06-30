@@ -17,6 +17,11 @@ import okhttp3.Response;
 import retrofit2.Call;
 import retrofit2.Callback;
 
+import static com.example.technoparkmobileproject.TechnoparkApplication.AUTH_TOKEN;
+import static com.example.technoparkmobileproject.TechnoparkApplication.LOGIN;
+import static com.example.technoparkmobileproject.TechnoparkApplication.PASSWORD;
+import static com.example.technoparkmobileproject.TechnoparkApplication.SALT;
+import static com.example.technoparkmobileproject.TechnoparkApplication.SITE;
 import static com.example.technoparkmobileproject.auth.AuthRepo.sendTokenToServer;
 import static com.example.technoparkmobileproject.auth.AuthRepo.sha256;
 
@@ -24,12 +29,7 @@ public class HttpInterceptor implements Interceptor {
 
     static SharedPreferences.Editor editor;
     static SharedPreferences mSettings;
-    static String LOGIN = "login";
-    static String PASSWORD = "password";
     private Context mContext;
-    static String SALT = "salt";
-    static String AUTH_TOKEN = "auth_token";
-    private static String SITE = "site";
 
     public HttpInterceptor(Context context) {
         mContext = context;
@@ -59,7 +59,6 @@ public class HttpInterceptor implements Interceptor {
                             if (response.isSuccessful() && response.body() != null) {
                                 AuthApi.UserAuth user = response.body();
                                 editor.putString(AUTH_TOKEN, user.getAuthToken()).apply();
-                                //sendTokenToServer(mContext);
                             } else {
                                 mContext.startActivity(new Intent(mContext, AuthActivity.class)
                                         .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)

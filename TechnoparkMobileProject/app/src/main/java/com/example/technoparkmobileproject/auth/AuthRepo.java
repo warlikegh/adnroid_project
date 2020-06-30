@@ -29,6 +29,14 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 import static android.content.Context.TELEPHONY_SERVICE;
+import static com.example.technoparkmobileproject.TechnoparkApplication.AUTH_TOKEN;
+import static com.example.technoparkmobileproject.TechnoparkApplication.IS_AUTHORISED;
+import static com.example.technoparkmobileproject.TechnoparkApplication.IS_DELETED;
+import static com.example.technoparkmobileproject.TechnoparkApplication.LOGIN;
+import static com.example.technoparkmobileproject.TechnoparkApplication.PASSWORD;
+import static com.example.technoparkmobileproject.TechnoparkApplication.SALT;
+import static com.example.technoparkmobileproject.TechnoparkApplication.SITE;
+import static com.example.technoparkmobileproject.TechnoparkApplication.TOKEN;
 
 @SuppressWarnings("WeakerAccess")
 public class AuthRepo {
@@ -36,12 +44,6 @@ public class AuthRepo {
     private final ApiRepo mApiRepo;
     static SharedPreferences mSettings;
     static SharedPreferences.Editor editor;
-    static String SALT = "salt";
-    static String AUTH_TOKEN = "auth_token";
-    static String LOGIN = "login";
-    static String PASSWORD = "password";
-    private static String SITE = "site";
-    public static String IS_AUTHORISED = "is_authorised";
     private static Context context;
 
     public AuthRepo(ApiRepo apiRepo) {
@@ -84,8 +86,9 @@ public class AuthRepo {
                                     .putInt(SITE, index)
                                     .putBoolean(IS_AUTHORISED, true).apply();
 
+                            if (!mSettings.getBoolean(IS_DELETED, true))
+                                deleteTokenFromServer(context);
                             sendTokenToServer(context);
-
 
                             progress.postValue(AuthProgress.SUCCESS);
                         } else {
@@ -112,13 +115,11 @@ public class AuthRepo {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
             byte[] hash = digest.digest(base.getBytes("UTF-8"));
             StringBuffer hexString = new StringBuffer();
-
             for (int i = 0; i < hash.length; i++) {
                 String hex = Integer.toHexString(0xff & hash[i]);
                 if (hex.length() == 1) hexString.append('0');
                 hexString.append(hex);
             }
-
             return hexString.toString();
         } catch (Exception ex) {
             throw new RuntimeException(ex);
@@ -129,15 +130,11 @@ public class AuthRepo {
         PushApi mPushApi = ApiRepo.from(context).getPushApi(new SecretData().getSecretData(context).getInt(SITE, 0));
         SharedPreferences mSettings = new SecretData().getSecretData(context);
 
-        mPushApi.registerAPN(" Token " + mSettings.getString(AUTH_TOKEN, ""), getUserPush(context))
+        mPushApi.registerAPN(TOKEN + mSettings.getString(AUTH_TOKEN, ""), getUserPush(context))
                 .enqueue(new Callback<PushApi.PushSuccess>() {
                     @Override
                     public void onResponse(Call<PushApi.PushSuccess> call,
                                            Response<PushApi.PushSuccess> response) {
-                        if (response.isSuccessful() && response.body() != null)
-                            Log.d("wasPushTokenRegister", response.body().getMessage());
-                        else
-                            Log.d("wasPushTokenRegister", "No");
                     }
 
                     @Override
@@ -156,6 +153,36 @@ public class AuthRepo {
         Log.d("wasPushTokenRegister", token);
 
         return (new PushApi.UserPush(id, token));
+    }
+
+    public static void deleteTokenFromServer(Context context) {
+        PushApi mPushApi = ApiRepo.from(context).getPushApi(new SecretData().getSecretData(context).getInt(SITE, 0));
+        final SharedPreferences mSettings = new SecretData().getSecretData(context);
+
+        mPushApi.deleteToken(TOKEN + mSettings.getString(AUTH_TOKEN, ""), getUserToken(context))
+                .enqueue(new Callback<PushApi.PushSuccess>() {
+                    @Override
+                    public void onResponse(Call<PushApi.PushSuccess> call,
+                                           Response<PushApi.PushSuccess> response) {
+                        if (response.isSuccessful())
+                            mSettings.edit().putBoolean(IS_DELETED, true).apply();
+                        else
+                            mSettings.edit().putBoolean(IS_DELETED, true).apply();
+                    }
+
+                    @Override
+                    public void onFailure(Call<PushApi.PushSuccess> call, Throwable t) {
+                        mSettings.edit().putBoolean(IS_DELETED, false).apply();
+                    }
+                });
+    }
+
+    static PushApi.UserToken getUserToken(Context context) {
+        String token = MessagingService.getToken(context);
+
+        Log.d("wasPushTokenDelete", token);
+
+        return (new PushApi.UserToken(token));
     }
 
 }

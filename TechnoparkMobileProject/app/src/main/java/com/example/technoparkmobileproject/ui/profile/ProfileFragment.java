@@ -4,12 +4,12 @@ import android.app.AlertDialog;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.VibrationEffect;
-import android.os.Vibrator;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
 import android.util.Log;
@@ -19,6 +19,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
@@ -35,14 +36,23 @@ import com.example.technoparkmobileproject.R;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.technoparkmobileproject.Router;
+import com.example.technoparkmobileproject.SecretData;
+import com.example.technoparkmobileproject.network.ApiRepo;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import static android.content.Context.VIBRATOR_SERVICE;
+import static android.view.HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING;
+import static android.view.HapticFeedbackConstants.KEYBOARD_TAP;
 import static android.view.View.GONE;
+import static com.example.technoparkmobileproject.TechnoparkApplication.CREATE_FIRST_SETTINGS;
+import static com.example.technoparkmobileproject.TechnoparkApplication.IS_FIRST_PROFILE;
+import static com.example.technoparkmobileproject.TechnoparkApplication.PROFILE_ID;
+import static com.example.technoparkmobileproject.TechnoparkApplication.PROFILE_PATH_URL;
+import static com.example.technoparkmobileproject.TechnoparkApplication.PROFILE_USERNAME;
+import static com.example.technoparkmobileproject.TechnoparkApplication.SITE;
 
 public class ProfileFragment extends Fragment {
     static GroupAdapter groupAdapter;
@@ -53,28 +63,14 @@ public class ProfileFragment extends Fragment {
     static Context context;
     static SharedPreferences.Editor mEditor;
 
+    String username = "";
     int id;
-    String username;
     Boolean isOther;
     static FragmentManager fragmentManager;
-    int[] background = {R.color.colorWhite,
-            R.mipmap.profile_background01,
-            R.mipmap.profile_background02,
-            R.mipmap.profile_background03,
-            R.mipmap.profile_background04,
-            R.mipmap.profile_background05,
-            R.mipmap.profile_background06,
-            R.mipmap.profile_background07,
-            R.mipmap.profile_background08,
-            R.mipmap.profile_background09,
-            R.mipmap.profile_background10,
-            R.mipmap.profile_background11,
-            R.mipmap.profile_background12,
-            R.mipmap.profile_background13};
+
     int backgroundNumber = 0;
 
     protected ImageView mAva;
-    protected ImageView mBackground;
     protected TextView mFullName;
     protected TextView mMainGroup;
     protected RecyclerView mGroups;
@@ -96,29 +92,33 @@ public class ProfileFragment extends Fragment {
     protected View mSeparator1;
     protected View mSeparator2;
     protected View mSeparator3;
+    protected RelativeLayout birthdayLayout;
+    protected RelativeLayout aboutLayout;
+    protected RelativeLayout contactsLayout;
+    protected RelativeLayout phoneLayout;
+    protected RelativeLayout mailLayout;
+    protected RelativeLayout groupLayout;
+    protected RelativeLayout accountLayout;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
-        Log.d(getLogTag(), "onCreate");
         super.onCreate(savedInstanceState);
         context = getContext();
         mProfileViewModel = new ViewModelProvider(Objects.requireNonNull(getActivity()))
                 .get(ProfileViewModel.class);
         fragmentManager = getChildFragmentManager();
-
     }
 
     @Override
     public void onStart() {
-        Log.d(getLogTag(), "onStart");
         super.onStart();
-        mSettings = Objects.requireNonNull(getContext()).getSharedPreferences("createFirst", Context.MODE_PRIVATE);
+        mSettings = Objects.requireNonNull(getContext()).getSharedPreferences(CREATE_FIRST_SETTINGS, Context.MODE_PRIVATE);
         mEditor = mSettings.edit();
 
-        id = getArguments().getInt("id");
-        username = getArguments().getString("username");
+        id = getArguments().getInt(PROFILE_ID);
+        username = getArguments().getString(PROFILE_USERNAME);
         if (id == -1) {
-            if (mSettings.getBoolean("isFirstProfile", true)) {
+            if (mSettings.getBoolean(IS_FIRST_PROFILE, true)) {
                 mProfileViewModel.refreshMe();
             } else {
                 mProfileViewModel.pullMeFromDB();
@@ -135,16 +135,25 @@ public class ProfileFragment extends Fragment {
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        Log.d(getLogTag(), "onCreateView");
         final View view = inflater.inflate(R.layout.fragment_profile, container, false);
+        final SharedPreferences mSecretSettings = new SecretData().getSecretData(getContext());
 
         mSeparator1 = view.findViewById(R.id.separator1);
         mSeparator2 = view.findViewById(R.id.separator2);
         mSeparator3 = view.findViewById(R.id.separator3);
         mProgressBar = view.findViewById(R.id.progress_bar);
         mAva = view.findViewById(R.id.photo);
-        mBackground = view.findViewById(R.id.background);
         mFullName = view.findViewById(R.id.full_name);
+        mFullName.setOnClickListener((new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                int pos = mSecretSettings.getInt(SITE, 0);
+                String base = ApiRepo.from(getContext()).getBaseURL(pos);
+                String baseSite = base.substring(0, base.indexOf('/', 9) + 1);
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(baseSite + PROFILE_PATH_URL + username + "/"));
+                startActivity(browserIntent);
+            }
+        }));
         mMainGroup = view.findViewById(R.id.main_group);
         mGroups = view.findViewById(R.id.subgroups);
         mAbout = view.findViewById(R.id.about);
@@ -186,17 +195,24 @@ public class ProfileFragment extends Fragment {
         mContactsString = view.findViewById(R.id.contacts_string);
         mAccountsString = view.findViewById(R.id.accounts_string);
 
-        Glide.with(Objects.requireNonNull(getContext()))
-                .load(background[0])
-                .into(mBackground);
+        birthdayLayout = view.findViewById(R.id.birthday_layout);
+        aboutLayout = view.findViewById(R.id.about_layout);
+        contactsLayout = view.findViewById(R.id.contacts_layout);
+        phoneLayout = view.findViewById(R.id.phone_layout);
+        mailLayout = view.findViewById(R.id.mail_layout);
+        groupLayout = view.findViewById(R.id.group_layout);
+        accountLayout = view.findViewById(R.id.accounts_layout);
 
         final SwipeRefreshLayout pullToRefresh = view.findViewById(R.id.pullToRefresh);
+        pullToRefresh.setColorSchemeColors(
+                getResources().getColor(R.color.colorAccent, null), getResources().getColor(R.color.colorBlueBackgroungIS, null),
+                getResources().getColor(R.color.colorGradientBottomAuth, null), getResources().getColor(R.color.colorGradientTopAuth, null));
         pullToRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
                 assert getArguments() != null;
-                id = getArguments().getInt("id");
-                username = getArguments().getString("username");
+                id = getArguments().getInt(PROFILE_ID);
+                username = getArguments().getString(PROFILE_USERNAME);
                 if (id == -1) {
                     mProfileViewModel.refreshMe();
                     isOther = false;
@@ -204,9 +220,7 @@ public class ProfileFragment extends Fragment {
                     isOther = true;
                     mProfileViewModel.refresh(username, id);
                 }
-                Glide.with(Objects.requireNonNull(getContext()))
-                        .load(background[(++backgroundNumber) % 14])
-                        .into(mBackground);
+
                 pullToRefresh.setRefreshing(false);
             }
         });
@@ -225,7 +239,7 @@ public class ProfileFragment extends Fragment {
                     mAva.setVisibility(View.VISIBLE);
                     mFullName.setText(mProfile.getFullname());
                     mFullName.setVisibility(View.VISIBLE);
-                    mFullName.setTextIsSelectable(true);
+                    username = mProfile.getUsername();
                     mMainGroup.setText(mProfile.getMainGroup());
                     mMainGroup.setVisibility(View.VISIBLE);
                     mMainGroup.setTextIsSelectable(true);
@@ -277,6 +291,25 @@ public class ProfileFragment extends Fragment {
                     mGroupsString.setVisibility(View.VISIBLE);
                     mAccountsString.setVisibility(View.VISIBLE);
 
+                    if (mProfile.getBirthdate() == null)
+                        birthdayLayout.setVisibility(GONE);
+                    if (mProfile.getAbout() == null)
+                        aboutLayout.setVisibility(GONE);
+                    else if (mProfile.getAbout().equals(""))
+                        aboutLayout.setVisibility(GONE);
+                    if (mProfile.getSubgroups().size() == 0)
+                        groupLayout.setVisibility(GONE);
+                    if (mProfile.getAccounts().size() == 0)
+                        accountLayout.setVisibility(GONE);
+                    if ((mProfile.getContacts().get(0).getValue().equals("") || mProfile.getContacts().get(0).getValue().equals(" ")) &&
+                            (mProfile.getContacts().get(1).getValue().equals("") || mProfile.getContacts().get(1).getValue().equals(" "))) {
+                        contactsLayout.setVisibility(GONE);
+                    } else {
+                        if (mProfile.getContacts().get(0).getValue().equals("") || mProfile.getContacts().get(0).getValue().equals(" "))
+                            phoneLayout.setVisibility(GONE);
+                        if (mProfile.getContacts().get(1).getValue().equals("") || mProfile.getContacts().get(1).getValue().equals(" "))
+                            mailLayout.setVisibility(GONE);
+                    }
                 }
                 if (isOther) {
                     mButton.setVisibility(GONE);
@@ -306,16 +339,11 @@ public class ProfileFragment extends Fragment {
 
         mProfileViewModel
                 .getProfile()
-                .
-
-                        observe(getViewLifecycleOwner(), observer);
+                .observe(getViewLifecycleOwner(), observer);
 
         mProfileViewModel
                 .getProfileProgress()
-                .
-
-                        observe(getViewLifecycleOwner(), observerProgress);
-
+                .observe(getViewLifecycleOwner(), observerProgress);
         return view;
     }
 
@@ -345,20 +373,16 @@ public class ProfileFragment extends Fragment {
         mAbout.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
     }
 
-    void clipAndVibrate(View view, TextView textView) {
-        Vibrator vibrator = (Vibrator) context.getSystemService(VIBRATOR_SERVICE);
-        if (Build.VERSION.SDK_INT >= 26) {
-            vibrator.vibrate(VibrationEffect.createOneShot(150, VibrationEffect.DEFAULT_AMPLITUDE));
-        } else {
-            vibrator.vibrate(150);
-        }
-
+    private void clipAndVibrate(View view, TextView textView) {
         ClipboardManager clipboard = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
         ClipData clip = ClipData.newPlainText("", textView.getText());
+        assert clipboard != null;
         clipboard.setPrimaryClip(clip);
 
         Snackbar.make(view, R.string.copied, Snackbar.LENGTH_LONG)
                 .show();
+
+        view.performHapticFeedback(KEYBOARD_TAP, FLAG_IGNORE_GLOBAL_SETTING);
     }
 
     private class GroupAdapter extends RecyclerView.Adapter<GroupViewHolder> {
@@ -427,53 +451,51 @@ public class ProfileFragment extends Fragment {
 
         @Override
         public void onBindViewHolder(@NonNull AccountViewHolder holder, int position) {
-            final UserProfile.Account group = mAccount.get(position);
-            if (group.getName().equals("vkontakte")) {
+            final UserProfile.Account account = mAccount.get(position);
+            if (account.getName().equals("vkontakte")) {
                 holder.mImage.setImageBitmap(BitmapFactory.decodeResource(context.getResources(), R.mipmap.vk_logo));
             }
-            if (group.getName().equals("odnoklassniki")) {
+            if (account.getName().equals("odnoklassniki")) {
                 holder.mImage.setImageBitmap(BitmapFactory.decodeResource(context.getResources(), R.mipmap.ok_logo));
             }
-            if (group.getName().equals("github")) {
+            if (account.getName().equals("github")) {
                 holder.mImage.setImageBitmap(BitmapFactory.decodeResource(context.getResources(), R.mipmap.github_logo));
             }
-            if (group.getName().equals("facebook")) {
+            if (account.getName().equals("facebook")) {
                 holder.mImage.setImageBitmap(BitmapFactory.decodeResource(context.getResources(), R.mipmap.facebook_logo));
             }
-            if (group.getName().equals("agent")) {
+            if (account.getName().equals("agent")) {
                 holder.mImage.setImageBitmap(BitmapFactory.decodeResource(context.getResources(), R.mipmap.mailru_agent_logo));
             }
-            if (group.getName().equals("telegram")) {
+            if (account.getName().equals("telegram")) {
                 holder.mImage.setImageBitmap(BitmapFactory.decodeResource(context.getResources(), R.mipmap.telegram_logo));
             }
-            if (group.getName().equals("tamtam")) {
+            if (account.getName().equals("tamtam")) {
                 holder.mImage.setImageBitmap(BitmapFactory.decodeResource(context.getResources(), R.mipmap.tam_tam_logo));
             }
-            if (group.getName().equals("skype")) {
+            if (account.getName().equals("skype")) {
                 holder.mImage.setImageBitmap(BitmapFactory.decodeResource(context.getResources(), R.mipmap.skype_logo));
             }
-            if (group.getName().equals("icq")) {
+            if (account.getName().equals("icq")) {
                 holder.mImage.setImageBitmap(BitmapFactory.decodeResource(context.getResources(), R.mipmap.icq_logo));
             }
-            if (group.getName().equals("bitbucket")) {
+            if (account.getName().equals("bitbucket")) {
                 holder.mImage.setImageBitmap(BitmapFactory.decodeResource(context.getResources(), R.mipmap.bitbucket_logo));
             }
-            if (group.getName().equals("myworld")) {
+            if (account.getName().equals("myworld")) {
                 holder.mImage.setImageBitmap(BitmapFactory.decodeResource(context.getResources(), R.mipmap.my_world_logo));
             }
-            if (group.getName().equals("linkedin")) {
+            if (account.getName().equals("linkedin")) {
                 holder.mImage.setImageBitmap(BitmapFactory.decodeResource(context.getResources(), R.mipmap.linkedin_logo));
             }
-            if (group.getName().equals("jabber")) {
+            if (account.getName().equals("jabber")) {
                 holder.mImage.setImageBitmap(BitmapFactory.decodeResource(context.getResources(), R.mipmap.jabber_logo));
             }
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                holder.mAccount.setText(Html.fromHtml(group.getValue(), Html.FROM_HTML_MODE_COMPACT));
-            } else {
-                holder.mAccount.setText(Html.fromHtml(group.getValue()));
-            }
-            holder.mAccount.setMovementMethod(LinkMovementMethod.getInstance());
+            holder.mAccount.setText(account.getValue());
+
+            if (position == mAccount.size() - 1)
+                holder.mSeparator.setVisibility(GONE);
 
         }
 
@@ -488,30 +510,19 @@ public class ProfileFragment extends Fragment {
 
         protected TextView mAccount;
         protected ImageView mImage;
+        protected View mSeparator;
 
         public AccountViewHolder(@NonNull final View itemView) {
             super(itemView);
             mAccount = itemView.findViewById(R.id.account);
             mImage = itemView.findViewById(R.id.account_image);
+            mSeparator = itemView.findViewById(R.id.separator1);
 
             mAccount.setOnLongClickListener((new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {
-                    Vibrator vibrator = (Vibrator) context.getSystemService(VIBRATOR_SERVICE);
-                    if (Build.VERSION.SDK_INT >= 26) {
-                        vibrator.vibrate(VibrationEffect.createOneShot(150, VibrationEffect.DEFAULT_AMPLITUDE));
-                    } else {
-                        vibrator.vibrate(150);
-                    }
-
-                    ClipboardManager clipboard = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
-                    ClipData clip = ClipData.newPlainText("", AccountViewHolder.this.mAccount.getText());
-                    clipboard.setPrimaryClip(clip);
-
-                    Snackbar.make(itemView, R.string.copied, Snackbar.LENGTH_LONG)
-                            .show();
-
-                    return false;
+                    clipAndVibrate(v, AccountViewHolder.this.mAccount);
+                    return true;
                 }
             }));
         }
@@ -519,7 +530,4 @@ public class ProfileFragment extends Fragment {
     }
 
 
-    protected String getLogTag() {
-        return getClass().getSimpleName();
-    }
 }

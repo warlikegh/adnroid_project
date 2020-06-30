@@ -1,16 +1,12 @@
 package com.example.technoparkmobileproject.auth;
 
-
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
-
-import com.example.technoparkmobileproject.R;
 
 public class SnowView extends View {
     private static final int NUM_SNOWFLAKES = 40;
@@ -42,14 +38,7 @@ public class SnowView extends View {
 
     @SuppressLint("ResourceAsColor")
     protected void resize(int width, int height) {
-
-        //paint.setColor(Color.argb(255, 28, 28,28));
-        //paint.setColor(Color.argb(255, 9, 9,9));
-        // paint.setColor(Color.argb(255, 89, 148,204));
-        //paint.setColor(Color.argb(255, 66, 99, 130));   //telega good
         paint.setColor(Color.argb(255, red, green, blue));
-        // paint.setColor(R.color.color);
-        // paint.setAlpha(255);
         paint.setStyle(Paint.Style.FILL_AND_STROKE);
         snowflakes = new SnowFlake[NUM_SNOWFLAKES];
         for (int i = 0; i < NUM_SNOWFLAKES; i++) {

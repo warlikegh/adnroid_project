@@ -25,6 +25,14 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import static com.example.technoparkmobileproject.TechnoparkApplication.AUTH_TOKEN;
+import static com.example.technoparkmobileproject.TechnoparkApplication.CREATE_FIRST_SETTINGS;
+import static com.example.technoparkmobileproject.TechnoparkApplication.IS_FIRST_PROFILE;
+import static com.example.technoparkmobileproject.TechnoparkApplication.PROFILE_MY_ID;
+import static com.example.technoparkmobileproject.TechnoparkApplication.PROFILE_PATH_URL;
+import static com.example.technoparkmobileproject.TechnoparkApplication.SITE;
+import static com.example.technoparkmobileproject.TechnoparkApplication.TOKEN;
+
 class ProfileRepo {
 
     private final static MutableLiveData<UserProfile> mProfile = new MutableLiveData<>();
@@ -33,8 +41,6 @@ class ProfileRepo {
     SharedPreferences.Editor mEditor;
     private final Context mContext;
     private ProfileApi mProfileApi;
-    private static String AUTH_TOKEN = "auth_token";
-    private static String SITE = "site";
     private int key = 0;
     private static String username_repo;
     private MutableLiveData<ProfileProgress> mProfileProgress = new MutableLiveData<>();
@@ -61,7 +67,7 @@ class ProfileRepo {
         mContext = context;
         mProfileApi = ApiRepo.from(mContext).getProfileApi(new SecretData().getSecretData(mContext).getInt(SITE, 0));
 
-        mSettings = mContext.getSharedPreferences("createFirst", Context.MODE_PRIVATE);
+        mSettings = mContext.getSharedPreferences(CREATE_FIRST_SETTINGS, Context.MODE_PRIVATE);
         mEditor = mSettings.edit();
     }
 
@@ -76,10 +82,10 @@ class ProfileRepo {
     public void refreshMe() {
         mProfileProgress.postValue(ProfileProgress.IN_PROGRESS);
         mProfile.postValue(null);
-        mEditor.putBoolean("isFirstProfile", false);
+        mEditor.putBoolean(IS_FIRST_PROFILE, false);
         mEditor.apply();
         mSecretSettings = new SecretData().getSecretData(mContext);
-        mProfileApi.getUserProfile(" Token " + mSecretSettings.getString(AUTH_TOKEN, "")).enqueue(new Callback<ProfileApi.UserProfilePlain>() {
+        mProfileApi.getUserProfile(TOKEN + mSecretSettings.getString(AUTH_TOKEN, "")).enqueue(new Callback<ProfileApi.UserProfilePlain>() {
             @Override
             public void onResponse(Call<ProfileApi.UserProfilePlain> call,
                                    Response<ProfileApi.UserProfilePlain> response) {
@@ -88,7 +94,7 @@ class ProfileRepo {
                     mProfile.postValue(transform(result));
                     mProfileProgress.postValue(ProfileProgress.SUCCESS);
                     saveData(transform(result));
-                    mEditor.putInt("my_id", result.getId()).commit();
+                    mEditor.putInt(PROFILE_MY_ID, result.getId()).commit();
                 } else {
                     if (key == 0) {
                         pullMeFromDB();
@@ -120,7 +126,7 @@ class ProfileRepo {
         username_repo = username;
         final ProfileDbManager manager = ProfileDbManager.getInstance(mContext);
         mSecretSettings = new SecretData().getSecretData(mContext);
-        mProfileApi.getOtherUserProfile(" Token " + mSecretSettings.getString(AUTH_TOKEN, ""), "profile/" + username).enqueue(new Callback<ProfileApi.UserProfilePlain>() {
+        mProfileApi.getOtherUserProfile(TOKEN + mSecretSettings.getString(AUTH_TOKEN, ""), PROFILE_PATH_URL + username).enqueue(new Callback<ProfileApi.UserProfilePlain>() {
             @Override
             public void onResponse(Call<ProfileApi.UserProfilePlain> call,
                                    Response<ProfileApi.UserProfilePlain> response) {
@@ -158,13 +164,13 @@ class ProfileRepo {
         mProfileProgress.postValue(ProfileProgress.IN_PROGRESS);
     //    mProfile.postValue(null);
         ProfileDbManager manager = ProfileDbManager.getInstance(mContext);
-        long id = mSettings.getInt("my_id", -1);
+        long id = mSettings.getInt(PROFILE_MY_ID, -1);
         manager.read(readListener, id);
     }
 
     public void cleanDB() {
         final ProfileDbManager manager = ProfileDbManager.getInstance(mContext);
-        long id = mSettings.getInt("my_id", -1);
+        long id = mSettings.getInt(PROFILE_MY_ID, -1);
         manager.clean(id);
     }
 

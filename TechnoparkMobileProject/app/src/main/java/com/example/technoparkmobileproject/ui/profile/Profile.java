@@ -1,5 +1,7 @@
 package com.example.technoparkmobileproject.ui.profile;
 
+import android.util.Log;
+
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
@@ -7,6 +9,7 @@ import com.example.technoparkmobileproject.SecretData;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Entity(tableName = "Profile")
 public class Profile {
@@ -77,7 +80,10 @@ public class Profile {
         List<String> tempContactsValue = new ArrayList<>();
         for (int j = 0; j < contactsSize; j++) {
             tempContactsName.add(contacts.get(j).getName());
-            tempContactsValue.add(contacts.get(j).getValue());
+            if (contacts.get(j).getValue() != null && !Objects.equals(contacts.get(j).getValue(), ""))
+                tempContactsValue.add(contacts.get(j).getValue());
+            else
+                tempContactsValue.add(" ");
         }
         this.contactsName = new SecretData().parseListToString(tempContactsName, contactsSize);
         this.contactsValue = new SecretData().parseListToString(tempContactsValue, contactsSize);

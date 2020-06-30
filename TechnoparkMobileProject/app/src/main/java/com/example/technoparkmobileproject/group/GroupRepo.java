@@ -14,11 +14,20 @@ import com.example.technoparkmobileproject.network.GroupApi;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+
+import static com.example.technoparkmobileproject.TechnoparkApplication.AUTH_TOKEN;
+import static com.example.technoparkmobileproject.TechnoparkApplication.GROUP_LAST_ID;
+import static com.example.technoparkmobileproject.TechnoparkApplication.GROUP_PATH_URL;
+import static com.example.technoparkmobileproject.TechnoparkApplication.GROUP_SETTINGS;
+import static com.example.technoparkmobileproject.TechnoparkApplication.SITE;
+import static com.example.technoparkmobileproject.TechnoparkApplication.TOKEN;
 
 class GroupRepo {
     private final static MutableLiveData<UserGroup> mGroup = new MutableLiveData<>();
@@ -28,8 +37,6 @@ class GroupRepo {
     private SharedPreferences.Editor mEditor;
     private final Context mContext;
     private GroupApi mGroupApi;
-    private static String AUTH_TOKEN = "auth_token";
-    private static String SITE = "site";
     private int key = 0;
 
     private final GroupDbManager.ReadListener<Group> readListener = new GroupDbManager.ReadListener<Group>() {
@@ -65,9 +72,9 @@ class GroupRepo {
 
     public void refresh(final Integer id) {
         mGroupProgress.postValue(GroupProgress.IN_PROGRESS);
-        String url = "groups/" + id.toString();
+        String url = GROUP_PATH_URL + id.toString();
         mSecretSettings = new SecretData().getSecretData(mContext);
-        mGroupApi.getStudentsGroup(" Token " + mSecretSettings.getString(AUTH_TOKEN, ""), url).enqueue(
+        mGroupApi.getStudentsGroup(TOKEN + mSecretSettings.getString(AUTH_TOKEN, ""), url).enqueue(
                 new Callback<GroupApi.StudentGroupPlain>() {
             @Override
             public void onResponse(Call<GroupApi.StudentGroupPlain> call,
@@ -112,6 +119,12 @@ class GroupRepo {
                 e.printStackTrace();
             }
         }
+        Comparator<UserGroup.Student> comp = new Comparator<UserGroup.Student>() {
+            @Override
+            public int compare(UserGroup.Student a, UserGroup.Student b) {
+                return a.getFullname().compareToIgnoreCase(b.getFullname());
+            }};
+        Collections.sort(result, comp);
         return new UserGroup(plains.getId(), plains.getName(), result);
     }
 
@@ -141,27 +154,25 @@ class GroupRepo {
             UserGroup.Student tempStudent = temp.new Student(data.get(i).idUser, data.get(i).username,
                     data.get(i).fullname, data.get(i).avatarUrl, data.get(i).online, data.get(i).rating);
             tempResult.add(tempStudent);
-            Log.d("groupRepoPost", data.get(i).fullname);
         }
         mGroup.postValue(new UserGroup(data.get(0).idGroup, data.get(0).nameGroup, tempResult));
         mGroupProgress.postValue(GroupProgress.SUCCESS);
     }
 
     private void saveData(UserGroup result) {
-        mSettings = mContext.getSharedPreferences("groupIDs", Context.MODE_PRIVATE);
+        mSettings = mContext.getSharedPreferences(GROUP_SETTINGS, Context.MODE_PRIVATE);
         mEditor = mSettings.edit();
 
-        Integer id = mSettings.getInt("groupID", 1);
+        Integer id = mSettings.getInt(GROUP_LAST_ID, 1);
 
         for (int i = 0; i < result.getStudents().size(); i++, id++) {
             GroupDbManager.getInstance(mContext).insert(id, result.getId(), result.getName(),
                     result.getStudents().get(i).getId(), result.getStudents().get(i).getUsername(),
                     result.getStudents().get(i).getFullname(), result.getStudents().get(i).getAvatarUrl(),
                     result.getStudents().get(i).getOnline(), result.getStudents().get(i).getRating());
-            Log.d("groupRepoSave", result.getStudents().get(i).getFullname());
         }
 
-        mEditor.putInt("groupID", id).apply();
+        mEditor.putInt(GROUP_LAST_ID, id).apply();
     }
     public enum GroupProgress {
         IN_PROGRESS,

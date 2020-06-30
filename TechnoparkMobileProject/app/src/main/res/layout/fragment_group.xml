@@ -10,7 +10,6 @@
         android:layout_height="wrap_content">
 
         <androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-            xmlns:app="http://schemas.android.com/apk/res-auto"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
@@ -31,11 +30,10 @@
                         android:layout_height="32dp"
                         android:layout_margin="8dp"
                         android:layout_marginTop="24dp"
-                        android:background="@drawable/shape_blue_round"
                         android:gravity="center_vertical"
-                        android:text=""
+                        android:text="group_name"
                         android:textAlignment="center"
-                        android:textColor="@color/colorWindow"
+                        android:textColor="@color/colorAccent"
                         android:textSize="16sp" />
 
                     <SearchView

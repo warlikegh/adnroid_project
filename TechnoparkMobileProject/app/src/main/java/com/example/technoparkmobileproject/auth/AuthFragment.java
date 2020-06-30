@@ -32,6 +32,10 @@ import static com.example.technoparkmobileproject.R.color.colorOrange;
 import static com.example.technoparkmobileproject.R.color.colorRed;
 import static com.example.technoparkmobileproject.R.color.colorRedMadeAuth;
 import static com.example.technoparkmobileproject.R.color.colorWindow;
+import static com.example.technoparkmobileproject.TechnoparkApplication.CREATE_FIRST_SETTINGS;
+import static com.example.technoparkmobileproject.TechnoparkApplication.IS_FIRST_NEWS;
+import static com.example.technoparkmobileproject.TechnoparkApplication.IS_FIRST_PROFILE;
+import static com.example.technoparkmobileproject.TechnoparkApplication.IS_FIRST_SCHEDULE;
 
 
 public class AuthFragment extends Fragment {
@@ -79,23 +83,25 @@ public class AuthFragment extends Fragment {
             public void onChanged(AuthViewModel.AuthState authState) {
                 if (authState == AuthViewModel.AuthState.FAILED) {
                     enter.setEnabled(true);
-                    enter.setBackgroundColor(getResources().getColor(colorRed));
+                    enter.setBackgroundColor(getResources().getColor(colorRed, null));
                     Snackbar.make(viewAll, R.string.error_400, Snackbar.LENGTH_LONG)
                             .show();
                 } else if (authState == AuthViewModel.AuthState.FAILED_NET) {
                     enter.setEnabled(true);
-                    enter.setBackgroundColor(getResources().getColor(colorOrange));
+                    enter.setBackgroundColor(getResources().getColor(colorOrange, null));
                     Snackbar.make(viewAll, R.string.http_failed, Snackbar.LENGTH_LONG)
                             .show();
                 } else if (authState == AuthViewModel.AuthState.IN_PROGRESS) {
-                    enter.setBackgroundColor(getResources().getColor(colorAccent));
+                    enter.setBackgroundColor(getResources().getColor(colorAccent, null));
                     enter.setEnabled(false);
                     Snackbar.make(viewAll, R.string.load, Snackbar.LENGTH_LONG)
                             .show();
                 } else if (authState == AuthViewModel.AuthState.SUCCESS) {
-                    SharedPreferences mSettings = getContext().getSharedPreferences("createFirst", Context.MODE_PRIVATE);
+                    SharedPreferences mSettings = getContext().getSharedPreferences(CREATE_FIRST_SETTINGS, Context.MODE_PRIVATE);
                     SharedPreferences.Editor editor = mSettings.edit();
-                    editor.putBoolean("isFirstSchedule", true);
+                    editor.putBoolean(IS_FIRST_NEWS, true);
+                    editor.putBoolean(IS_FIRST_SCHEDULE, true);
+                    editor.putBoolean(IS_FIRST_PROFILE, true);
                     editor.apply();
 
                     Router router = (Router) getActivity();
@@ -129,15 +135,15 @@ public class AuthFragment extends Fragment {
         int[] redpos = new int[]{44, 255, 208, 44, 135, 255, 255, 252, 255};
         int[] greenpos = new int[]{43, 255, 18, 43, 66, 255, 255, 44, 255};
         int[] bluepos = new int[]{41, 255, 22, 41, 221, 255, 255, 56, 255};
-        int[] viewpos = new int[]{getResources().getColor(colorWindow),
-                getResources().getDrawable(R.drawable.tech_sfera_background).getAlpha(),
-                getResources().getColor(colorWindow),
-                getResources().getColor(colorWindow),
-                getResources().getColor(colorWindow),
-                getResources().getColor(colorBlueBackgroungIS),
-                getResources().getColor(colorBlueBackgroungIS),
-                getResources().getColor(colorWindow),
-                getResources().getColor(colorRedMadeAuth)};
+        int[] viewpos = new int[]{getResources().getColor(colorWindow, null),
+                getResources().getDrawable(R.drawable.tech_sfera_background, null).getAlpha(),
+                getResources().getColor(colorWindow, null),
+                getResources().getColor(colorWindow, null),
+                getResources().getColor(colorWindow, null),
+                getResources().getColor(colorBlueBackgroungIS, null),
+                getResources().getColor(colorBlueBackgroungIS, null),
+                getResources().getColor(colorWindow, null),
+                getResources().getColor(colorRedMadeAuth, null)};
 
         public ViewPagerAdapter(Context context, int[] resids) {
             this.mContext = context;
@@ -168,7 +174,7 @@ public class AuthFragment extends Fragment {
                     (mPos == 0 && (position == 8 || position == 6)) || (mPos == 2 && position == 8)) {
                 int posDown = (position + 1) % mPictureIDs.length;
                 if (position == 0) {
-                    viewAll.setBackground(getResources().getDrawable(R.drawable.tech_sfera_background));
+                    viewAll.setBackground(getResources().getDrawable(R.drawable.tech_sfera_background, null));
                 } else {
                     viewAll.setBackgroundColor(viewpos[posDown]);
                 }
@@ -176,7 +182,7 @@ public class AuthFragment extends Fragment {
             } else {
                 int posUp = (position - 1 >= 0) ? position - 1 : 8;
                 if (position == 2) {
-                    viewAll.setBackground(getResources().getDrawable(R.drawable.tech_sfera_background));
+                    viewAll.setBackground(getResources().getDrawable(R.drawable.tech_sfera_background, null));
                 } else {
                     viewAll.setBackgroundColor(viewpos[posUp]);
                 }

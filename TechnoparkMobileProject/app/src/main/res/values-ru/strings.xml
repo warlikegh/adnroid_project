@@ -28,4 +28,11 @@
     <string name="phone_string">Моб. телефон</string>
     <string name="mail_string">Эл. почта</string>
     <string name="birthday_string">День рождения</string>
+    <string name="feedback">Оставить отзыв о занятии</string>
+    <string name="check">Отметиться</string>
+    <string name="checked">Посещено ✓</string>
+    <string name="checking">Отмечаю...</string>
+    <string name="check_success">Вы успешно отметились!</string>
+    <string name="error">Что-то пошло не так! Повторите позднее.</string>
+    <string name="no_schedule">Нет расписания</string>
 </resources>

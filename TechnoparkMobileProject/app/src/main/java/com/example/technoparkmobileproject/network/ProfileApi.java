@@ -11,17 +11,18 @@ import retrofit2.http.Header;
 import retrofit2.http.Query;
 import retrofit2.http.Url;
 
+import static com.example.technoparkmobileproject.TechnoparkApplication.AUTHORISATION;
+import static com.example.technoparkmobileproject.TechnoparkApplication.PROFILE_PATH_URL;
+
 public interface ProfileApi {
 
-    @GET("profile/")
-    Call<UserProfilePlain> getUserProfile(@Header("Authorization") String auth_token);
+    @GET(PROFILE_PATH_URL)
+    Call<UserProfilePlain> getUserProfile(@Header(AUTHORISATION) String auth_token);
 
     @GET
-    Call<UserProfilePlain> getOtherUserProfile(@Header("Authorization") String auth_token, @Url String url);
+    Call<UserProfilePlain> getOtherUserProfile(@Header(AUTHORISATION) String auth_token, @Url String url);
 
     class UserProfilePlain {
-
-
 
         @SerializedName("id")
         @Expose

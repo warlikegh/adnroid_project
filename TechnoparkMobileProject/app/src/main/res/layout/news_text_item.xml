@@ -8,17 +8,12 @@
         android:id="@+id/text_news"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="8dp"
-        android:text=""
+        android:text="Lorem ipsum dolor sit amet, consectetur adipisicing elit. Commodi corporis culpa dolore earum eum? Ab aliquam consequatur deserunt eaque explicabo illo ipsam natus nulla pariatur quae, quia, quidem quisquam quod rem rerum! Consequatur dignissimos dolorem doloribus esse explicabo, facere, harum, incidunt iste iure nisi numquam perferendis perspiciatis provident quis tempora."
         android:textSize="16sp"
-        android:textIsSelectable="true"
-        />
+        android:textIsSelectable="true"/>
     <ImageView
         android:id="@+id/photo"
         android:layout_height="match_parent"
         android:scaleType="center"
-        android:layout_marginTop="8dp"
-        android:layout_width="match_parent"
-        />
+        android:layout_width="match_parent"/>
 </LinearLayout>

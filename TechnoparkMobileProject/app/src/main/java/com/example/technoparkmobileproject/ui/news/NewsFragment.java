@@ -4,7 +4,9 @@ import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.Html;
@@ -18,6 +20,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -47,6 +50,21 @@ import java.util.Set;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
+import static com.example.technoparkmobileproject.TechnoparkApplication.CREATE_FIRST_SETTINGS;
+import static com.example.technoparkmobileproject.TechnoparkApplication.IS_FIRST_NEWS;
+import static com.example.technoparkmobileproject.TechnoparkApplication.NEWS_BLOCKQOTE;
+import static com.example.technoparkmobileproject.TechnoparkApplication.NEWS_CODE;
+import static com.example.technoparkmobileproject.TechnoparkApplication.NEWS_H4;
+import static com.example.technoparkmobileproject.TechnoparkApplication.NEWS_H5;
+import static com.example.technoparkmobileproject.TechnoparkApplication.NEWS_H6;
+import static com.example.technoparkmobileproject.TechnoparkApplication.NEWS_IMG;
+import static com.example.technoparkmobileproject.TechnoparkApplication.NEWS_O1;
+import static com.example.technoparkmobileproject.TechnoparkApplication.NEWS_P;
+import static com.example.technoparkmobileproject.TechnoparkApplication.NEWS_PATH_URL;
+import static com.example.technoparkmobileproject.TechnoparkApplication.NEWS_POS;
+import static com.example.technoparkmobileproject.TechnoparkApplication.NEWS_PRE;
+import static com.example.technoparkmobileproject.TechnoparkApplication.NEWS_U1;
+
 
 public class NewsFragment extends Fragment {
 
@@ -55,7 +73,6 @@ public class NewsFragment extends Fragment {
     private static NewsAdapter adapter;
     private static NewsViewModel mNewsViewModel;
     public static String mUrl = "";
-    public static String BASE_URL = "topics/subscribed/";
     RecyclerView recycler;
     static Context context;
     Integer positionSave = 0;
@@ -82,13 +99,16 @@ public class NewsFragment extends Fragment {
             @Override
             public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
                 if (mNews.getNext() != null) {
-                    mUrl = BASE_URL + "?" + mNews.getNext().substring(mNews.getNext().indexOf("?") + 1);
+                    mUrl = NEWS_PATH_URL + "?" + mNews.getNext().substring(mNews.getNext().indexOf("?") + 1);
                     loadNextDataFromApi(mUrl);
                 }
             }
         };
 
         final SwipeRefreshLayout pullToRefresh = view.findViewById(R.id.pullToRefresh);
+        pullToRefresh.setColorSchemeColors(
+                getResources().getColor(R.color.colorAccent, null), getResources().getColor(R.color.colorBlueBackgroungIS, null),
+                getResources().getColor(R.color.colorGradientBottomAuth, null), getResources().getColor(R.color.colorGradientTopAuth, null));
         pullToRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -126,13 +146,13 @@ public class NewsFragment extends Fragment {
         mNewsViewModel = new ViewModelProvider(Objects.requireNonNull(getActivity()))
                 .get(NewsViewModel.class);
 
-        mSettings = Objects.requireNonNull(getContext()).getSharedPreferences("createFirst", Context.MODE_PRIVATE);
+        mSettings = Objects.requireNonNull(getContext()).getSharedPreferences(CREATE_FIRST_SETTINGS, Context.MODE_PRIVATE);
         mEditor = mSettings.edit();
-        if (mSettings.getBoolean("isFirstNews", true)) {
+        if (mSettings.getBoolean(IS_FIRST_NEWS, true)) {
             mNewsViewModel.refresh();
         } else {
             mNewsViewModel.pullFromDB();
-            positionSave = mSettings.getInt("pos_news", 0);
+            positionSave = mSettings.getInt(NEWS_POS, 0);
         }
         if (savedInstanceState != null) {
             mNewsViewModel.pullFromDB();
@@ -177,33 +197,33 @@ public class NewsFragment extends Fragment {
         public void onBindViewHolder(@NonNull NewsViewHolder holder, int position) {
             positionSave = position;
             final UserNews.Result news = mNews.get(position);
-            String url = "<a href=\"" + news.getUrl() + "\" target=\"_blank\">" + news.getTitle() + "</a>";
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                holder.mTitle.setText(Html.fromHtml(url, Html.FROM_HTML_MODE_COMPACT));
-            } else {
-                holder.mTitle.setText(Html.fromHtml(url));
-            }
-
-            holder.mTitle.setMovementMethod(LinkMovementMethod.getInstance());
+            holder.mTitle.setText(news.getTitle());
             holder.mBlog.setText(news.getBlog());
             holder.mAuthor.setText(news.getAuthor().getFullname());
+
+            if (news.getAuthor().getFullname().length() < 25)
+                holder.mAuthor.setPadding(0,12,0,0);
+
 
             String date = new SecretData().getDateString(news.getPublishDate());
             holder.mDate.setText(date);
             String rating = "";
-            if (news.getRating()>0)
+            if (news.getRating() > 0)
                 rating = "+";
-            rating += ((Integer)news.getRating().intValue()).toString();
+            rating += ((Integer) news.getRating().intValue()).toString();
             holder.mRating.setText(rating);
 
             boolean buttonIsActive = false;
             holder.mCommentsCount.setText(news.getCommentsCount().toString());
-            if (news.getText().size() > 1 ||
-                    (!(news.getText().get(0).getContent().equals(news.getTextShort().get(0).getContent())))) {
+            if ((news.getText().size() > 1 ||
+                    (!(news.getText().get(0).getContent().equals(news.getTextShort().get(0).getContent())))) && !news.getOpen())
+            {
                 holder.mNext.setVisibility(View.VISIBLE);
                 holder.mNext.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
                 buttonIsActive = true;
             }
+            if (!buttonIsActive)
+                holder.mNext.setVisibility(View.GONE);
 
             final ContentAdapter contentAdapter = new ContentAdapter();
             List<UserNews.TextShort> textShort = new ArrayList<UserNews.TextShort>();
@@ -233,7 +253,7 @@ public class NewsFragment extends Fragment {
         }
     }
 
-    static class NewsViewHolder extends RecyclerView.ViewHolder {
+    class NewsViewHolder extends RecyclerView.ViewHolder {
         protected TextView mTitle;
         protected TextView mBlog;
         protected RecyclerView mContent;
@@ -243,16 +263,27 @@ public class NewsFragment extends Fragment {
         protected TextView mCommentsCount;
         private final TextView mNext;
         protected ImageView mAvatar;
+        protected RelativeLayout mTitleLayout;
+        protected RelativeLayout mAuthorLayout;
 
 
         public NewsViewHolder(@NonNull View itemView) {
             super(itemView);
             mTitle = itemView.findViewById(R.id.title);
+            mTitleLayout = itemView.findViewById(R.id.title_layout);
+            mTitleLayout.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    int pos = NewsViewHolder.this.getAdapterPosition();
+                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(mNews.getResults().get(pos).getUrl()));
+                    startActivity(browserIntent);
+                }});
             mBlog = itemView.findViewById(R.id.blog);
             mContent = itemView.findViewById(R.id.content);
             mAuthor = itemView.findViewById(R.id.author);
+            mAuthorLayout = itemView.findViewById(R.id.author_layout);
 
-            mAuthor.setOnClickListener(new View.OnClickListener() {
+            mAuthorLayout.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     int pos = NewsViewHolder.this.getAdapterPosition();
@@ -274,6 +305,8 @@ public class NewsFragment extends Fragment {
                     mNext.setVisibility(View.GONE);
                     int pos = NewsViewHolder.this.getAdapterPosition();
                     adapter.setDisactive(NewsViewHolder.this, pos);
+                    mNews.getResults().get(pos).setOpen(true);
+                    mNewsViewModel.openNews(mNews.getResults().get(pos).getId());
                 }
 
             });
@@ -313,20 +346,20 @@ public class NewsFragment extends Fragment {
                 text = mText.get(position).getContent();
                 type = mText.get(position).getType();
             }
-            if (type.equals("p") || type.equals("ul") || type.equals("code") || type.equals("ol") || type.equals("blockquote")
-                    || type.equals("h4") || type.equals("h5") || type.equals("h6") || type.equals("pre")/* || type.equals("iframe")*/) {
+            if (type.equals(NEWS_P) || type.equals(NEWS_H4) || type.equals(NEWS_H5) || type.equals(NEWS_H6) || type.equals(NEWS_O1)
+                    || type.equals(NEWS_CODE) || type.equals(NEWS_BLOCKQOTE) || type.equals(NEWS_PRE) || type.equals(NEWS_U1)/* || type.equals("iframe")*/) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                    holder.mTextNews.setText(Html.fromHtml(text, Html.FROM_HTML_MODE_COMPACT));
+                    holder.mTextNews.setText(Html.fromHtml(secretData.deleteEnter(text), Html.FROM_HTML_MODE_COMPACT));
                 } else {
-                    holder.mTextNews.setText(Html.fromHtml(text));
+                    holder.mTextNews.setText(Html.fromHtml(secretData.deleteEnter(text)));
                 }
                 holder.mTextNews.setMovementMethod(LinkMovementMethod.getInstance());
-            } else if (type.equals("img")) {
+            } else if (type.equals(NEWS_IMG)) {
                 Glide.with(Objects.requireNonNull(getContext()))
                         .load(text)
                         .placeholder(R.drawable.ic_restore_black_24dp)
                         .into(holder.mImageNews);
-                holder.mTextNews.setEnabled(true);
+                holder.mTextNews.setVisibility(View.GONE);
             } else {
                 holder.mTextNews.setText("Here must be " + type);
             }

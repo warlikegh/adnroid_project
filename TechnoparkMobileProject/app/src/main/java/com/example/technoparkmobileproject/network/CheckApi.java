@@ -4,15 +4,25 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 import retrofit2.Call;
+import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
+import retrofit2.http.POST;
+import retrofit2.http.Url;
+
+import static com.example.technoparkmobileproject.TechnoparkApplication.AUTHORISATION;
 
 public interface CheckApi {
-    @GET("schedule/9101/check/")
-    Call<UserCheck> getUserCheck(@Header("Authorization") String auth_token);
+    @POST
+    Call<UserCheck> checkUser(@Header(AUTHORISATION) String auth_token, @Url String url, @Body Nothing nothing);
+
+    class Nothing {
+        public Nothing() {
+
+        }
+    }
 
     class UserCheck {
-
         @SerializedName("schedule_item")
         @Expose
         private Integer scheduleItem;
