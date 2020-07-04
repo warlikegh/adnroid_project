@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/navigation_home"
-        android:name="com.example.technoparkmobileproject.ui.news.NewsFragment"
+        android:name="com.zzz.technoparkmobileproject.ui.news.NewsFragment"
         android:label="@string/title_home"
         tools:layout="@layout/fragment_home" >
 
@@ -21,7 +21,7 @@
 
     <fragment
         android:id="@+id/navigation_dashboard"
-        android:name="com.example.technoparkmobileproject.ui.shedule.ScheduleFragment"
+        android:name="com.zzz.technoparkmobileproject.ui.shedule.ScheduleFragment"
         android:label="@string/title_dashboard"
         tools:layout="@layout/fragment_schedule" >
         <action
@@ -37,7 +37,7 @@
 
     <fragment
         android:id="@+id/navigation_notifications"
-        android:name="com.example.technoparkmobileproject.ui.profile.ProfileFragment"
+        android:name="com.zzz.technoparkmobileproject.ui.profile.ProfileFragment"
         android:label="@string/title_notifications"
         tools:layout="@layout/fragment_profile" >
         <argument
@@ -60,7 +60,7 @@
     </fragment>
     <fragment
         android:id="@+id/groupFragment"
-        android:name="com.example.technoparkmobileproject.group.GroupFragment"
+        android:name="com.zzz.technoparkmobileproject.group.GroupFragment"
         android:label="fragment_group"
         tools:layout="@layout/fragment_group" >
         <argument

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">TechnoparkMobileProject</string>
+    <string name="app_name">Технопроекты Mail.ru Group</string>
     <string name="title_activity_main">MainActivity</string>
     <string name="title_home">Новости</string>
     <string name="title_dashboard">Расписание</string>
