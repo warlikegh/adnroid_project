@@ -4,6 +4,11 @@ import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import androidx.annotation.NonNull;
+
+import com.my.tracker.MyTracker;
+import com.my.tracker.MyTrackerConfig;
+import com.my.tracker.MyTrackerParams;
 import com.zzz.technoparkmobileproject.auth.AuthRepo;
 import com.zzz.technoparkmobileproject.network.ApiRepo;
 
@@ -58,6 +63,7 @@ public class TechnoparkApplication extends Application {
     final public static String SCHEDULE_PATH_URL = "schedule/";
     final public static String CHECK_PATH_URL = "/check/";
     final public static String AUTHORISATION = "Authorization";
+    private static @NonNull String SDK_KEY = "99201576151741145914";
 
     @Override
     public void onCreate() {
@@ -77,6 +83,17 @@ public class TechnoparkApplication extends Application {
                 .putBoolean(DEFAULT_TWO_WEEK, true)
                 .putString(DISCIPLINE, ALL_DISCIPLINES);
         editor.apply();
+
+        // При необходимости, настройте конфигурацию трекера
+        // MyTrackerParams trackerParams = MyTracker.getTrackerParams();
+        MyTrackerConfig trackerConfig = MyTracker.getTrackerConfig();
+        // …
+        // Настройте параметры трекера
+        // …
+        trackerConfig.setLaunchTimeout(10);
+        trackerConfig.setRegion(MyTrackerConfig.Region.RU);
+        // Инициализируйте трекер
+        MyTracker.initTracker(SDK_KEY, this);
     }
 
     public AuthRepo getAuthRepo() {
