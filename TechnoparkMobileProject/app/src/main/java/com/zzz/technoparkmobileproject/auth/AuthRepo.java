@@ -21,12 +21,14 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import static com.my.tracker.MyTracker.trackLoginEvent;
 import static com.zzz.technoparkmobileproject.TechnoparkApplication.AUTH_TOKEN;
 import static com.zzz.technoparkmobileproject.TechnoparkApplication.IS_AUTHORISED;
 import static com.zzz.technoparkmobileproject.TechnoparkApplication.IS_DELETED;
 import static com.zzz.technoparkmobileproject.TechnoparkApplication.LOGIN;
 import static com.zzz.technoparkmobileproject.TechnoparkApplication.PASSWORD;
 import static com.zzz.technoparkmobileproject.TechnoparkApplication.SALT;
+import static com.zzz.technoparkmobileproject.TechnoparkApplication.SDK_KEY;
 import static com.zzz.technoparkmobileproject.TechnoparkApplication.SITE;
 import static com.zzz.technoparkmobileproject.TechnoparkApplication.TOKEN;
 
@@ -83,6 +85,7 @@ public class AuthRepo {
                             sendTokenToServer(context);
 
                             progress.postValue(AuthProgress.SUCCESS);
+                            trackLoginEvent(login);
                         } else {
                             progress.postValue(AuthProgress.FAILED);
                         }

@@ -63,7 +63,7 @@ public class TechnoparkApplication extends Application {
     final public static String SCHEDULE_PATH_URL = "schedule/";
     final public static String CHECK_PATH_URL = "/check/";
     final public static String AUTHORISATION = "Authorization";
-    private static @NonNull String SDK_KEY = "99201576151741145914";
+    public static @NonNull String SDK_KEY = "99201576151741145914";
 
     @Override
     public void onCreate() {

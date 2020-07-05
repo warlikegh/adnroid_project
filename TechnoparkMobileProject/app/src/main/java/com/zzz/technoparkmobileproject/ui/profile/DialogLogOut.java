@@ -13,6 +13,7 @@ import com.zzz.technoparkmobileproject.auth.AuthActivity;
 import com.zzz.technoparkmobileproject.ui.shedule.ScheduleViewModel;
 
 import static android.content.Context.MODE_PRIVATE;
+import static com.my.tracker.MyTracker.trackEvent;
 import static com.zzz.technoparkmobileproject.TechnoparkApplication.CREATE_FIRST_SETTINGS;
 import static com.zzz.technoparkmobileproject.TechnoparkApplication.IS_AUTHORISED;
 import static com.zzz.technoparkmobileproject.TechnoparkApplication.IS_FIRST_NEWS;
@@ -39,6 +40,7 @@ public class DialogLogOut {
                 deleteTokenFromServer(context);
 
                 SharedPreferences mSecretSettings = new SecretData().getSecretData(context);
+                trackEvent(String.format("Log  out %s", mSecretSettings.getString(LOGIN, " - ")));
                 SharedPreferences.Editor mSecretEditor = mSecretSettings.edit();
                 mSecretEditor.remove(LOGIN)
                         .remove(PASSWORD)
@@ -59,8 +61,6 @@ public class DialogLogOut {
                 context.startActivity(new Intent(context, AuthActivity.class)
                         .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
                         .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
-
-
             }
         });
         builder.setNeutralButton(R.string.no, new DialogInterface.OnClickListener() {
