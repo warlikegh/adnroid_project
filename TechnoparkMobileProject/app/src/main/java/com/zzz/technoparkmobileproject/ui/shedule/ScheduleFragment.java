@@ -336,7 +336,7 @@ public class ScheduleFragment extends Fragment {
                 String date = new SecretData().getDateString(schedule.getDate());
                 Calendar calendar = Calendar.getInstance();
                 calendar.setTime(end);
-                String dayOfWeek = daysOfTheWeek[calendar.get(Calendar.DAY_OF_WEEK) - 2];
+                String dayOfWeek = daysOfTheWeek[Math.abs(calendar.get(Calendar.DAY_OF_WEEK) - 2) % daysOfTheWeek.length];
                 holder.mDateSchedule.setText(String.format("%s\n%s", date, dayOfWeek));
                 if (now.after(end))
                     holder.mSeparator1.setBackground(getResources().getDrawable(R.drawable.shape_done_start, null));
