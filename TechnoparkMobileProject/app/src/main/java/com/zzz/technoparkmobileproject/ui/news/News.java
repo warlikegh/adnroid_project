@@ -83,7 +83,7 @@ public class News {
         List<String> listType = new SecretData().parseStringToList(typeText);
         UserNews temp = new UserNews();
         List<UserNews.Text> text = new ArrayList<>();
-        for (int i = 0; i < textSize; i++) {
+        for (int i = 0; i < listContent.size(); i++) {
             text.add(temp.new Text(listType.get(i), listContent.get(i)));
         }
         return text;
@@ -94,7 +94,7 @@ public class News {
         List<String> listType = new SecretData().parseStringToList(typeShort);
         UserNews temp = new UserNews();
         List<UserNews.TextShort> textShort = new ArrayList<>();
-        for (int i = 0; i < textShortSize; i++) {
+        for (int i = 0; i < listContent.size(); i++) {
             textShort.add(temp.new TextShort(listType.get(i), listContent.get(i)));
         }
         return textShort;

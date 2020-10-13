@@ -40,7 +40,7 @@ public class DialogLogOut {
                 deleteTokenFromServer(context);
 
                 SharedPreferences mSecretSettings = new SecretData().getSecretData(context);
-                trackEvent(String.format("Log  out %s", mSecretSettings.getString(LOGIN, " - ")));
+                trackEvent("Log  out");
                 SharedPreferences.Editor mSecretEditor = mSecretSettings.edit();
                 mSecretEditor.remove(LOGIN)
                         .remove(PASSWORD)

@@ -47,6 +47,7 @@ import static com.zzz.technoparkmobileproject.TechnoparkApplication.NEWS_CODE;
 import static com.zzz.technoparkmobileproject.TechnoparkApplication.NEWS_H4;
 import static com.zzz.technoparkmobileproject.TechnoparkApplication.NEWS_H5;
 import static com.zzz.technoparkmobileproject.TechnoparkApplication.NEWS_H6;
+import static com.zzz.technoparkmobileproject.TechnoparkApplication.NEWS_IFRAME;
 import static com.zzz.technoparkmobileproject.TechnoparkApplication.NEWS_IMG;
 import static com.zzz.technoparkmobileproject.TechnoparkApplication.NEWS_O1;
 import static com.zzz.technoparkmobileproject.TechnoparkApplication.NEWS_P;
@@ -337,7 +338,7 @@ public class NewsFragment extends Fragment {
                 type = mText.get(position).getType();
             }
             if (type.equals(NEWS_P) || type.equals(NEWS_H4) || type.equals(NEWS_H5) || type.equals(NEWS_H6) || type.equals(NEWS_O1)
-                    || type.equals(NEWS_CODE) || type.equals(NEWS_BLOCKQOTE) || type.equals(NEWS_PRE) || type.equals(NEWS_U1)/* || type.equals("iframe")*/) {
+                    || type.equals(NEWS_CODE) || type.equals(NEWS_BLOCKQOTE) || type.equals(NEWS_PRE) || type.equals(NEWS_U1) || (type.equals(NEWS_IFRAME) && text.contains("https://www.youtube.com/"))) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                     holder.mTextNews.setText(Html.fromHtml(secretData.deleteEnter(text), Html.FROM_HTML_MODE_COMPACT));
                 } else {

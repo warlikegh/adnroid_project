@@ -255,12 +255,17 @@ public class ScheduleFragment extends Fragment {
                 R.drawable.shape_purple_start,
                 R.drawable.shape_red_dark_start,
                 R.drawable.shape_blue_dark_start};
+        String[] daysOfTheWeek;
 
         public void setSchedule(List<UserSchedule> schedule, String disciplineText, boolean defaultTime) {
             mWholeSchedule = schedule;
             discipline = disciplineText;
             isDefaultTime = defaultTime;
             filter(discipline, isDefaultTime);
+            daysOfTheWeek = new String[]{getResources().getString(R.string.monday), getResources().getString(R.string.tuesday),
+                    getResources().getString(R.string.wednesday), getResources().getString(R.string.thursday),
+                    getResources().getString(R.string.friday), getResources().getString(R.string.saturday),
+                    getResources().getString(R.string.sunday)};
             notifyDataSetChanged();
         }
 
@@ -311,8 +316,8 @@ public class ScheduleFragment extends Fragment {
         @NonNull
         @Override
         public ScheduleViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-                return new ScheduleViewHolder(LayoutInflater.from(parent.getContext())
-                        .inflate(R.layout.schedule_item, parent, false));
+            return new ScheduleViewHolder(LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.schedule_item, parent, false));
         }
 
         @Override
@@ -322,15 +327,17 @@ public class ScheduleFragment extends Fragment {
                 holder.mScheduleLayout.setVisibility(View.VISIBLE);
                 final UserSchedule schedule = mSchedule.get(position);
 
-                String date = new SecretData().getDateString(schedule.getDate());
-                holder.mDateSchedule.setText(date);
                 holder.mDiscipline.setText(schedule.getDiscipline());
                 holder.mShortTitle.setText(schedule.getShortTitle());
                 holder.mLocation.setText(schedule.getLocation());
 
-
                 Date now = new Date();
                 Date end = new SecretData().getDate(schedule.getEndTime());
+                String date = new SecretData().getDateString(schedule.getDate());
+                Calendar calendar = Calendar.getInstance();
+                calendar.setTime(end);
+                String dayOfWeek = daysOfTheWeek[calendar.get(Calendar.DAY_OF_WEEK) - 2];
+                holder.mDateSchedule.setText(String.format("%s\n%s", date, dayOfWeek));
                 if (now.after(end))
                     holder.mSeparator1.setBackground(getResources().getDrawable(R.drawable.shape_done_start, null));
                 else
@@ -366,7 +373,6 @@ public class ScheduleFragment extends Fragment {
             } else {
                 holder.mScheduleLayout.setVisibility(GONE);
                 holder.mNoSchedule.setVisibility(View.VISIBLE);
-
             }
         }
 

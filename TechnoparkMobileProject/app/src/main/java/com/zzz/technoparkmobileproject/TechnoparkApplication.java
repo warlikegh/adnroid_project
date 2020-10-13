@@ -48,6 +48,7 @@ public class TechnoparkApplication extends Application {
     public static String NEWS_H6 = "h6";
     public static String NEWS_PRE = "pre";
     public static String NEWS_IMG = "img";
+    public static String NEWS_IFRAME = "iframe";
     public static String DEFAULT_TWO_WEEK = "default_two_week";
     public static String DISCIPLINE = "discipline";
     public static String PROFILE_ID = "profile_ID"; // in change case you need change it in mobile_navigation.xml
@@ -71,7 +72,7 @@ public class TechnoparkApplication extends Application {
         ALL_DISCIPLINES = getResources().getString(R.string.all_disciplines);
         mSecretSettings = new SecretData().getSecretData(getApplicationContext());
         mSecretEditor = mSecretSettings.edit();
-        mSecretEditor.putString(SALT, "").apply();
+        mSecretEditor.putString(SALT, "salt").apply();
 
         mApiRepo = new ApiRepo(getApplicationContext());
         mAuthRepo = new AuthRepo(mApiRepo);
